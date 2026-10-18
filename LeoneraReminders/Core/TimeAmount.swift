@@ -119,6 +119,16 @@ struct TimeOfDay: Codable, Hashable, Sendable, Comparable {
         return calendar.date(from: parts) ?? date
     }
 
+    /// Esta hora el día de `date`; si eso ya pasó, la próxima vez que llegue después de `now` (hoy o mañana).
+    func nextOccurrence(from date: Date, now: Date, calendar: Calendar = .current) -> Date {
+        let sameDay = applied(to: date, calendar: calendar)
+        guard sameDay <= now else { return sameDay }
+        let today = applied(to: now, calendar: calendar)
+        guard today <= now else { return today }
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+        return applied(to: tomorrow, calendar: calendar)
+    }
+
     static func < (lhs: TimeOfDay, rhs: TimeOfDay) -> Bool {
         (lhs.hour, lhs.minute) < (rhs.hour, rhs.minute)
     }

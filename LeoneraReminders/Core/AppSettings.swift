@@ -74,8 +74,8 @@ enum OverdueAdditionBase: String, Codable, CaseIterable, Sendable, Identifiable 
 }
 
 extension QuickAdjustGrid.Cell {
-    /// Aplica la celda a `date`. Si `date` ya pasó y `overdueBase` es `.now`, las sumas cuentan desde `now`;
-    /// fijar la hora y restar siempre parten de `date`.
+    /// Aplica la celda a `date`. Con `overdueBase` en `.now`, si `date` ya pasó las sumas cuentan desde `now`,
+    /// y si la hora fijada ya pasó se usa su próxima vez (hoy o mañana). Restar siempre parte de `date`.
     func apply(
         to date: Date,
         now: Date = Date(),
@@ -83,7 +83,7 @@ extension QuickAdjustGrid.Cell {
         calendar: Calendar = .current
     ) -> Date {
         switch self {
-        case .setTime(let time): time.applied(to: date, calendar: calendar)
+        case .setTime(let time): overdueBase == .now ? time.nextOccurrence(from: date, now: now, calendar: calendar) : time.applied(to: date, calendar: calendar)
         case .add(let amount): amount.added(to: overdueBase == .now && date <= now ? now : date, calendar: calendar)
         case .subtract(let amount): amount.subtracted(from: date, calendar: calendar)
         }

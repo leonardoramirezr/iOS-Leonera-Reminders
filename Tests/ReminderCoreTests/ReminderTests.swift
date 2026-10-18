@@ -196,6 +196,12 @@ struct QuickAdjustGridTests {
         #expect(rows[1][1].apply(to: start, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 16, 15, 1))
         #expect(rows[2][0].apply(to: start, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 16, 10, 57))
         #expect(rows[0][3].apply(to: start, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 16, 21, 0))
+        // Desde ahora: una hora fija que ya pasó se va al día siguiente.
+        #expect(rows[0][0].apply(to: start, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 17, 10, 0))
+        #expect(rows[0][0].apply(to: start, now: now, calendar: mexico) == local(2026, 10, 16, 10, 0))
+        let daysAgo = local(2026, 10, 12, 9)
+        #expect(rows[0][2].apply(to: daysAgo, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 16, 18, 0))
+        #expect(rows[0][1].apply(to: daysAgo, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 17, 14, 0))
         let future = local(2026, 10, 16, 18)
         #expect(rows[1][0].apply(to: future, now: now, overdueBase: .now, calendar: mexico) == local(2026, 10, 16, 18, 10))
     }
