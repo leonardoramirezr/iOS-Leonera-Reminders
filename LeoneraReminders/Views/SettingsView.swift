@@ -200,7 +200,7 @@ struct SettingsView: View {
         case .dueDate:
             "Si el recordatorio ya venció, +10 min, +1 h, etc. suman a su fecha límite, aunque ya haya pasado."
         case .now:
-            "Si el recordatorio ya venció, +10 min, +1 h, etc. suman desde ahora, como al posponer. Restar y fijar la hora siempre parten de la fecha límite."
+            "Si el recordatorio ya venció, +10 min, +1 h, etc. suman desde ahora, como al posponer, y fijar una hora que ya pasó la pone al día siguiente. Restar siempre parte de la fecha límite."
         }
     }
 

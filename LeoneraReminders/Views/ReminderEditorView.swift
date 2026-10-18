@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ReminderEditorView: View {
     @Environment(ReminderStore.self) private var store
@@ -43,6 +44,7 @@ struct ReminderEditorView: View {
                     DatePicker("Fecha y hora", selection: dueDate)
                     QuickAdjustGridView(grid: settingsStore.settings.quickAdjustGrid) { _, _, cell in
                         let adjusted = cell.apply(to: draft.dueDate, overdueBase: settingsStore.settings.overdueAdditionBase)
+                        vibrate()
                         withAnimation(.snappy) { dueDate.wrappedValue = adjusted }
                     }
                     .padding(.vertical, 4)
@@ -70,7 +72,7 @@ struct ReminderEditorView: View {
                         } else {
                             SlideToConfirm(title: draft.repeatRule == nil ? "Desliza para completar" : "Desliza para completar esta vez") {
                                 draft.complete()
-                                save()
+                                save(vibrating: false)
                             }
                             .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
                         }
@@ -82,7 +84,10 @@ struct ReminderEditorView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
+                    Button("Cancelar") {
+                        vibrate()
+                        dismiss()
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Guardar") { save() }
@@ -101,8 +106,10 @@ struct ReminderEditorView: View {
         }
     }
 
-    private func save() {
+    /// La misma vibración que al completar (`SlideToConfirm` ya vibra por su cuenta).
+    private func save(vibrating: Bool = true) {
         guard !trimmedTitle.isEmpty else { return }
+        if vibrating { vibrate() }
         var reminder = draft
         reminder.title = trimmedTitle
         if isNew {
@@ -111,5 +118,11 @@ struct ReminderEditorView: View {
             store.update(reminder)
         }
         dismiss()
+    }
+
+    /// Vibra igual que al marcar como completado. Se lanza directo porque Guardar y Cancelar cierran la hoja
+    /// y un `.sensoryFeedback` ya no alcanzaría a sonar.
+    private func vibrate() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 }
