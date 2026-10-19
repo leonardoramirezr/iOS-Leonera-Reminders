@@ -1,13 +1,19 @@
 # CLAUDE.md
 
-## Resumen al terminar una tarea
+## Language
 
-Cada vez que termines una tarea y escribas el resumen de los cambios implementados, incluye el nombre del
-build que contiene esos cambios, por ejemplo `build-30-1bca82e`.
+Everything written in the repository must be in English: Markdown files, code comments, docstrings and
+documentation comments, and the names of functions, methods, classes, structs, enums, protocols, variables,
+constants, objects, files and tests.
 
-- El workflow `.github/workflows/build.yml` nombra los builds de ramas distintas de `main` como
-  `build-<N>-<commit>`: `N` es el número de ejecución del workflow (`GITHUB_RUN_NUMBER`) y `commit` son los
-  7 primeros caracteres del hash del commit (`git rev-parse --short=7 HEAD`).
-- En `main` el build es la versión `0.x.0` que calcula el mismo workflow.
-- Obtén `N` después de hacer push, consultando la ejecución de *Build IPA* para ese commit en GitHub Actions.
-  Si todavía no aparece, indícalo en el resumen junto con el commit corto (`build-<N>-1bca82e`).
+## Summary at the end of a task
+
+Whenever you finish a task and write the summary of the implemented changes, include the name of the build
+that contains those changes, for example `build-30-1bca82e`.
+
+- The `.github/workflows/build.yml` workflow names builds of branches other than `main` as
+  `build-<N>-<commit>`: `N` is the workflow run number (`GITHUB_RUN_NUMBER`) and `commit` is the first
+  7 characters of the commit hash (`git rev-parse --short=7 HEAD`).
+- On `main` the build is the `0.x.0` version computed by the same workflow.
+- Get `N` after pushing, by looking up the *Build IPA* run for that commit in GitHub Actions.
+  If it does not show up yet, say so in the summary and give the short commit (`build-<N>-1bca82e`).
