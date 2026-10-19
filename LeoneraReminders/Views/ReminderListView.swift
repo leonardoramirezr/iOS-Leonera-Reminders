@@ -7,6 +7,7 @@ struct ReminderListView: View {
     @Environment(SettingsStore.self) private var settingsStore
     @Environment(AlarmSyncService.self) private var alarms
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var editing: EditorTarget?
     @State private var assistant: AssistantSource?
@@ -123,8 +124,10 @@ struct ReminderListView: View {
         } message: {
             Text(exportError ?? "")
         }
-        .onChange(of: store.pendingOptionsReminderID, initial: true) { _, id in
-            // La alarma pidió completar o posponer.
+        // The alarm asked to complete or snooze. The sheet waits until the scene is active: presenting it
+        // while the system was still bringing the app to the foreground (or on a cold launch, before the
+        // window was on screen) made the screen flash black before the sheet rose.
+        .onChange(of: scenePhase == .active ? store.pendingOptionsReminderID : nil, initial: true) { _, id in
             guard let id else { return }
             // Se vibra aquí (y no al tocar el botón) porque es cuando la app ya está al frente.
             Haptics.success()
