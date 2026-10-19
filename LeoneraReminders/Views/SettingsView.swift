@@ -211,10 +211,11 @@ struct SettingsView: View {
                 Text("De derecha a izquierda").tag(SwipeCompleteDirection.rightToLeft)
                 Text("De izquierda a derecha").tag(SwipeCompleteDirection.leftToRight)
             }
+            Toggle("Fuegos artificiales al completar", isOn: settings.celebratesCompletion)
         } header: {
             Text("Lista")
         } footer: {
-            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y «Posponer».")
+            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y «Posponer». Los fuegos artificiales no aparecen si «Reducir movimiento» está activado en Accesibilidad.")
         }
     }
 

@@ -86,6 +86,8 @@ struct ReminderActionSheet: View {
                 }
 
                 SlideToConfirm(title: "Desliza para completar") {
+                    // Right away: the rockets climb while the sheet closes.
+                    Celebration.celebrateCompletion()
                     Task {
                         // Deja ver la palomita un instante antes de cerrar.
                         try? await Task.sleep(for: .milliseconds(350))

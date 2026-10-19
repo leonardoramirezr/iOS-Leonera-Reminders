@@ -385,6 +385,7 @@ struct ReminderListView: View {
     private func complete(_ reminder: Reminder) {
         withAnimation { store.complete(id: reminder.id) }
         completedTrigger += 1
+        Celebration.celebrateCompletion()
     }
 
     /// Los que no se repiten (o ya no tienen otra fecha) pasan a «Completados».

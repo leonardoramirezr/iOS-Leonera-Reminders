@@ -73,6 +73,7 @@ struct ReminderEditorView: View {
                             SlideToConfirm(title: draft.repeatRule == nil ? "Desliza para completar" : "Desliza para completar esta vez") {
                                 draft.complete()
                                 save(vibrating: false)
+                                Celebration.celebrateCompletion()
                             }
                             .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
                         }

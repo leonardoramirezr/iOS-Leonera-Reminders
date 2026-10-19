@@ -187,6 +187,8 @@ struct AppSettings: Codable, Hashable, Sendable {
     var ignoresSilentMode = true
     /// Hacia dónde se desliza una fila para completarla.
     var swipeCompleteDirection: SwipeCompleteDirection = .rightToLeft
+    /// Play fireworks when a reminder is completed in the app.
+    var celebratesCompletion = true
     /// Modelos de Groq para crear recordatorios con voz, texto o fotos.
     var assistant: AssistantSettings = .default
 
@@ -205,6 +207,7 @@ struct AppSettings: Codable, Hashable, Sendable {
         sound: .bell,
         ignoresSilentMode: true,
         swipeCompleteDirection: .rightToLeft,
+        celebratesCompletion: true,
         assistant: .default
     )
 
@@ -223,7 +226,7 @@ struct AppSettings: Codable, Hashable, Sendable {
 extension AppSettings {
     private enum CodingKeys: String, CodingKey {
         case snoozeOptions, defaultSnooze, stopAction, secondaryAction, quickAdjustGrid, overdueAdditionBase, followUp, sound, ignoresSilentMode
-        case swipeCompleteDirection, assistant
+        case swipeCompleteDirection, celebratesCompletion, assistant
     }
 
     init(from decoder: any Decoder) throws {
@@ -241,6 +244,7 @@ extension AppSettings {
             ignoresSilentMode: (try? c.decodeIfPresent(Bool.self, forKey: .ignoresSilentMode)) ?? fallback.ignoresSilentMode,
             swipeCompleteDirection: (try? c.decodeIfPresent(SwipeCompleteDirection.self, forKey: .swipeCompleteDirection))
                 ?? fallback.swipeCompleteDirection,
+            celebratesCompletion: (try? c.decodeIfPresent(Bool.self, forKey: .celebratesCompletion)) ?? fallback.celebratesCompletion,
             assistant: (try? c.decodeIfPresent(AssistantSettings.self, forKey: .assistant)) ?? fallback.assistant
         )
     }
