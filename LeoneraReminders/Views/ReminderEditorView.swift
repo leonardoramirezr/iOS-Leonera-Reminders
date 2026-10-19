@@ -123,6 +123,6 @@ struct ReminderEditorView: View {
     /// Vibra igual que al marcar como completado. Se lanza directo porque Guardar y Cancelar cierran la hoja
     /// y un `.sensoryFeedback` ya no alcanzaría a sonar.
     private func vibrate() {
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        Haptics.success()
     }
 }
