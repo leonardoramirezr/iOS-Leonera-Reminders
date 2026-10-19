@@ -91,6 +91,7 @@ struct ReminderActionSheet: View {
                         try? await Task.sleep(for: .milliseconds(350))
                         store.complete(id: reminder.id)
                         dismiss()
+                        FireworksPresenter.shared.celebrate()
                     }
                 }
 
