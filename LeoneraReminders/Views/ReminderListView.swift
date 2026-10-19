@@ -124,13 +124,11 @@ struct ReminderListView: View {
         } message: {
             Text(exportError ?? "")
         }
-        // The alarm asked to complete or snooze. The sheet waits until the scene is active and the system
-        // has finished bringing the app to the foreground: presenting it during that transition (or on a
-        // cold launch, before the window is on screen) made the screen flash black before the sheet rose.
-        .task(id: scenePhase == .active ? store.pendingOptionsReminderID : nil) {
-            guard scenePhase == .active, let id = store.pendingOptionsReminderID else { return }
-            try? await Task.sleep(for: .milliseconds(300))
-            guard !Task.isCancelled, store.pendingOptionsReminderID == id else { return }
+        // The alarm asked to complete or snooze. The sheet waits until the scene is active: presenting it
+        // while the system was still bringing the app to the foreground (or on a cold launch, before the
+        // window was on screen) made the screen flash black before the sheet rose.
+        .onChange(of: scenePhase == .active ? store.pendingOptionsReminderID : nil, initial: true) { _, id in
+            guard let id else { return }
             // Se vibra aquí (y no al tocar el botón) porque es cuando la app ya está al frente.
             Haptics.success()
             store.pendingOptionsReminderID = nil

@@ -13,18 +13,23 @@ struct ReminderActionSheet: View {
 
     private let columns = [GridItem(.adaptive(minimum: 96), spacing: 8)]
 
-    /// Alto del contenido, para abrir la hoja justo del tamaño necesario y no tener que desplazarse.
-    @State private var contentHeight: CGFloat
+    /// The sheet's only detent, fitted to the content so it opens at the needed height without scrolling.
+    /// It is both the detent set and the selection, so the sheet always sits on it and never falls back
+    /// to full screen when the measured height changes.
+    @State private var detent: PresentationDetent
 
     /// Last measured content height, persisted so the sheet opens straight at its final height
-    /// (even on a cold launch from the alarm's "Abrir app" button) instead of rising to `.large`
-    /// and then shrinking once the content is measured.
+    /// (even on a cold launch from the alarm's "Abrir app" button).
     private static let contentHeightKey = "reminderActionSheet.contentHeight"
+
+    /// Used until the content has been measured once; close to the usual height, never full screen.
+    private static let estimatedContentHeight: CGFloat = 460
 
     init(reminderID: UUID, onEdit: @escaping () -> Void) {
         self.reminderID = reminderID
         self.onEdit = onEdit
-        _contentHeight = State(initialValue: CGFloat(UserDefaults.standard.double(forKey: Self.contentHeightKey)))
+        let stored = CGFloat(UserDefaults.standard.double(forKey: Self.contentHeightKey))
+        _detent = State(initialValue: Self.fittedDetent(contentHeight: stored > 0 ? stored : Self.estimatedContentHeight))
     }
 
     var body: some View {
@@ -44,17 +49,21 @@ struct ReminderActionSheet: View {
                 }
             }
         }
-        // A single detent: with `.large` alongside and a selection, swapping the fitted detent when the
-        // measured height changed could leave the sheet expanded to full screen.
-        .presentationDetents([fittedDetent])
-        .onChange(of: contentHeight) {
-            UserDefaults.standard.set(Double(contentHeight), forKey: Self.contentHeightKey)
-        }
+        .presentationDetents([detent], selection: $detent)
     }
 
     /// Contenido más la barra de navegación y el tirador de la hoja.
-    private var fittedDetent: PresentationDetent {
-        contentHeight > 0 ? .height(contentHeight + 72) : .large
+    private static func fittedDetent(contentHeight: CGFloat) -> PresentationDetent {
+        .height(contentHeight + 72)
+    }
+
+    private func contentSizeChanged(_ size: CGSize) {
+        // Before the sheet has its width the text wraps into a much taller column; that height is not real.
+        guard size.width > 0, size.height > 0 else { return }
+        let fitted = Self.fittedDetent(contentHeight: size.height)
+        guard fitted != detent else { return }
+        detent = fitted
+        UserDefaults.standard.set(Double(size.height), forKey: Self.contentHeightKey)
     }
 
     private func content(for reminder: Reminder) -> some View {
@@ -105,7 +114,9 @@ struct ReminderActionSheet: View {
             }
             .padding()
             // Rounded so sub-point differences between layout passes do not resize the sheet.
-            .onGeometryChange(for: CGFloat.self, of: { $0.size.height.rounded(.up) }) { contentHeight = $0 }
+            .onGeometryChange(for: CGSize.self, of: {
+                CGSize(width: $0.size.width.rounded(.up), height: $0.size.height.rounded(.up))
+            }) { contentSizeChanged($0) }
         }
     }
 }
