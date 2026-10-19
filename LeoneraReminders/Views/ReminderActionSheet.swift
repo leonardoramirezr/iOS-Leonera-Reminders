@@ -14,8 +14,18 @@ struct ReminderActionSheet: View {
     private let columns = [GridItem(.adaptive(minimum: 96), spacing: 8)]
 
     /// Alto del contenido, para abrir la hoja justo del tamaño necesario y no tener que desplazarse.
-    @State private var contentHeight: CGFloat = 0
-    @State private var detent: PresentationDetent = .large
+    @State private var contentHeight: CGFloat
+
+    /// Last measured content height, persisted so the sheet opens straight at its final height
+    /// (even on a cold launch from the alarm's "Abrir app" button) instead of rising to `.large`
+    /// and then shrinking once the content is measured.
+    private static let contentHeightKey = "reminderActionSheet.contentHeight"
+
+    init(reminderID: UUID, onEdit: @escaping () -> Void) {
+        self.reminderID = reminderID
+        self.onEdit = onEdit
+        _contentHeight = State(initialValue: CGFloat(UserDefaults.standard.double(forKey: Self.contentHeightKey)))
+    }
 
     var body: some View {
         NavigationStack {
@@ -34,19 +44,17 @@ struct ReminderActionSheet: View {
                 }
             }
         }
-        .presentationDetents(fittedDetents, selection: $detent)
+        // A single detent: with `.large` alongside and a selection, swapping the fitted detent when the
+        // measured height changed could leave the sheet expanded to full screen.
+        .presentationDetents([fittedDetent])
         .onChange(of: contentHeight) {
-            if let fitted { detent = fitted }
+            UserDefaults.standard.set(Double(contentHeight), forKey: Self.contentHeightKey)
         }
     }
 
     /// Contenido más la barra de navegación y el tirador de la hoja.
-    private var fitted: PresentationDetent? {
-        contentHeight > 0 ? .height(contentHeight + 72) : nil
-    }
-
-    private var fittedDetents: Set<PresentationDetent> {
-        fitted.map { [$0, .large] } ?? [.large]
+    private var fittedDetent: PresentationDetent {
+        contentHeight > 0 ? .height(contentHeight + 72) : .large
     }
 
     private func content(for reminder: Reminder) -> some View {
@@ -96,7 +104,8 @@ struct ReminderActionSheet: View {
                 }
             }
             .padding()
-            .onGeometryChange(for: CGFloat.self, of: \.size.height) { contentHeight = $0 }
+            // Rounded so sub-point differences between layout passes do not resize the sheet.
+            .onGeometryChange(for: CGFloat.self, of: { $0.size.height.rounded(.up) }) { contentHeight = $0 }
         }
     }
 }
