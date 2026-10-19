@@ -28,6 +28,7 @@ struct SettingsView: View {
                 gridSection
                 listSection
                 permissionSection
+                aboutSection
             }
             .navigationTitle("Configuración")
             .navigationBarTitleDisplayMode(.inline)
@@ -239,6 +240,23 @@ struct SettingsView: View {
                 Text(error).font(.footnote).foregroundStyle(.secondary)
             }
         }
+    }
+
+    private var aboutSection: some View {
+        Section("Acerca de") {
+            LabeledContent("Build", value: Self.buildName)
+                .textSelection(.enabled)
+        }
+    }
+
+    /// The name the Build IPA workflow gives this build (`build-48-10cac63` on a branch, `0.x.0` on main).
+    /// Builds made outside the workflow fall back to the version and build number.
+    private static var buildName: String {
+        let info = Bundle.main.infoDictionary ?? [:]
+        if let name = info["LeoneraBuildName"] as? String, !name.isEmpty { return name }
+        let version = info["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
     }
 }
 

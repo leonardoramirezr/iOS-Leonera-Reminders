@@ -145,7 +145,8 @@ jobs:
             CODE_SIGN_STYLE=Automatic \
             APP_BUNDLE_ID="${{ steps.ids.outputs.bundle }}" \
             MARKETING_VERSION="${{ steps.version.outputs.marketing }}" \
-            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            LEONERA_BUILD_NAME="${{ steps.version.outputs.tag }}"
 
       - name: Exportar Ad Hoc y verificar los perfiles
         id: export
@@ -279,6 +280,7 @@ jobs:
             APP_BUNDLE_ID="${{ steps.ids.outputs.bundle }}" \
             MARKETING_VERSION="${{ steps.version.outputs.marketing }}" \
             CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            LEONERA_BUILD_NAME="${{ steps.version.outputs.tag }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""

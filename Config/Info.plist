@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LeoneraBuildName</key>
+	<string>$(LEONERA_BUILD_NAME)</string>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Leonera usa alarmas para que cada recordatorio suene a su hora, aunque el teléfono esté en silencio o en un modo de concentración.</string>
 	<key>NSMicrophoneUsageDescription</key>
