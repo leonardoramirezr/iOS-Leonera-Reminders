@@ -178,7 +178,8 @@ final class FireworksSimulation {
         let palette = Self.randomPalette()
 
         // A big classic shell opens the show; the rest are all different from each other.
-        let opener: ShellKind = [.peony, .chrysanthemum, .ring].randomElement() ?? .peony
+        let openers: [ShellKind] = [.peony, .chrysanthemum, .ring]
+        let opener = openers.randomElement() ?? .peony
         var kinds = [opener]
         kinds += ShellKind.allCases.filter { $0 != opener }.shuffled().prefix(count - 1)
 
@@ -213,7 +214,8 @@ final class FireworksSimulation {
     /// Two or three hues that look good together: complementary, triadic, analogous or split.
     private static func randomPalette() -> [FireworkColor] {
         let base = Double.random(in: 0..<1)
-        let offsets = [[0, 0.5], [0, 1.0 / 3, 2.0 / 3], [0, 0.08, 0.92], [0, 0.12, 0.5]].randomElement() ?? [0, 0.5]
+        let schemes: [[Double]] = [[0, 0.5], [0, 1.0 / 3, 2.0 / 3], [0, 0.08, 0.92], [0, 0.12, 0.5]]
+        let offsets = schemes.randomElement() ?? [0, 0.5]
         return offsets.map {
             FireworkColor(
                 hue: base + $0 + Double.random(in: -0.02...0.02),
@@ -259,7 +261,7 @@ final class FireworksSimulation {
                 let head = rocket.position(at: time - rocket.trailDebt, in: canvasSize)
                 sparks.append(Spark(
                     position: CGPoint(x: head.x + CGFloat.random(in: -1...1), y: head.y + CGFloat.random(in: -1...1)),
-                    velocity: CGVector(dx: .random(in: -18...18), dy: .random(in: 10...55)),
+                    velocity: CGVector(dx: CGFloat.random(in: -18...18), dy: CGFloat.random(in: 10...55)),
                     lifetime: .random(in: 0.22...0.5),
                     color: .warmWhite,
                     endColor: .ember,
@@ -481,7 +483,7 @@ final class FireworksSimulation {
     private func ember(at position: CGPoint, color: FireworkColor) -> Spark {
         Spark(
             position: CGPoint(x: position.x + CGFloat.random(in: -1.5...1.5), y: position.y + CGFloat.random(in: -1.5...1.5)),
-            velocity: CGVector(dx: .random(in: -14...14), dy: .random(in: -6...20)),
+            velocity: CGVector(dx: CGFloat.random(in: -14...14), dy: CGFloat.random(in: -6...20)),
             lifetime: .random(in: 0.35...0.7),
             color: color.mixed(with: .white, by: 0.3),
             endColor: .ember,

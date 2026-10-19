@@ -8,13 +8,18 @@ struct FireworksView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
+    init(simulation: FireworksSimulation, onFinished: @escaping () -> Void) {
+        self.simulation = simulation
+        self.onFinished = onFinished
+    }
+
     var body: some View {
         TimelineView(.animation) { timeline in
             Canvas { context, size in
                 simulation.advance(to: timeline.date, size: size)
                 FireworksRenderer(simulation: simulation, isDark: colorScheme == .dark).draw(in: &context, size: size)
                 if simulation.takeFinish() {
-                    DispatchQueue.main.async(execute: onFinished)
+                    DispatchQueue.main.async { onFinished() }
                 }
             }
         }
