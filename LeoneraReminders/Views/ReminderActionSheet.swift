@@ -13,6 +13,10 @@ struct ReminderActionSheet: View {
 
     private let columns = [GridItem(.adaptive(minimum: 96), spacing: 8)]
 
+    /// Alto del contenido, para abrir la hoja justo del tamaño necesario y no tener que desplazarse.
+    @State private var contentHeight: CGFloat = 0
+    @State private var detent: PresentationDetent = .large
+
     var body: some View {
         NavigationStack {
             Group {
@@ -30,7 +34,19 @@ struct ReminderActionSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents(fittedDetents, selection: $detent)
+        .onChange(of: contentHeight) {
+            if let fitted { detent = fitted }
+        }
+    }
+
+    /// Contenido más la barra de navegación y el tirador de la hoja.
+    private var fitted: PresentationDetent? {
+        contentHeight > 0 ? .height(contentHeight + 72) : nil
+    }
+
+    private var fittedDetents: Set<PresentationDetent> {
+        fitted.map { [$0, .large] } ?? [.large]
     }
 
     private func content(for reminder: Reminder) -> some View {
@@ -60,6 +76,7 @@ struct ReminderActionSheet: View {
                     LazyVGrid(columns: columns, spacing: 8) {
                         ForEach(settingsStore.settings.sortedSnoozeOptions) { option in
                             Button {
+                                Haptics.success()
                                 store.snooze(id: reminder.id, by: option)
                                 dismiss()
                             } label: {
@@ -73,9 +90,13 @@ struct ReminderActionSheet: View {
                     }
                 }
 
-                Button("Elegir otra fecha…", action: onEdit)
+                Button("Elegir otra fecha…") {
+                    Haptics.success()
+                    onEdit()
+                }
             }
             .padding()
+            .onGeometryChange(for: CGFloat.self, of: \.size.height) { contentHeight = $0 }
         }
     }
 }

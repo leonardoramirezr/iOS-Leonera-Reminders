@@ -68,6 +68,8 @@ enum AlarmActionHandler {
     }
 
     static func perform(_ action: AlarmAction, reminderID: String, alarmID: String) async {
+        // «Abrir app» vibra al mostrar la hoja, ya con la app al frente (ver `ReminderListView`).
+        if action != .snoozeOptions { Haptics.success() }
         let alarm = UUID(uuidString: alarmID)
         if let alarm { try? AlarmManager.shared.stop(id: alarm) }
 

@@ -126,6 +126,8 @@ struct ReminderListView: View {
         .onChange(of: store.pendingOptionsReminderID, initial: true) { _, id in
             // La alarma pidió completar o posponer.
             guard let id else { return }
+            // Se vibra aquí (y no al tocar el botón) porque es cuando la app ya está al frente.
+            Haptics.success()
             store.pendingOptionsReminderID = nil
             editing = nil
             assistant = nil
