@@ -5,6 +5,9 @@ import UIKit
 /// Se abre desde la lista o desde el botón «Abrir app» de la alarma.
 struct ReminderActionSheet: View {
     let reminderID: UUID
+    /// The reminder was confirmed as completed. The presenter completes it in the store once the sheet
+    /// has closed, so the list animates its row while nothing covers it.
+    let onComplete: () -> Void
     /// Abre el editor para elegir otra fecha.
     let onEdit: () -> Void
 
@@ -30,8 +33,9 @@ struct ReminderActionSheet: View {
     /// the text and the grid wrap into a far taller column; those heights are not real.
     private static let minimumMeasuredWidth: CGFloat = 300
 
-    init(reminderID: UUID, onEdit: @escaping () -> Void) {
+    init(reminderID: UUID, onComplete: @escaping () -> Void, onEdit: @escaping () -> Void) {
         self.reminderID = reminderID
+        self.onComplete = onComplete
         self.onEdit = onEdit
         let stored = CGFloat(UserDefaults.standard.double(forKey: Self.contentHeightKey))
         _sheetHeight = State(initialValue: Self.fittedHeight(contentHeight: stored > 0 ? stored : Self.estimatedContentHeight))
@@ -86,10 +90,11 @@ struct ReminderActionSheet: View {
                 }
 
                 SlideToConfirm(title: "Desliza para completar") {
+                    // Right away, so it is still completed if the sheet is closed during the pause.
+                    onComplete()
                     Task {
                         // Deja ver la palomita un instante antes de cerrar.
                         try? await Task.sleep(for: .milliseconds(350))
-                        store.complete(id: reminder.id)
                         dismiss()
                         FireworksPresenter.shared.celebrate()
                     }
