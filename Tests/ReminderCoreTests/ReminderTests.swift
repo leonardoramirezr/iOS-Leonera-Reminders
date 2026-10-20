@@ -282,6 +282,16 @@ struct AppSettingsTests {
         #expect(decoded.swipeCompleteDirection == .leftToRight)
     }
 
+    @Test func celebratesCompletionDefaultsToOnAndRoundTrips() throws {
+        #expect(AppSettings.default.celebratesCompletion)
+        let legacy = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"stopAction":"snooze"}"#.utf8))
+        #expect(legacy.celebratesCompletion)
+        var settings = AppSettings.default
+        settings.celebratesCompletion = false
+        let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
+        #expect(!decoded.celebratesCompletion)
+    }
+
     @Test func sortedSnoozeOptionsRemovesDuplicates() {
         var settings = AppSettings.default
         settings.snoozeOptions = [.hours(1), .minutes(5), .hours(1), .minutes(1)]
