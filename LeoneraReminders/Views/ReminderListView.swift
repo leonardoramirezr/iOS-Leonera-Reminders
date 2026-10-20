@@ -23,6 +23,8 @@ struct ReminderListView: View {
     @State private var searchText = ""
     @State private var isSearching = false
     @State private var completedTrigger = 0
+    /// Reminder completed from the action sheet; the list removes it once the sheet has closed.
+    @State private var completingFromSheet: UUID?
 
     var body: some View {
         NavigationStack {
@@ -65,9 +67,11 @@ struct ReminderListView: View {
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
+                // Only the bar animates: on the whole stack these also animated the list with the
+                // completion (or deletion) that showed the toast, on top of the list's own animation.
+                .animation(.snappy, value: store.undoable?.id)
+                .animation(.snappy, value: isSearching)
             }
-            .animation(.snappy, value: store.undoable?.id)
-            .animation(.snappy, value: isSearching)
         }
         .sensoryFeedback(.success, trigger: completedTrigger)
         .sheet(item: $editing) { target in
@@ -79,8 +83,10 @@ struct ReminderListView: View {
             case .photo: PhotoCaptureView()
             }
         }
-        .sheet(item: $acting) { sheet in
+        .sheet(item: $acting, onDismiss: finishCompletionFromSheet) { sheet in
             ReminderActionSheet(reminderID: sheet.id) {
+                completingFromSheet = sheet.id
+            } onEdit: {
                 acting = nil
                 editing = .edit(sheet.id)
             }
@@ -148,8 +154,8 @@ struct ReminderListView: View {
 
             ForEach(grouped) { section in
                 Section {
-                    ForEach(section.reminders) { reminder in
-                        row(reminder, now: now)
+                    ForEach(section.rows) { item in
+                        row(item.reminder, now: now)
                     }
                 } header: {
                     Text(section.title)
@@ -168,8 +174,8 @@ struct ReminderListView: View {
                         )
                     }
                     if showCompleted {
-                        ForEach(completed) { reminder in
-                            row(reminder, now: now)
+                        ForEach(completed.map { SectionRow(sectionID: SectionKind.completed.id, reminder: $0) }) { item in
+                            row(item.reminder, now: now)
                         }
                     }
                 }
@@ -203,9 +209,10 @@ struct ReminderListView: View {
         }
         .swipeActions(edge: completeEdge) {
             if !reminder.isCompleted {
-                // Si al completarlo sale de su sección, la fila se desliza fuera como al eliminar
-                // en lugar de regresar a su lugar y luego desaparecer de golpe.
-                Button(role: leavesSectionWhenCompleted(reminder) ? .destructive : nil) {
+                // If completing moves it to another section (also a repeating one whose next date falls on
+                // another day), the row slides out as when deleting instead of springing back into place
+                // and then vanishing.
+                Button(role: leavesSectionWhenCompleted(reminder, now: now) ? .destructive : nil) {
                     complete(reminder)
                 } label: {
                     Label("Completar", systemImage: "checkmark")
@@ -348,51 +355,87 @@ struct ReminderListView: View {
         return store.reminders.filter { $0.title.localizedStandardContains(query) }
     }
 
+    private enum SectionKind: String, CaseIterable {
+        case overdue, today, tomorrow, week, later, completed
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .overdue: "Vencidos"
+            case .today: "Hoy"
+            case .tomorrow: "Mañana"
+            case .week: "Próximos 7 días"
+            case .later: "Más adelante"
+            case .completed: "Completados"
+            }
+        }
+
+        static func of(_ reminder: Reminder, now: Date, calendar: Calendar = .current) -> SectionKind {
+            if reminder.isCompleted { return .completed }
+            let today = calendar.startOfDay(for: now)
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? now
+            let dayAfter = calendar.date(byAdding: .day, value: 2, to: today) ?? now
+            let nextWeek = calendar.date(byAdding: .day, value: 8, to: today) ?? now
+            let date = reminder.dueDate
+            if date <= now { return .overdue }
+            if date < tomorrow { return .today }
+            if date < dayAfter { return .tomorrow }
+            if date < nextWeek { return .week }
+            return .later
+        }
+    }
+
     private struct ReminderSection: Identifiable {
-        let id: String
-        let title: String
+        let kind: SectionKind
         let reminders: [Reminder]
-        var isOverdue = false
+
+        var id: String { kind.id }
+        var title: String { kind.title }
+        var isOverdue: Bool { kind == .overdue }
+        var rows: [SectionRow] { reminders.map { SectionRow(sectionID: id, reminder: $0) } }
+    }
+
+    /// A reminder's row within a section. Its identity includes the section, so a reminder that changes
+    /// section (completed, snoozed, or a repeating one advanced to its next date) is removed from one and
+    /// inserted into the other: moving the row across sections of the inset grouped list drew the
+    /// section backgrounds and headers at their final places while the row was still traveling.
+    private struct SectionRow: Identifiable {
+        let sectionID: String
+        let reminder: Reminder
+
+        var id: String { "\(sectionID)/\(reminder.id)" }
     }
 
     private func sections(now: Date) -> [ReminderSection] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: now)
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? now
-        let dayAfter = calendar.date(byAdding: .day, value: 2, to: today) ?? now
-        let nextWeek = calendar.date(byAdding: .day, value: 8, to: today) ?? now
-
-        var overdue: [Reminder] = [], todays: [Reminder] = [], tomorrows: [Reminder] = []
-        var week: [Reminder] = [], later: [Reminder] = []
-        for reminder in filtered.filter({ !$0.isCompleted }).sorted(by: { $0.dueDate < $1.dueDate }) {
-            let date = reminder.dueDate
-            if date <= now { overdue.append(reminder) }
-            else if date < tomorrow { todays.append(reminder) }
-            else if date < dayAfter { tomorrows.append(reminder) }
-            else if date < nextWeek { week.append(reminder) }
-            else { later.append(reminder) }
-        }
-        return [
-            ReminderSection(id: "overdue", title: "Vencidos", reminders: overdue, isOverdue: true),
-            ReminderSection(id: "today", title: "Hoy", reminders: todays),
-            ReminderSection(id: "tomorrow", title: "Mañana", reminders: tomorrows),
-            ReminderSection(id: "week", title: "Próximos 7 días", reminders: week),
-            ReminderSection(id: "later", title: "Más adelante", reminders: later),
-        ].filter { !$0.reminders.isEmpty }
+        let pending = filtered.filter { !$0.isCompleted }.sorted { $0.dueDate < $1.dueDate }
+        let grouped = Dictionary(grouping: pending) { SectionKind.of($0, now: now) }
+        return SectionKind.allCases
+            .filter { $0 != .completed }
+            .compactMap { kind in grouped[kind].map { ReminderSection(kind: kind, reminders: $0) } }
     }
 
     /// Sólo desde el deslizamiento de la fila (que ya es un gesto deliberado).
     private func complete(_ reminder: Reminder) {
-        withAnimation { store.complete(id: reminder.id) }
+        withAnimation(.smooth) { store.complete(id: reminder.id) }
         completedTrigger += 1
         FireworksPresenter.shared.celebrate()
     }
 
-    /// Los que no se repiten (o ya no tienen otra fecha) pasan a «Completados».
-    private func leavesSectionWhenCompleted(_ reminder: Reminder) -> Bool {
+    /// Completes the reminder confirmed in the action sheet only after the sheet has finished closing, so
+    /// its row leaves the list in plain sight instead of while the list moves under the closing sheet.
+    private func finishCompletionFromSheet() {
+        guard let id = completingFromSheet else { return }
+        completingFromSheet = nil
+        withAnimation(.smooth) { store.complete(id: id) }
+    }
+
+    /// Whether completing moves the row to another section: «Completados» for the ones that do not
+    /// repeat (or have no other date), or the section of a repeating one's next date.
+    private func leavesSectionWhenCompleted(_ reminder: Reminder, now: Date) -> Bool {
         var completed = reminder
         completed.complete()
-        return completed.isCompleted
+        return SectionKind.of(completed, now: now) != SectionKind.of(reminder, now: now)
     }
 
     /// Todos los recordatorios (también los completados), en el formato que «Importar CSV…» vuelve a leer.
