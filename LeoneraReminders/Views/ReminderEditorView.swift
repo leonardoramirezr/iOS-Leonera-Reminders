@@ -45,7 +45,7 @@ struct ReminderEditorView: View {
                         ForEach(checklistItems) { $item in
                             HStack(spacing: 12) {
                                 Button {
-                                    item.isDone.toggle()
+                                    $item.isDone.wrappedValue.toggle()
                                 } label: {
                                     Image(systemName: item.isDone ? "checkmark.square.fill" : "square")
                                         .font(.title3)
@@ -54,7 +54,7 @@ struct ReminderEditorView: View {
                                 .buttonStyle(.borderless)
                                 .accessibilityLabel(item.isDone ? "Desmarcar casilla" : "Marcar casilla")
                                 TextField("Casilla", text: $item.title)
-                                    .focused($focusedItemID, equals: item.wrappedValue.id)
+                                    .focused($focusedItemID, equals: item.id)
                             }
                         }
                         .onDelete(perform: deleteChecklistItems)
