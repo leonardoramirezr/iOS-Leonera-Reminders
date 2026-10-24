@@ -22,12 +22,16 @@ final class FireworksScene: SKScene {
     private var scheduledLaunches = 0
     private var lastUpdateTime: TimeInterval?
     private var isFinishing = false
+    /// Set by `skip()`: the stars still in the air burn out faster instead of playing their full course.
+    private var isSkipping = false
     /// Scales the number of stars per shell (fewer in Low Power Mode).
     private var density: CGFloat = 1
     private var lastStyle: ShellStyle?
 
     /// Above this many live stars, embers are skipped so a pile of celebrations never drops frames.
     private static let starBudget = 2600
+    /// How much faster the remaining stars run once the show is skipped.
+    private static let skipSpeed: TimeInterval = 4
     private static let skyColor = UIColor(red: 0.02, green: 0.03, blue: 0.10, alpha: 1)
 
     /// Points per design unit: sizes and speeds are tuned for a 390 pt wide iPhone and scale from there.
@@ -65,6 +69,7 @@ final class FireworksScene: SKScene {
     func celebrate(reducedMotion: Bool, darkAppearance: Bool) {
         density = ProcessInfo.processInfo.isLowPowerModeEnabled ? 0.6 : 1
         isFinishing = false
+        isSkipping = false
         sky.removeAction(forKey: "sky")
         sky.run(.fadeAlpha(to: darkAppearance ? 0.42 : 0.58, duration: 0.35), withKey: "sky")
         impact.prepare()
@@ -90,6 +95,19 @@ final class FireworksScene: SKScene {
             // The finale goes off almost at once; the rest keep a loose, uneven rhythm.
             delay += isFinale ? .random(in: 0.06...0.18) : .random(in: 0.3...0.52)
         }
+    }
+
+    /// Ends the show early: the launches still waiting are cancelled, the rockets in the air disappear, and the
+    /// stars already out burn out faster. The sky then fades as usual.
+    func skip() {
+        guard !isSkipping else { return }
+        isSkipping = true
+        removeAllActions()
+        scheduledLaunches = 0
+        for rocket in rockets {
+            recycle(dot: rocket.head)
+        }
+        rockets.removeAll()
     }
 
     private func nextStyle(isLast: Bool) -> ShellStyle {
@@ -157,7 +175,8 @@ final class FireworksScene: SKScene {
 
     override func update(_ currentTime: TimeInterval) {
         // Clamped so a hitch (or coming back from the background) never makes the stars jump.
-        let dt = min(max(currentTime - (lastUpdateTime ?? currentTime), 0), 1.0 / 30)
+        let elapsed = min(max(currentTime - (lastUpdateTime ?? currentTime), 0), 1.0 / 30)
+        let dt = isSkipping ? elapsed * Self.skipSpeed : elapsed
         lastUpdateTime = currentTime
         if dt > 0 {
             updateRockets(dt: CGFloat(dt))

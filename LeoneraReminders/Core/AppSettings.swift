@@ -117,6 +117,26 @@ enum SwipeCompleteDirection: String, Codable, CaseIterable, Sendable, Identifiab
     var id: String { rawValue }
 }
 
+/// Whether the app responds while the fireworks of a completed reminder are playing.
+enum FireworksInteraction: String, Codable, CaseIterable, Sendable, Identifiable {
+    /// The app does not respond until the show is over.
+    case blocksApp
+    /// The app does not respond, but a tap ends the show right away.
+    case tapToFinish
+    /// The app keeps responding while the show plays.
+    case allowsApp
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .blocksApp: "Bloquear la app"
+        case .tapToFinish: "Tocar para terminar"
+        case .allowsApp: "Permitir usar la app"
+        }
+    }
+}
+
 /// Repetir la alarma si no se atiende: vuelve a sonar cada `interval`, hasta `count` veces.
 struct FollowUpSettings: Codable, Hashable, Sendable {
     var isEnabled: Bool
@@ -189,6 +209,8 @@ struct AppSettings: Codable, Hashable, Sendable {
     var swipeCompleteDirection: SwipeCompleteDirection = .rightToLeft
     /// Plays a fireworks show when a reminder is completed.
     var celebratesCompletion = true
+    /// Whether the app responds while the fireworks play.
+    var fireworksInteraction: FireworksInteraction = .blocksApp
     /// Modelos de Groq para crear recordatorios con voz, texto o fotos.
     var assistant: AssistantSettings = .default
 
@@ -208,6 +230,7 @@ struct AppSettings: Codable, Hashable, Sendable {
         ignoresSilentMode: true,
         swipeCompleteDirection: .rightToLeft,
         celebratesCompletion: true,
+        fireworksInteraction: .blocksApp,
         assistant: .default
     )
 
@@ -226,7 +249,7 @@ struct AppSettings: Codable, Hashable, Sendable {
 extension AppSettings {
     private enum CodingKeys: String, CodingKey {
         case snoozeOptions, defaultSnooze, stopAction, secondaryAction, quickAdjustGrid, overdueAdditionBase, followUp, sound, ignoresSilentMode
-        case swipeCompleteDirection, celebratesCompletion, assistant
+        case swipeCompleteDirection, celebratesCompletion, fireworksInteraction, assistant
     }
 
     init(from decoder: any Decoder) throws {
@@ -245,6 +268,8 @@ extension AppSettings {
             swipeCompleteDirection: (try? c.decodeIfPresent(SwipeCompleteDirection.self, forKey: .swipeCompleteDirection))
                 ?? fallback.swipeCompleteDirection,
             celebratesCompletion: (try? c.decodeIfPresent(Bool.self, forKey: .celebratesCompletion)) ?? fallback.celebratesCompletion,
+            fireworksInteraction: (try? c.decodeIfPresent(FireworksInteraction.self, forKey: .fireworksInteraction))
+                ?? fallback.fireworksInteraction,
             assistant: (try? c.decodeIfPresent(AssistantSettings.self, forKey: .assistant)) ?? fallback.assistant
         )
     }
