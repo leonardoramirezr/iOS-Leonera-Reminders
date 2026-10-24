@@ -41,6 +41,9 @@ final class FireworksPresenter {
         window.backgroundColor = .clear
         let controller = FireworksViewController()
         window.rootViewController = controller
+        // The window receives every tap on it, so the tap works whichever view it lands on.
+        let tap = UITapGestureRecognizer(target: controller, action: #selector(FireworksViewController.handleTap))
+        window.addGestureRecognizer(tap)
         self.window = window
         setInteraction(interaction)
         window.isHidden = false
@@ -58,7 +61,7 @@ final class FireworksPresenter {
     private func setInteraction(_ interaction: FireworksInteraction) {
         guard let window, let controller = window.rootViewController as? FireworksViewController else { return }
         window.isUserInteractionEnabled = interaction != .allowsApp
-        controller.skView.isUserInteractionEnabled = interaction == .tapToFinish
+        controller.interaction = interaction
     }
 
     /// Frees the window and the scene once the show is over; the next celebration creates new ones.
@@ -79,7 +82,9 @@ private final class FireworksWindow: UIWindow {
 
 private final class FireworksViewController: UIViewController {
     let skView = SKView()
-    /// Called when the show is tapped; only reached while `skView` takes touches.
+    /// Decides what a tap does on the show.
+    var interaction: FireworksInteraction = .blocksApp
+    /// Called when the show is tapped while `interaction` is `.tapToFinish`.
     var onTap: (() -> Void)?
 
     override func loadView() {
@@ -88,12 +93,14 @@ private final class FireworksViewController: UIViewController {
         skView.backgroundColor = .clear
         // Additive stars look the same in any order, so SpriteKit can batch them freely.
         skView.ignoresSiblingOrder = true
+        // The view only draws; the window takes the touches.
         skView.isUserInteractionEnabled = false
-        skView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
         view = skView
     }
 
-    @objc private func handleTap() {
+    /// Target of the tap gesture on the window.
+    @objc func handleTap() {
+        guard interaction == .tapToFinish else { return }
         onTap?()
     }
 
