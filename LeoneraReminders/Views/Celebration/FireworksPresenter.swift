@@ -4,7 +4,8 @@ import UIKit
 /// Plays the fireworks over the whole app when a reminder is completed.
 ///
 /// The show runs in its own window above everything else, so it is also seen over a sheet that closes at
-/// that moment (like the "Desliza para completar" sheet), and it never blocks touches.
+/// that moment (like the "Desliza para completar" sheet). Whether it also takes the touches meant for the app
+/// depends on `FireworksInteraction`.
 @MainActor
 final class FireworksPresenter {
     static let shared = FireworksPresenter()
@@ -26,28 +27,38 @@ final class FireworksPresenter {
         let style = (windowScene.keyWindow ?? windowScene.windows.first)?.traitCollection.userInterfaceStyle
             ?? windowScene.traitCollection.userInterfaceStyle
         let darkAppearance = style == .dark
+        let interaction = SettingsStore.shared.settings.fireworksInteraction
 
         if let scene {
+            setInteraction(interaction)
             scene.celebrate(reducedMotion: reducedMotion, darkAppearance: darkAppearance)
             return
         }
 
-        let window = PassthroughWindow(windowScene: windowScene)
+        let window = FireworksWindow(windowScene: windowScene)
         window.frame = windowScene.coordinateSpace.bounds
         window.windowLevel = .alert + 1
         window.backgroundColor = .clear
-        window.isUserInteractionEnabled = false
         let controller = FireworksViewController()
         window.rootViewController = controller
+        self.window = window
+        setInteraction(interaction)
         window.isHidden = false
 
         let scene = FireworksScene(size: window.bounds.size)
         scene.onFinished = { [weak self] in self?.tearDown() }
+        controller.onTap = { [weak scene] in scene?.skip() }
         controller.present(scene, framesPerSecond: windowScene.screen.maximumFramesPerSecond)
         scene.celebrate(reducedMotion: reducedMotion, darkAppearance: darkAppearance)
 
-        self.window = window
         self.scene = scene
+    }
+
+    /// Lets the touches reach the app, takes them all, or takes them all and lets a tap end the show.
+    private func setInteraction(_ interaction: FireworksInteraction) {
+        guard let window, let controller = window.rootViewController as? FireworksViewController else { return }
+        window.isUserInteractionEnabled = interaction != .allowsApp
+        controller.skView.isUserInteractionEnabled = interaction == .tapToFinish
     }
 
     /// Frees the window and the scene once the show is over; the next celebration creates new ones.
@@ -59,12 +70,8 @@ final class FireworksPresenter {
     }
 }
 
-/// A window that lets every touch through to the app below it.
-private final class PassthroughWindow: UIWindow {
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        nil
-    }
-
+/// The window of the show. It never becomes the key window, so the app keeps its own.
+private final class FireworksWindow: UIWindow {
     override var canBecomeKey: Bool {
         false
     }
@@ -72,6 +79,8 @@ private final class PassthroughWindow: UIWindow {
 
 private final class FireworksViewController: UIViewController {
     let skView = SKView()
+    /// Called when the show is tapped; only reached while `skView` takes touches.
+    var onTap: (() -> Void)?
 
     override func loadView() {
         skView.allowsTransparency = true
@@ -80,7 +89,12 @@ private final class FireworksViewController: UIViewController {
         // Additive stars look the same in any order, so SpriteKit can batch them freely.
         skView.ignoresSiblingOrder = true
         skView.isUserInteractionEnabled = false
+        skView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
         view = skView
+    }
+
+    @objc private func handleTap() {
+        onTap?()
     }
 
     func present(_ scene: SKScene, framesPerSecond: Int) {

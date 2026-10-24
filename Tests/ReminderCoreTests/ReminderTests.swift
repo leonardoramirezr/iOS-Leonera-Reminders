@@ -292,6 +292,16 @@ struct AppSettingsTests {
         #expect(!decoded.celebratesCompletion)
     }
 
+    @Test func fireworksInteractionDefaultsToBlockingAndRoundTrips() throws {
+        #expect(AppSettings.default.fireworksInteraction == .blocksApp)
+        let legacy = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"stopAction":"snooze"}"#.utf8))
+        #expect(legacy.fireworksInteraction == .blocksApp)
+        var settings = AppSettings.default
+        settings.fireworksInteraction = .tapToFinish
+        let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
+        #expect(decoded.fireworksInteraction == .tapToFinish)
+    }
+
     @Test func sortedSnoozeOptionsRemovesDuplicates() {
         var settings = AppSettings.default
         settings.snoozeOptions = [.hours(1), .minutes(5), .hours(1), .minutes(1)]

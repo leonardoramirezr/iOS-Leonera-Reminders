@@ -196,14 +196,6 @@ struct ReminderListView: View {
                 reminder: reminder,
                 now: now,
                 isRinging: reminder.scheduledAlarms.contains { alarms.alertingAlarmIDs.contains($0.id) },
-                onToggle: {
-                    // Completar siempre pide deslizar; reabrir un completado es inofensivo.
-                    if reminder.isCompleted {
-                        store.markIncomplete(id: reminder.id)
-                    } else {
-                        acting = ReminderSheetID(id: reminder.id)
-                    }
-                },
                 onToggleItem: { store.toggleChecklistItem(reminderID: reminder.id, itemID: $0) }
             )
             .contentShape(Rectangle())
@@ -518,21 +510,12 @@ struct ReminderRow: View {
     let reminder: Reminder
     let now: Date
     let isRinging: Bool
-    let onToggle: () -> Void
     let onToggleItem: (ChecklistItem.ID) -> Void
 
     private var isOverdue: Bool { reminder.isOverdue(now: now) }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Button(action: onToggle) {
-                Image(systemName: reminder.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundStyle(reminder.isCompleted ? Color.green : (isOverdue ? Color.red : Color.secondary))
-            }
-            .buttonStyle(.borderless)
-            .accessibilityLabel(reminder.isCompleted ? "Marcar como pendiente" : "Completar")
-
             VStack(alignment: .leading, spacing: 4) {
                 Text(reminder.title)
                     .strikethrough(reminder.isCompleted)

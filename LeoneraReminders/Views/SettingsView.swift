@@ -212,10 +212,17 @@ struct SettingsView: View {
                 Text("De izquierda a derecha").tag(SwipeCompleteDirection.leftToRight)
             }
             Toggle("Fuegos artificiales al completar", isOn: settings.celebratesCompletion)
+            if settingsStore.settings.celebratesCompletion {
+                Picker("Mientras se ven", selection: settings.fireworksInteraction) {
+                    ForEach(FireworksInteraction.allCases) { interaction in
+                        Text(interaction.label).tag(interaction)
+                    }
+                }
+            }
         } header: {
             Text("Lista")
         } footer: {
-            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y «Posponer». Al completar un recordatorio hay fuegos artificiales, nunca iguales.")
+            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y «Posponer». Al completar un recordatorio hay fuegos artificiales, nunca iguales. «Bloquear la app» impide usarla mientras se ven; «Tocar para terminar» lo impide hasta que un toque los acaba; «Permitir usar la app» no impide nada.")
         }
     }
 
