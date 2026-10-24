@@ -1,0 +1,17 @@
+{
+  "tag": "build-33-abf0b8c",
+  "channel": "branch",
+  "branch": "claude/upbeat-lovelace-91vdfh",
+  "commit": "abf0b8c9ff702ad84a168777a19e86839178ea51",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.10.0",
+  "build": "33",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-33-abf0b8c.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38782505341",
+  "created_at": "2026-10-15T18:06:55Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-33-abf0b8c/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-33-abf0b8c/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-33-abf0b8c%2Fmanifest.plist"
+}

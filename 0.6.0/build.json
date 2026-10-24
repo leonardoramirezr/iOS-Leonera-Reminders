@@ -1,0 +1,17 @@
+{
+  "tag": "0.6.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "7687135061ac90794b58bc7dc43e198c1401d7fa",
+  "title": "Leonera",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.6.0",
+  "build": "21",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.6.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38477866442",
+  "created_at": "2026-10-13T22:30:14Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.6.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.6.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.6.0%2Fmanifest.plist"
+}

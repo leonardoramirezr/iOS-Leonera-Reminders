@@ -1,0 +1,17 @@
+{
+  "tag": "build-41-9bf84a0",
+  "channel": "branch",
+  "branch": "claude/jolly-archimedes-4rv1sh",
+  "commit": "9bf84a0d4438de13f2ac117992edc255f9c79166",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.12.0",
+  "build": "41",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-41-9bf84a0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39317808341",
+  "created_at": "2026-10-19T20:17:56Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-41-9bf84a0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-41-9bf84a0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-41-9bf84a0%2Fmanifest.plist"
+}

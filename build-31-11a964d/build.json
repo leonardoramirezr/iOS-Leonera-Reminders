@@ -1,0 +1,17 @@
+{
+  "tag": "build-31-11a964d",
+  "channel": "branch",
+  "branch": "claude/beautiful-lovelace-2yanuo",
+  "commit": "11a964dc33d2acf7b7ef2e903763ab77f17e378b",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.9.0",
+  "build": "31",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-31-11a964d.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38779148222",
+  "created_at": "2026-10-15T17:41:14Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-31-11a964d/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-31-11a964d/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-31-11a964d%2Fmanifest.plist"
+}

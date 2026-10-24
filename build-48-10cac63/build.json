@@ -1,0 +1,17 @@
+{
+  "tag": "build-48-10cac63",
+  "channel": "branch",
+  "branch": "claude/zealous-goldberg-avgox0",
+  "commit": "10cac63b0920bffd8494561589fb1b7298a33438",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.15.0",
+  "build": "48",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-48-10cac63.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39324932017",
+  "created_at": "2026-10-19T21:09:22Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-48-10cac63/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-48-10cac63/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-48-10cac63%2Fmanifest.plist"
+}

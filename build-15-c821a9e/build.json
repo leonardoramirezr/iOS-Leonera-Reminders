@@ -1,0 +1,17 @@
+{
+  "tag": "build-15-c821a9e",
+  "channel": "branch",
+  "branch": "claude/youthful-turing-tx6rf5",
+  "commit": "c821a9e9b6ae32e10b5d57832cc420f6174bd060",
+  "title": "Leonera",
+  "bundle_id": "com.leonardoramirezr.leonerareminders",
+  "version": "0.3.0",
+  "build": "15",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-15-c821a9e.ipa",
+  "run_url": "https://github.com/leonardoramirezr/LeoneraReminders/actions/runs/38435699889",
+  "created_at": "2026-10-13T17:06:57Z",
+  "page_url": "https://leonardoramirezr.github.io/LeoneraReminders/build-15-c821a9e/",
+  "manifest_url": "https://leonardoramirezr.github.io/LeoneraReminders/build-15-c821a9e/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2Fbuild-15-c821a9e%2Fmanifest.plist"
+}

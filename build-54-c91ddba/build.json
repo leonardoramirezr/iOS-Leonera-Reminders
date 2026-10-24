@@ -1,0 +1,17 @@
+{
+  "tag": "build-54-c91ddba",
+  "channel": "branch",
+  "branch": "claude/amazing-ramanujan-5n1wy0",
+  "commit": "c91ddbae9a2d2d0b6314c6144976ec063daeef7f",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.17.0",
+  "build": "54",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-54-c91ddba.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39336906294",
+  "created_at": "2026-10-19T22:45:26Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-54-c91ddba/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-54-c91ddba/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-54-c91ddba%2Fmanifest.plist"
+}

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonera Reminders</title>
+<style>
+:root { color-scheme: light dark; --bg:#f2f2f7; --card:#fff; --text:#1c1c1e; --muted:#6e6e73; --accent:#c8671d; --line:#d1d1d6; }
+@media (prefers-color-scheme: dark) { :root { --bg:#000; --card:#1c1c1e; --text:#f2f2f7; --muted:#98989f; --line:#38383a; } }
+* { box-sizing: border-box; }
+body { margin:0; padding:24px 16px 48px; background:var(--bg); color:var(--text);
+       font:16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { max-width:640px; margin:0 auto; }
+h1 { font-size:28px; margin:0 0 4px; } h2 { font-size:20px; margin:32px 0 12px; }
+.muted { color:var(--muted); font-size:14px; }
+.card { background:var(--card); border-radius:16px; padding:20px; margin:16px 0; }
+.hero { display:flex; gap:16px; align-items:center; }
+.hero img { width:72px; height:72px; border-radius:16px; }
+.button { display:block; text-align:center; background:var(--accent); color:#fff; text-decoration:none;
+          font-weight:600; padding:14px 18px; border-radius:12px; margin-top:16px; }
+.button.small { display:inline-block; padding:8px 14px; margin:0; font-size:14px; }
+ul.builds { list-style:none; margin:0; padding:0; }
+ul.builds li { display:flex; justify-content:space-between; align-items:center; gap:12px;
+               padding:12px 0; border-top:1px solid var(--line); }
+ul.builds li:first-child { border-top:0; }
+ul.builds a.name { color:var(--text); font-weight:600; text-decoration:none; }
+.badge { font-size:12px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:6px;
+         background:var(--line); color:var(--text); }
+.badge.stable { background:#2e8b57; color:#fff; }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:4px 12px; margin:0; font-size:14px; }
+dt { color:var(--muted); } dd { margin:0; overflow-wrap:anywhere; }
+</style>
+</head>
+<body><main>
+
+<div class="card">
+  <div class="hero">
+    <img src="0.22.0/icon-512.png" alt="">
+    <div><h1>Leonera Reminders</h1><div class="muted">Última versión estable: 0.22.0</div></div>
+  </div>
+  <a class="button" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.22.0%2Fmanifest.plist">Instalar la última versión estable</a>
+  <p class="muted">Abre esta página en Safari en un iPhone registrado en la cuenta de Apple Developer.</p>
+</div>
+<h2>Todos los builds</h2>
+<div class="card"><ul class="builds">
+  <li>
+    <div><a class="name" href="0.22.0/">0.22.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.22.0 (65) · cfc1149 · 2026-10-24 17:21 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.22.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-64-84dd4c4/">build-64-84dd4c4</a><span class="badge">fix/fireworks-tap-to-finish</span>
+      <div class="muted">0.21.0 (64) · 84dd4c4 · 2026-10-24 16:32 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-64-84dd4c4%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.21.0/">0.21.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.21.0 (63) · dd5f8ac · 2026-10-24 07:40 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.21.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-62-814ba47/">build-62-814ba47</a><span class="badge">claude/reminders-fireworks-animation-jz23mn</span>
+      <div class="muted">0.20.0 (62) · 814ba47 · 2026-10-24 07:21 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-62-814ba47%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.20.0/">0.20.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.20.0 (61) · 4074be5 · 2026-10-24 07:05 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.20.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-60-8a453a4/">build-60-8a453a4</a><span class="badge">claude/kind-gates-q1w1qo</span>
+      <div class="muted">0.19.0 (60) · 8a453a4 · 2026-10-24 06:42 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-60-8a453a4%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.19.0/">0.19.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.19.0 (58) · 6490b8c · 2026-10-20 06:33 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.19.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-57-32bd39e/">build-57-32bd39e</a><span class="badge">claude/compassionate-mendel-kxo21d</span>
+      <div class="muted">0.18.0 (57) · 32bd39e · 2026-10-20 00:24 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-57-32bd39e%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.18.0/">0.18.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.18.0 (56) · 61b8e0b · 2026-10-20 00:18 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.18.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-55-ce85b19/">build-55-ce85b19</a><span class="badge">claude/compassionate-noether-tko2gk</span>
+      <div class="muted">0.17.0 (55) · ce85b19 · 2026-10-20 00:01 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-55-ce85b19%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-54-c91ddba/">build-54-c91ddba</a><span class="badge">claude/amazing-ramanujan-5n1wy0</span>
+      <div class="muted">0.17.0 (54) · c91ddba · 2026-10-19 22:45 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-54-c91ddba%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.17.0/">0.17.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.17.0 (52) · 2462872 · 2026-10-19 21:41 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.17.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-51-ec8f811/">build-51-ec8f811</a><span class="badge">claude/clever-hypatia-4itwtq</span>
+      <div class="muted">0.16.0 (51) · ec8f811 · 2026-10-19 21:30 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-51-ec8f811%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.16.0/">0.16.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.16.0 (50) · 959adee · 2026-10-19 21:26 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.16.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-49-7ad397b/">build-49-7ad397b</a><span class="badge">claude/zealous-goldberg-avgox0</span>
+      <div class="muted">0.15.0 (49) · 7ad397b · 2026-10-19 21:18 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-49-7ad397b%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-48-10cac63/">build-48-10cac63</a><span class="badge">claude/zealous-goldberg-avgox0</span>
+      <div class="muted">0.15.0 (48) · 10cac63 · 2026-10-19 21:09 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-48-10cac63%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-47-09a35c5/">build-47-09a35c5</a><span class="badge">claude/zealous-goldberg-avgox0</span>
+      <div class="muted">0.15.0 (47) · 09a35c5 · 2026-10-19 20:50 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-47-09a35c5%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.15.0/">0.15.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.15.0 (46) · 9bab366 · 2026-10-19 20:48 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.15.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-45-065bb7c/">build-45-065bb7c</a><span class="badge">claude/quirky-maxwell-gdu2ty</span>
+      <div class="muted">0.14.0 (45) · 065bb7c · 2026-10-19 20:42 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-45-065bb7c%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-44-ef3b39a/">build-44-ef3b39a</a><span class="badge">claude/quirky-maxwell-gdu2ty</span>
+      <div class="muted">0.14.0 (44) · ef3b39a · 2026-10-19 20:32 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-44-ef3b39a%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.14.0/">0.14.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.14.0 (43) · c253912 · 2026-10-19 20:28 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.14.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.13.0/">0.13.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.13.0 (42) · f88fc5b · 2026-10-19 20:19 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.13.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-41-9bf84a0/">build-41-9bf84a0</a><span class="badge">claude/jolly-archimedes-4rv1sh</span>
+      <div class="muted">0.12.0 (41) · 9bf84a0 · 2026-10-19 20:17 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-41-9bf84a0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-40-0818d22/">build-40-0818d22</a><span class="badge">claude/jolly-archimedes-4rv1sh</span>
+      <div class="muted">0.12.0 (40) · 0818d22 · 2026-10-19 20:15 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-40-0818d22%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-39-4aac2ba/">build-39-4aac2ba</a><span class="badge">claude/keen-mccarthy-jl6q30</span>
+      <div class="muted">0.12.0 (39) · 4aac2ba · 2026-10-19 20:13 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-39-4aac2ba%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-38-1b6e16a/">build-38-1b6e16a</a><span class="badge">claude/wonderful-pasteur-ou6swv</span>
+      <div class="muted">0.12.0 (38) · 1b6e16a · 2026-10-19 20:08 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-38-1b6e16a%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.12.0/">0.12.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.12.0 (37) · 2245093 · 2026-10-18 20:44 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.12.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-36-6376dbd/">build-36-6376dbd</a><span class="badge">vibrar-editor-hora-fija</span>
+      <div class="muted">0.11.0 (36) · 6376dbd · 2026-10-18 20:22 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-36-6376dbd%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.11.0/">0.11.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.11.0 (35) · 1e60c03 · 2026-10-15 18:44 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.11.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-34-2722c20/">build-34-2722c20</a><span class="badge">claude/clever-johnson-ubldce</span>
+      <div class="muted">0.10.0 (34) · 2722c20 · 2026-10-15 18:26 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-34-2722c20%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-33-abf0b8c/">build-33-abf0b8c</a><span class="badge">claude/upbeat-lovelace-91vdfh</span>
+      <div class="muted">0.10.0 (33) · abf0b8c · 2026-10-15 18:06 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-33-abf0b8c%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.10.0/">0.10.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.10.0 (32) · 1fde41a · 2026-10-15 18:00 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.10.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-31-11a964d/">build-31-11a964d</a><span class="badge">claude/beautiful-lovelace-2yanuo</span>
+      <div class="muted">0.9.0 (31) · 11a964d · 2026-10-15 17:41 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-31-11a964d%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.9.0/">0.9.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.9.0 (30) · 78033b9 · 2026-10-14 19:26 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.9.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-29-92f115d/">build-29-92f115d</a><span class="badge">claude/festive-cori-jwjdx4</span>
+      <div class="muted">0.8.0 (29) · 92f115d · 2026-10-14 15:57 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-29-92f115d%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-28-05e6e54/">build-28-05e6e54</a><span class="badge">claude/festive-cori-jwjdx4</span>
+      <div class="muted">0.8.0 (28) · 05e6e54 · 2026-10-14 15:46 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-28-05e6e54%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.8.0/">0.8.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.8.0 (27) · 08ee0e7 · 2026-10-14 15:40 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.8.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.7.0/">0.7.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.7.0 (26) · 3460c42 · 2026-10-14 15:24 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.7.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-24-db65215/">build-24-db65215</a><span class="badge">claude/fix-pbxproj-display-name</span>
+      <div class="muted">0.6.0 (24) · db65215 · 2026-10-14 06:56 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-24-db65215%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-25-bcfde2a/">build-25-bcfde2a</a><span class="badge">claude/groq-voice-photo-reminders</span>
+      <div class="muted">0.6.0 (25) · bcfde2a · 2026-10-14 06:56 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-25-bcfde2a%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.6.0/">0.6.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.6.0 (21) · 7687135 · 2026-10-13 22:30 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.6.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-20-b063e57/">build-20-b063e57</a><span class="badge">claude/pensive-hamilton-irit3w</span>
+      <div class="muted">0.5.0 (20) · b063e57 · 2026-10-13 22:07 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-20-b063e57%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.5.0/">0.5.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.5.0 (19) · ed445aa · 2026-10-13 22:04 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.5.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-18-63e1f0d/">build-18-63e1f0d</a><span class="badge">claude/practical-rubin-skk3hu</span>
+      <div class="muted">0.4.0 (18) · 63e1f0d · 2026-10-13 17:33 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2Fbuild-18-63e1f0d%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="0.4.0/">0.4.0</a><span class="badge stable">estable</span>
+      <div class="muted">0.4.0 (16) · 7a06943 · 2026-10-13 17:11 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2F0.4.0%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-15-c821a9e/">build-15-c821a9e</a><span class="badge">claude/youthful-turing-tx6rf5</span>
+      <div class="muted">0.3.0 (15) · c821a9e · 2026-10-13 17:06 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2Fbuild-15-c821a9e%2Fmanifest.plist">Instalar</a>
+  </li>
+  <li>
+    <div><a class="name" href="build-14-3678807/">build-14-3678807</a><span class="badge">claude/youthful-turing-tx6rf5</span>
+      <div class="muted">0.3.0 (14) · 3678807 · 2026-10-13 17:03 UTC</div></div>
+    <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2Fbuild-14-3678807%2Fmanifest.plist">Instalar</a>
+  </li>
+</ul></div>
+<p class="muted">Se guardan todas las versiones de main y los últimos 50 builds de otras ramas.</p>
+
+</main></body>
+</html>

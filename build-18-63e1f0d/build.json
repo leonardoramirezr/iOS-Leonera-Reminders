@@ -1,0 +1,17 @@
+{
+  "tag": "build-18-63e1f0d",
+  "channel": "branch",
+  "branch": "claude/practical-rubin-skk3hu",
+  "commit": "63e1f0d8cedd2363f2b1dd8169884e40745c33da",
+  "title": "Leonera",
+  "bundle_id": "com.leonardoramirezr.leonerareminders",
+  "version": "0.4.0",
+  "build": "18",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-18-63e1f0d.ipa",
+  "run_url": "https://github.com/leonardoramirezr/LeoneraReminders/actions/runs/38439282276",
+  "created_at": "2026-10-13T17:33:20Z",
+  "page_url": "https://leonardoramirezr.github.io/LeoneraReminders/build-18-63e1f0d/",
+  "manifest_url": "https://leonardoramirezr.github.io/LeoneraReminders/build-18-63e1f0d/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2Fbuild-18-63e1f0d%2Fmanifest.plist"
+}

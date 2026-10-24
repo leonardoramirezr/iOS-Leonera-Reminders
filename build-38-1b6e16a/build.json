@@ -1,0 +1,17 @@
+{
+  "tag": "build-38-1b6e16a",
+  "channel": "branch",
+  "branch": "claude/wonderful-pasteur-ou6swv",
+  "commit": "1b6e16a289858b5eba3dcb6bdd251c699600f5ac",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.12.0",
+  "build": "38",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-38-1b6e16a.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39316686370",
+  "created_at": "2026-10-19T20:08:59Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-38-1b6e16a/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-38-1b6e16a/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-38-1b6e16a%2Fmanifest.plist"
+}

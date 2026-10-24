@@ -1,0 +1,17 @@
+{
+  "tag": "build-25-bcfde2a",
+  "channel": "branch",
+  "branch": "claude/groq-voice-photo-reminders",
+  "commit": "bcfde2a64b08e51542e42ee5efab0f4e2a718d33",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.6.0",
+  "build": "25",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-25-bcfde2a.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38524945218",
+  "created_at": "2026-10-14T06:56:01Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-25-bcfde2a/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-25-bcfde2a/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-25-bcfde2a%2Fmanifest.plist"
+}

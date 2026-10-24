@@ -1,0 +1,17 @@
+{
+  "tag": "build-45-065bb7c",
+  "channel": "branch",
+  "branch": "claude/quirky-maxwell-gdu2ty",
+  "commit": "065bb7c797efb5ce41a6e3c06cc15f5170334179",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.14.0",
+  "build": "45",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-45-065bb7c.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39321278140",
+  "created_at": "2026-10-19T20:42:43Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-45-065bb7c/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-45-065bb7c/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-45-065bb7c%2Fmanifest.plist"
+}

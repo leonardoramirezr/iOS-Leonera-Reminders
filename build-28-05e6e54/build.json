@@ -1,0 +1,17 @@
+{
+  "tag": "build-28-05e6e54",
+  "channel": "branch",
+  "branch": "claude/festive-cori-jwjdx4",
+  "commit": "05e6e54863604214f0ba5891d3af5f5fdc3e80aa",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.8.0",
+  "build": "28",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-28-05e6e54.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38592003806",
+  "created_at": "2026-10-14T15:46:07Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-28-05e6e54/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-28-05e6e54/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-28-05e6e54%2Fmanifest.plist"
+}

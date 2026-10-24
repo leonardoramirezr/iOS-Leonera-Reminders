@@ -1,0 +1,17 @@
+{
+  "tag": "build-34-2722c20",
+  "channel": "branch",
+  "branch": "claude/clever-johnson-ubldce",
+  "commit": "2722c20e0f00da6215d53453c70021c1a1968d17",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.10.0",
+  "build": "34",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-34-2722c20.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38785243876",
+  "created_at": "2026-10-15T18:26:31Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-34-2722c20/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-34-2722c20/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-34-2722c20%2Fmanifest.plist"
+}
