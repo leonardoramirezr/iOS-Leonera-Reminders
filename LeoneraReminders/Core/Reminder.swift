@@ -16,6 +16,8 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
     var createdAt: Date
     /// Alarmas de AlarmKit programadas ahora: la principal y las que repiten el aviso si no se atiende.
     var scheduledAlarms: [ScheduledAlarm]
+    /// Checkboxes of a reminder with a checklist; `nil` for a plain reminder. An empty list is still a checklist.
+    var checklist: [ChecklistItem]?
 
     init(
         id: UUID = UUID(),
@@ -26,7 +28,8 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
         completedAt: Date? = nil,
         lastCompletedAt: Date? = nil,
         createdAt: Date = Date(),
-        scheduledAlarms: [ScheduledAlarm] = []
+        scheduledAlarms: [ScheduledAlarm] = [],
+        checklist: [ChecklistItem]? = nil
     ) {
         self.id = id
         self.title = title
@@ -37,6 +40,7 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
         self.lastCompletedAt = lastCompletedAt
         self.createdAt = createdAt
         self.scheduledAlarms = scheduledAlarms
+        self.checklist = checklist
     }
 
     var isCompleted: Bool { completedAt != nil }
@@ -59,6 +63,12 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
         if let rule = repeatRule,
            let next = rule.nextOccurrence(from: dueDate, after: now, calendar: calendar) {
             dueDate = next
+            // Each occurrence of a repeating checklist starts with every checkbox unchecked.
+            checklist = checklist?.map { item in
+                var unchecked = item
+                unchecked.isDone = false
+                return unchecked
+            }
         } else {
             completedAt = now
         }
@@ -79,6 +89,17 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
 
     mutating func markIncomplete() {
         completedAt = nil
+    }
+
+    /// Checks or unchecks one checkbox. Does nothing for a plain reminder or an unknown item.
+    mutating func toggleChecklistItem(id itemID: ChecklistItem.ID) {
+        guard let index = checklist?.firstIndex(where: { $0.id == itemID }) else { return }
+        checklist?[index].isDone.toggle()
+    }
+
+    /// Adds an unchecked checkbox at the end. Does nothing for a plain reminder.
+    mutating func appendChecklistItem(titled title: String) {
+        checklist?.append(ChecklistItem(title: title))
     }
 
     /// Momentos futuros (posteriores a `now`) en que deben sonar sus alarmas: la hora del aviso y, si se ignora,
@@ -141,7 +162,7 @@ struct ScheduledAlarm: Codable, Hashable, Sendable {
 
 extension Reminder {
     private enum CodingKeys: String, CodingKey {
-        case id, title, dueDate, repeatRule, retryFrom, completedAt, lastCompletedAt, createdAt, scheduledAlarms
+        case id, title, dueDate, repeatRule, retryFrom, completedAt, lastCompletedAt, createdAt, scheduledAlarms, checklist
         /// Versiones anteriores guardaban una sola alarma.
         case scheduledAlarm
         /// Versiones anteriores posponían sin mover la fecha límite; al leerlas, la fecha límite pasa a ser esa hora.
@@ -160,7 +181,8 @@ extension Reminder {
             lastCompletedAt: try c.decodeIfPresent(Date.self, forKey: .lastCompletedAt),
             createdAt: try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date(),
             scheduledAlarms: try c.decodeIfPresent([ScheduledAlarm].self, forKey: .scheduledAlarms)
-                ?? (try c.decodeIfPresent(ScheduledAlarm.self, forKey: .scheduledAlarm)).map { [$0] } ?? []
+                ?? (try c.decodeIfPresent(ScheduledAlarm.self, forKey: .scheduledAlarm)).map { [$0] } ?? [],
+            checklist: try c.decodeIfPresent([ChecklistItem].self, forKey: .checklist)
         )
     }
 }
@@ -177,5 +199,6 @@ extension Reminder {
         try c.encodeIfPresent(lastCompletedAt, forKey: .lastCompletedAt)
         try c.encode(createdAt, forKey: .createdAt)
         try c.encode(scheduledAlarms, forKey: .scheduledAlarms)
+        try c.encodeIfPresent(checklist, forKey: .checklist)
     }
 }

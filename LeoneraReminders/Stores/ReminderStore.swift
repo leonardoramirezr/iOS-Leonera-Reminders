@@ -109,6 +109,24 @@ final class ReminderStore {
         mutate(id) { $0.reschedule(to: date) }
     }
 
+    /// Marca o desmarca una casilla. No deja nada que deshacer: tocarla otra vez basta.
+    func toggleChecklistItem(reminderID: UUID, itemID: ChecklistItem.ID) {
+        mutate(reminderID) { $0.toggleChecklistItem(id: itemID) }
+    }
+
+    /// Agrega un recordatorio sin lista como una casilla más de otro que tiene lista, y borra el original.
+    /// «Deshacer» devuelve los dos como estaban.
+    func moveIntoChecklist(_ sourceID: UUID, title: String, checklistID: UUID) {
+        guard sourceID != checklistID,
+              let source = reminder(id: sourceID), source.checklist == nil,
+              let targetIndex = reminders.firstIndex(where: { $0.id == checklistID && $0.checklist != nil })
+        else { return }
+        registerUndo("Agregado a «\(reminders[targetIndex].title)»", ids: [sourceID, checklistID])
+        reminders[targetIndex].appendChecklistItem(titled: title)
+        reminders.removeAll { $0.id == sourceID }
+        didChange()
+    }
+
     // MARK: - Deshacer
 
     /// Copia de los recordatorios tal como estaban antes de un cambio, con su posición en la lista,

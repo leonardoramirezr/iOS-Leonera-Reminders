@@ -9,7 +9,9 @@ struct ReminderEditorView: View {
     let target: EditorTarget
     @State private var draft: Reminder
     @State private var confirmDelete = false
+    @State private var choosingChecklist = false
     @FocusState private var titleFocused: Bool
+    @FocusState private var focusedItemID: ChecklistItem.ID?
 
     init(target: EditorTarget, existing: Reminder?) {
         self.target = target
@@ -24,12 +26,44 @@ struct ReminderEditorView: View {
         Binding(get: { draft.dueDate }, set: { draft.reschedule(to: $0) })
     }
 
+    /// Turning the checklist on starts it empty; turning it off drops its checkboxes.
+    private var checklistEnabled: Binding<Bool> {
+        Binding(get: { draft.checklist != nil }, set: { draft.checklist = $0 ? (draft.checklist ?? []) : nil })
+    }
+
     var body: some View {
         NavigationStack {
             Form {
                 Section {
                     TextField("Título", text: $draft.title, axis: .vertical)
                         .focused($titleFocused)
+                }
+
+                Section {
+                    Toggle("Lista con casillas", isOn: checklistEnabled)
+                    if draft.checklist != nil {
+                        ForEach(checklistItems) { $item in
+                            HStack(spacing: 12) {
+                                Button {
+                                    $item.isDone.wrappedValue.toggle()
+                                } label: {
+                                    Image(systemName: item.isDone ? "checkmark.square.fill" : "square")
+                                        .font(.title3)
+                                        .foregroundStyle(item.isDone ? Color.green : Color.secondary)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel(item.isDone ? "Desmarcar casilla" : "Marcar casilla")
+                                TextField("Casilla", text: $item.title)
+                                    .focused($focusedItemID, equals: item.id)
+                            }
+                        }
+                        .onDelete(perform: deleteChecklistItems)
+                        Button {
+                            addChecklistItem()
+                        } label: {
+                            Label("Agregar casilla", systemImage: "plus")
+                        }
+                    }
                 }
 
                 Section {
@@ -61,6 +95,19 @@ struct ReminderEditorView: View {
                                 .multilineTextAlignment(.trailing)
                         } label: {
                             Label("Repetir", systemImage: "repeat")
+                        }
+                    }
+                }
+
+                // Discreet on purpose: a secondary option, not one of the main actions of the reminder.
+                if !isNew, draft.checklist == nil {
+                    Section {
+                        Button {
+                            choosingChecklist = true
+                        } label: {
+                            Label("Agregar a una lista con casillas…", systemImage: "checklist")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -101,10 +148,32 @@ struct ReminderEditorView: View {
                     dismiss()
                 }
             }
+            .sheet(isPresented: $choosingChecklist) {
+                ChecklistPickerView { checklistID in
+                    // The title is the one being edited; this reminder is removed by the move.
+                    store.moveIntoChecklist(draft.id, title: trimmedTitle, checklistID: checklistID)
+                    vibrate()
+                    choosingChecklist = false
+                    dismiss()
+                }
+            }
             .onAppear {
                 if isNew { titleFocused = true }
             }
         }
+    }
+
+    private var checklistItems: Binding<[ChecklistItem]> {
+        Binding(get: { draft.checklist ?? [] }, set: { draft.checklist = $0 })
+    }
+
+    private func addChecklistItem() {
+        draft.appendChecklistItem(titled: "")
+        focusedItemID = draft.checklist?.last?.id
+    }
+
+    private func deleteChecklistItems(at offsets: IndexSet) {
+        draft.checklist?.remove(atOffsets: offsets)
     }
 
     /// La misma vibración que al completar (`SlideToConfirm` ya vibra por su cuenta).
@@ -113,6 +182,12 @@ struct ReminderEditorView: View {
         if vibrating { vibrate() }
         var reminder = draft
         reminder.title = trimmedTitle
+        // Checkboxes left without a title are dropped rather than saved empty.
+        reminder.checklist = reminder.checklist?.compactMap { item -> ChecklistItem? in
+            var trimmed = item
+            trimmed.title = item.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.title.isEmpty ? nil : trimmed
+        }
         if isNew {
             store.add(reminder)
         } else {
