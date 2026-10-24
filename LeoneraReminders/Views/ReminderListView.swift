@@ -203,7 +203,8 @@ struct ReminderListView: View {
                     } else {
                         acting = ReminderSheetID(id: reminder.id)
                     }
-                }
+                },
+                onToggleItem: { store.toggleChecklistItem(reminderID: reminder.id, itemID: $0) }
             )
             .contentShape(Rectangle())
         }
@@ -518,6 +519,7 @@ struct ReminderRow: View {
     let now: Date
     let isRinging: Bool
     let onToggle: () -> Void
+    let onToggleItem: (ChecklistItem.ID) -> Void
 
     private var isOverdue: Bool { reminder.isOverdue(now: now) }
 
@@ -535,6 +537,25 @@ struct ReminderRow: View {
                 Text(reminder.title)
                     .strikethrough(reminder.isCompleted)
                     .foregroundStyle(reminder.isCompleted ? Color.secondary : Color.primary)
+
+                if let items = reminder.checklist, !items.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(items) { item in
+                            // A button of its own (not the row's tap) so checking an item does not open the editor.
+                            Button { onToggleItem(item.id) } label: {
+                                Label {
+                                    Text(item.title)
+                                        .strikethrough(item.isDone)
+                                } icon: {
+                                    Image(systemName: item.isDone ? "checkmark.square.fill" : "square")
+                                }
+                                .foregroundStyle(item.isDone ? Color.secondary : Color.primary)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                    .font(.subheadline)
+                }
 
                 if let completedAt = reminder.completedAt {
                     Label("Completado \(DateText.relative(completedAt, now: now))", systemImage: "checkmark")
