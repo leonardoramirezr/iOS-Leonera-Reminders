@@ -75,6 +75,7 @@ def cmd_build(folder):
         "channel": e["CHANNEL"],  # "stable" (main) o "branch"
         "branch": e["BRANCH"],
         "commit": e["COMMIT"],
+        "commit_title": e.get("COMMIT_TITLE", ""),
         "title": e["TITLE"],
         "bundle_id": e["BUNDLE_ID"],
         "version": e["VERSION"],
@@ -112,6 +113,9 @@ def cmd_build(folder):
     esc = html.escape
     kind = "Versión estable" if info["channel"] == "stable" else f"Pre-release de la rama {info['branch']}"
     run = f'<dt>Ejecución</dt><dd><a href="{esc(info["run_url"])}">ver en GitHub Actions</a></dd>' if info["run_url"] else ""
+    commit = esc(info["commit"][:7])
+    if info["commit_title"]:
+        commit += f" · {esc(info['commit_title'])}"
     body = f"""
 <p class="muted"><a href="../">← Todos los builds</a></p>
 <div class="card">
@@ -128,7 +132,7 @@ def cmd_build(folder):
     <dt>Versión</dt><dd>{esc(info['version'])} ({esc(info['build'])})</dd>
     <dt>Bundle ID</dt><dd>{esc(info['bundle_id'])}</dd>
     <dt>Rama</dt><dd>{esc(info['branch'])}</dd>
-    <dt>Commit</dt><dd>{esc(info['commit'][:7])}</dd>
+    <dt>Commit</dt><dd>{commit}</dd>
     <dt>Fecha</dt><dd>{esc(info['created_at'])}</dd>
     {run}
     <dt>Archivo</dt><dd><a href="{esc(urllib.parse.quote(ipa))}">{esc(ipa)}</a></dd>
