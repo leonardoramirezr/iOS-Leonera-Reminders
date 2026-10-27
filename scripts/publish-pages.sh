@@ -61,6 +61,7 @@ for attempt in 1 2 3 4 5 6; do
   cp "$ICON_57" "$WORK/site/$TAG/icon-57.png"
   cp "$ICON_512" "$WORK/site/$TAG/icon-512.png"
   python3 "$SCRIPTS/pages.py" build "$WORK/site/$TAG"
+  python3 "$SCRIPTS/pages.py" titles "$WORK/site"
   python3 "$SCRIPTS/pages.py" site "$WORK/site" "$KEEP_BRANCH_BUILDS"
 
   # Commit huérfano con un índice aparte; --force para que un .gitignore (p. ej. *.ipa) no excluya nada.
