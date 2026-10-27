@@ -5,6 +5,7 @@ struct SettingsView: View {
     @Environment(SettingsStore.self) private var settingsStore
     @Environment(AlarmSyncService.self) private var alarms
     @Environment(GroqKeyStore.self) private var groqKey
+    @Environment(CalendarEventSource.self) private var calendarEvents
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -21,6 +22,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 assistantSection
+                calendarSection
                 soundSection
                 alarmSection
                 followUpSection
@@ -71,6 +73,31 @@ struct SettingsView: View {
         } footer: {
             Text("Crea recordatorios dictando o con una foto: Groq convierte la voz en texto y un modelo de lenguaje la convierte en recordatorios, que revisas antes de guardar.")
         }
+    }
+
+    private var calendarSection: some View {
+        Section {
+            NavigationLink {
+                CalendarSettingsView()
+            } label: {
+                LabeledContent {
+                    Text(calendarStatus)
+                } label: {
+                    Label("Calendario de Apple", systemImage: "calendar")
+                }
+            }
+        } header: {
+            Text("Eventos")
+        } footer: {
+            Text("Suena una alarma 5 minutos y 1 minuto antes de cada evento de los calendarios que elijas.")
+        }
+    }
+
+    private var calendarStatus: String {
+        let count = settingsStore.settings.calendarAlarms.calendarIDs.count
+        guard count > 0 else { return "Desactivado" }
+        guard calendarEvents.hasAccess else { return "Sin acceso" }
+        return count == 1 ? "1 calendario" : "\(count) calendarios"
     }
 
     private var alarmSection: some View {

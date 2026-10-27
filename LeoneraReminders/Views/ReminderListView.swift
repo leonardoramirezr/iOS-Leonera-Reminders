@@ -1,3 +1,4 @@
+import EventKit
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -6,12 +7,15 @@ struct ReminderListView: View {
     @Environment(ReminderStore.self) private var store
     @Environment(SettingsStore.self) private var settingsStore
     @Environment(AlarmSyncService.self) private var alarms
+    @Environment(CalendarEventSource.self) private var calendarEvents
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var editing: EditorTarget?
     @State private var assistant: AssistantSource?
     @State private var acting: ReminderSheetID?
+    /// Apple Calendar event shown read-only.
+    @State private var showingEvent: SyncedCalendarEvent?
     @State private var showSettings = false
     @State private var showImporter = false
     @State private var importPreview: ImportPreview?
@@ -36,7 +40,7 @@ struct ReminderListView: View {
             .navigationTitle("Recordatorios")
             .toolbar { toolbar }
             .overlay {
-                if store.reminders.isEmpty {
+                if store.reminders.isEmpty && alarms.scheduledEventAlarms.isEmpty {
                     ContentUnavailableView {
                         Label("Sin recordatorios", systemImage: "alarm")
                     } description: {
@@ -92,6 +96,9 @@ struct ReminderListView: View {
                 acting = nil
                 editing = .edit(sheet.id)
             }
+        }
+        .sheet(item: $showingEvent) { synced in
+            CalendarEventDetailView(synced: synced)
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
@@ -173,8 +180,11 @@ struct ReminderListView: View {
 
             ForEach(grouped) { section in
                 Section {
-                    ForEach(section.rows) { item in
-                        row(item.reminder, now: now)
+                    ForEach(section.rows) { entry in
+                        switch entry.item {
+                        case .reminder(let reminder): row(reminder, now: now)
+                        case .event(let synced): eventRow(synced, now: now)
+                        }
                     }
                 } header: {
                     Text(section.title)
@@ -193,8 +203,8 @@ struct ReminderListView: View {
                         )
                     }
                     if showCompleted {
-                        ForEach(completed.map { SectionRow(sectionID: SectionKind.completed.id, reminder: $0) }) { item in
-                            row(item.reminder, now: now)
+                        ForEach(completed.map { SectionRow(sectionID: SectionKind.completed.id, item: .reminder($0)) }) { item in
+                            if case .reminder(let reminder) = item.item { row(reminder, now: now) }
                         }
                     }
                 }
@@ -244,6 +254,19 @@ struct ReminderListView: View {
             }
         }
         .contextMenu { menuItems(for: reminder) }
+    }
+
+    /// An Apple Calendar event: no swipe actions or menu, a tap only shows its details.
+    private func eventRow(_ synced: SyncedCalendarEvent, now: Date) -> some View {
+        Button { showingEvent = synced } label: {
+            CalendarEventRow(
+                synced: synced,
+                now: now,
+                calendar: calendarEvents.calendar(id: synced.event.calendarID),
+                isRinging: synced.alarms.contains { alarms.alertingAlarmIDs.contains($0.id) }
+            )
+            .contentShape(Rectangle())
+        }
     }
 
     @ViewBuilder
@@ -361,10 +384,22 @@ struct ReminderListView: View {
 
     // MARK: - Datos
 
+    private var searchQuery: String { searchText.trimmingCharacters(in: .whitespaces) }
+
     private var filtered: [Reminder] {
-        let query = searchText.trimmingCharacters(in: .whitespaces)
+        let query = searchQuery
         guard !query.isEmpty else { return store.reminders }
         return store.reminders.filter { $0.title.localizedStandardContains(query) }
+    }
+
+    /// Apple Calendar events whose alarms are scheduled and still to ring (or ringing now).
+    private func syncedEvents(now: Date) -> [SyncedCalendarEvent] {
+        let events = CalendarEventAlarmPlanner.syncedEvents(
+            from: alarms.scheduledEventAlarms, now: now, alerting: alarms.alertingAlarmIDs
+        )
+        let query = searchQuery
+        guard !query.isEmpty else { return events }
+        return events.filter { $0.event.title.localizedStandardContains(query) }
     }
 
     private enum SectionKind: String, CaseIterable {
@@ -385,11 +420,14 @@ struct ReminderListView: View {
 
         static func of(_ reminder: Reminder, now: Date, calendar: Calendar = .current) -> SectionKind {
             if reminder.isCompleted { return .completed }
+            return of(date: reminder.dueDate, now: now, calendar: calendar)
+        }
+
+        static func of(date: Date, now: Date, calendar: Calendar = .current) -> SectionKind {
             let today = calendar.startOfDay(for: now)
             let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? now
             let dayAfter = calendar.date(byAdding: .day, value: 2, to: today) ?? now
             let nextWeek = calendar.date(byAdding: .day, value: 8, to: today) ?? now
-            let date = reminder.dueDate
             if date <= now { return .overdue }
             if date < tomorrow { return .today }
             if date < dayAfter { return .tomorrow }
@@ -398,33 +436,56 @@ struct ReminderListView: View {
         }
     }
 
+    /// What a row of the list shows: a reminder, or an Apple Calendar event with its alarms scheduled.
+    private enum ListItem {
+        case reminder(Reminder)
+        case event(SyncedCalendarEvent)
+
+        var id: String {
+            switch self {
+            case .reminder(let reminder): "reminder/\(reminder.id)"
+            case .event(let synced): "event/\(synced.id)"
+            }
+        }
+
+        var date: Date {
+            switch self {
+            case .reminder(let reminder): reminder.dueDate
+            case .event(let synced): synced.event.startDate
+            }
+        }
+    }
+
     private struct ReminderSection: Identifiable {
         let kind: SectionKind
-        let reminders: [Reminder]
+        let items: [ListItem]
 
         var id: String { kind.id }
         var title: String { kind.title }
         var isOverdue: Bool { kind == .overdue }
-        var rows: [SectionRow] { reminders.map { SectionRow(sectionID: id, reminder: $0) } }
+        var rows: [SectionRow] { items.map { SectionRow(sectionID: id, item: $0) } }
     }
 
-    /// A reminder's row within a section. Its identity includes the section, so a reminder that changes
+    /// A row within a section. Its identity includes the section, so a reminder that changes
     /// section (completed, snoozed, or a repeating one advanced to its next date) is removed from one and
     /// inserted into the other: moving the row across sections of the inset grouped list drew the
     /// section backgrounds and headers at their final places while the row was still traveling.
     private struct SectionRow: Identifiable {
         let sectionID: String
-        let reminder: Reminder
+        let item: ListItem
 
-        var id: String { "\(sectionID)/\(reminder.id)" }
+        var id: String { "\(sectionID)/\(item.id)" }
     }
 
+    /// Pending reminders and synced calendar events together, by date.
     private func sections(now: Date) -> [ReminderSection] {
-        let pending = filtered.filter { !$0.isCompleted }.sorted { $0.dueDate < $1.dueDate }
-        let grouped = Dictionary(grouping: pending) { SectionKind.of($0, now: now) }
+        let reminders = filtered.filter { !$0.isCompleted }.map(ListItem.reminder)
+        let events = syncedEvents(now: now).map(ListItem.event)
+        let pending = (reminders + events).sorted { $0.date < $1.date }
+        let grouped = Dictionary(grouping: pending) { SectionKind.of(date: $0.date, now: now) }
         return SectionKind.allCases
             .filter { $0 != .completed }
-            .compactMap { kind in grouped[kind].map { ReminderSection(kind: kind, reminders: $0) } }
+            .compactMap { kind in grouped[kind].map { ReminderSection(kind: kind, items: $0) } }
     }
 
     /// Sólo desde el deslizamiento de la fila (que ya es un gesto deliberado).

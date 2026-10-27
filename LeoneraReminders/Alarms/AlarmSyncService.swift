@@ -23,6 +23,9 @@ final class AlarmSyncService {
     private(set) var lastError: String?
     /// Permiso de notificaciones (sólo se usa en el modo que respeta el silencio).
     private(set) var notificationsAuthorized = true
+    /// Alarms before Apple Calendar events that are actually scheduled (AlarmKit or notifications), so the
+    /// list shows only events that will ring.
+    private(set) var scheduledEventAlarms: [CalendarEventAlarm] = []
 
     private let manager = AlarmManager.shared
     private let logger = Logger(subsystem: "LeoneraReminders", category: "alarms")
@@ -96,46 +99,82 @@ final class AlarmSyncService {
     private func performSync() async {
         let settings = SettingsStore.shared.settings
         if authorizationState != manager.authorizationState { authorizationState = manager.authorizationState }
+        let eventAlarms = calendarEventAlarms(settings: settings, now: Date())
         if settings.ignoresSilentMode {
             NotificationDelivery.shared.removeAll()
-            await syncAlarmKit(settings: settings)
+            await syncAlarmKit(settings: settings, eventAlarms: eventAlarms)
         } else {
             // Modo que respeta el silencio: nada de AlarmKit, sólo notificaciones.
             if authorizationState == .authorized {
                 for alarm in (try? manager.alarms) ?? [] { try? manager.cancel(id: alarm.id) }
             }
-            await syncNotifications(settings: settings)
+            await syncNotifications(settings: settings, eventAlarms: eventAlarms)
         }
     }
 
+    /// Alarms 5 and 1 minutes before each event of the selected Apple Calendar calendars.
+    ///
+    /// They start an hour back so that an event alarm ringing right now is kept instead of cancelled;
+    /// only the future ones are scheduled.
+    private func calendarEventAlarms(settings: AppSettings, now: Date) -> [CalendarEventAlarm] {
+        guard settings.calendarAlarms.isEnabled else { return [] }
+        let from = now.addingTimeInterval(-60 * 60)
+        let through = now.addingTimeInterval(TimeInterval(CalendarEventAlarmPlanner.lookAheadDays * 24 * 60 * 60))
+        let maxLead = TimeInterval((CalendarEventAlarmPlanner.leadMinutes.max() ?? 0) * 60)
+        let events = CalendarEventSource.shared.events(
+            calendarIDs: settings.calendarAlarms.calendarIDs, from: from, to: through.addingTimeInterval(maxLead)
+        )
+        return CalendarEventAlarmPlanner.alarms(
+            for: events, from: from, through: through, signature: "\(settings.alarmSignature)|\(Self.buttonsVersion)"
+        )
+    }
+
     /// Notificaciones locales: iOS permite 64 pendientes, así que se programan las más próximas.
-    private func syncNotifications(settings: AppSettings) async {
+    private func syncNotifications(settings: AppSettings, eventAlarms: [CalendarEventAlarm]) async {
         let delivery = NotificationDelivery.shared
         let authorized = await delivery.requestAuthorization()
         if notificationsAuthorized != authorized { notificationsAuthorized = authorized }
-        guard notificationsAuthorized else { return }
+        guard notificationsAuthorized else {
+            setScheduledEventAlarms([])
+            return
+        }
 
         let store = ReminderStore.shared
         let now = Date()
-        var items: [(reminder: Reminder, record: ScheduledAlarm)] = []
+        var items: [NotificationDelivery.Item] = []
         for reminder in store.reminders where !reminder.isCompleted {
             let signature = signature(for: reminder, settings: settings)
             for date in reminder.pendingAlarmDates(after: now.addingTimeInterval(1), followUp: settings.followUp) {
-                items.append((reminder, ScheduledAlarm(id: UUID(), fireDate: date, signature: signature)))
+                items.append(.reminder(reminder, ScheduledAlarm(id: UUID(), fireDate: date, signature: signature)))
             }
         }
-        items.sort { $0.record.fireDate < $1.record.fireDate }
+        for alarm in eventAlarms where alarm.fireDate > now.addingTimeInterval(1) {
+            items.append(.calendarEvent(alarm))
+        }
+        items.sort { $0.fireDate < $1.fireDate }
         let overLimit = items.count > NotificationDelivery.maxPending
         if limitReached != overLimit { limitReached = overLimit }
         let scheduled = Array(items.prefix(NotificationDelivery.maxPending))
         await delivery.replaceAll(scheduled, settings: settings)
 
-        store.setScheduledAlarms(Dictionary(grouping: scheduled, by: \.reminder.id).mapValues { $0.map(\.record) })
+        var records: [UUID: [ScheduledAlarm]] = [:]
+        var events: [CalendarEventAlarm] = []
+        for item in scheduled {
+            switch item {
+            case let .reminder(reminder, record): records[reminder.id, default: []].append(record)
+            case let .calendarEvent(alarm): events.append(alarm)
+            }
+        }
+        store.setScheduledAlarms(records)
+        setScheduledEventAlarms(events)
         await delivery.removeDelivered(keeping: Set(store.reminders.filter { !$0.isCompleted }.map(\.id)))
     }
 
-    private func syncAlarmKit(settings: AppSettings) async {
-        guard authorizationState == .authorized else { return }
+    private func syncAlarmKit(settings: AppSettings, eventAlarms: [CalendarEventAlarm]) async {
+        guard authorizationState == .authorized else {
+            setScheduledEventAlarms([])
+            return
+        }
 
         let existing: [Alarm]
         do {
@@ -143,6 +182,7 @@ final class AlarmSyncService {
         } catch {
             lastError = error.localizedDescription
             logger.error("No se pudieron leer las alarmas: \(error.localizedDescription, privacy: .public)")
+            setScheduledEventAlarms([])
             return
         }
         let existingByID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -151,7 +191,7 @@ final class AlarmSyncService {
 
         var keep = Set<UUID>()
         var kept: [UUID: [ScheduledAlarm]] = [:]
-        var missing: [(reminder: Reminder, date: Date, isMain: Bool)] = []
+        var missing: [MissingAlarm] = []
         for reminder in store.reminders where !reminder.isCompleted {
             let signature = signature(for: reminder, settings: settings)
             let wanted = reminder.pendingAlarmDates(after: now.addingTimeInterval(1), followUp: settings.followUp)
@@ -169,7 +209,15 @@ final class AlarmSyncService {
             kept[reminder.id] = current
             let scheduledDates = Set(current.map(\.fireDate))
             for date in wanted where !scheduledDates.contains(date) {
-                missing.append((reminder, date, date == reminder.dueDate))
+                missing.append(.reminder(reminder, date: date, isMain: date == reminder.dueDate))
+            }
+        }
+        // Event alarms have a stable ID, so an existing alarm with that ID is already the right one.
+        for alarm in eventAlarms {
+            if existingByID[alarm.id] != nil {
+                keep.insert(alarm.id)
+            } else if alarm.fireDate > now.addingTimeInterval(1) {
+                missing.append(.calendarEvent(alarm))
             }
         }
 
@@ -178,28 +226,67 @@ final class AlarmSyncService {
             try? manager.cancel(id: alarm.id)
         }
 
-        // Si AlarmKit llega a su límite, quedan programadas primero las alarmas principales y luego
-        // las repeticiones, en orden de fecha.
+        // Si AlarmKit llega a su límite, quedan programadas primero las alarmas principales (también las de
+        // eventos del calendario) y luego las repeticiones, en orden de fecha.
         missing.sort { ($0.isMain ? 0 : 1, $0.date) < ($1.isMain ? 0 : 1, $1.date) }
         var reachedLimit = false
         var syncError: String?
+        var scheduledEvents = Set(eventAlarms.map(\.id).filter(keep.contains))
         for item in missing where !reachedLimit {
-            let alarmID = UUID()
             do {
-                let configuration = Self.configuration(for: item.reminder, at: item.date, alarmID: alarmID, settings: settings)
-                _ = try await manager.schedule(id: alarmID, configuration: configuration)
-                let record = ScheduledAlarm(id: alarmID, fireDate: item.date, signature: signature(for: item.reminder, settings: settings))
-                kept[item.reminder.id, default: []].append(record)
+                switch item {
+                case let .reminder(reminder, date, _):
+                    let alarmID = UUID()
+                    let configuration = Self.configuration(for: reminder, at: date, alarmID: alarmID, settings: settings)
+                    _ = try await manager.schedule(id: alarmID, configuration: configuration)
+                    let record = ScheduledAlarm(id: alarmID, fireDate: date, signature: signature(for: reminder, settings: settings))
+                    kept[reminder.id, default: []].append(record)
+                case let .calendarEvent(alarm):
+                    _ = try await manager.schedule(id: alarm.id, configuration: Self.configuration(for: alarm, settings: settings))
+                    scheduledEvents.insert(alarm.id)
+                }
             } catch AlarmManager.AlarmError.maximumLimitReached {
                 reachedLimit = true
             } catch {
                 syncError = error.localizedDescription
-                logger.error("No se pudo programar «\(item.reminder.title, privacy: .private)»: \(error.localizedDescription, privacy: .public)")
+                logger.error("No se pudo programar «\(item.title, privacy: .private)»: \(error.localizedDescription, privacy: .public)")
             }
         }
         store.setScheduledAlarms(kept.mapValues { records in records.sorted { $0.fireDate < $1.fireDate } })
+        setScheduledEventAlarms(eventAlarms.filter { scheduledEvents.contains($0.id) })
         if lastError != syncError { lastError = syncError }
         if limitReached != reachedLimit { limitReached = reachedLimit }
+    }
+
+    private func setScheduledEventAlarms(_ alarms: [CalendarEventAlarm]) {
+        if scheduledEventAlarms != alarms { scheduledEventAlarms = alarms }
+    }
+
+    /// An alarm that still has to be scheduled with AlarmKit.
+    private enum MissingAlarm {
+        case reminder(Reminder, date: Date, isMain: Bool)
+        case calendarEvent(CalendarEventAlarm)
+
+        var date: Date {
+            switch self {
+            case let .reminder(_, date, _): date
+            case let .calendarEvent(alarm): alarm.fireDate
+            }
+        }
+
+        var isMain: Bool {
+            switch self {
+            case let .reminder(_, _, isMain): isMain
+            case .calendarEvent: true
+            }
+        }
+
+        var title: String {
+            switch self {
+            case let .reminder(reminder, _, _): reminder.title
+            case let .calendarEvent(alarm): alarm.alarmTitle
+            }
+        }
     }
 
     /// Sube cuando cambia el texto o el ícono de los botones, para reprogramar las alarmas ya creadas.
@@ -252,6 +339,37 @@ final class AlarmSyncService {
             secondaryIntent: secondaryButton == nil
                 ? nil
                 : intent(for: settings.secondaryAction, reminderID: reminder.id, alarmID: alarmID),
+            sound: settings.sound.fileName.map { AlertConfiguration.AlertSound.named($0) } ?? .default
+        )
+    }
+
+    /// The alarm of a calendar event: only a stop button, since there is nothing to snooze, and no intents.
+    nonisolated private static func configuration(
+        for alarm: CalendarEventAlarm,
+        settings: AppSettings
+    ) -> AlarmManager.AlarmConfiguration<CalendarEventAlarmMetadata> {
+        let title = LocalizedStringResource(stringLiteral: alarm.alarmTitle)
+        let alert: AlarmPresentation.Alert
+        if #available(iOS 26.1, *) {
+            alert = AlarmPresentation.Alert(title: title, secondaryButton: nil, secondaryButtonBehavior: nil)
+        } else {
+            alert = AlarmPresentation.Alert(
+                title: title,
+                stopButton: AlarmButton(text: "Detener", textColor: .white, systemImageName: "stop.circle"),
+                secondaryButton: nil,
+                secondaryButtonBehavior: nil
+            )
+        }
+        let attributes = AlarmAttributes<CalendarEventAlarmMetadata>(
+            presentation: AlarmPresentation(alert: alert),
+            metadata: CalendarEventAlarmMetadata(eventTitle: alarm.eventTitle, eventStart: alarm.eventStart),
+            tintColor: .brand
+        )
+        return AlarmManager.AlarmConfiguration<CalendarEventAlarmMetadata>.alarm(
+            schedule: .fixed(alarm.fireDate),
+            attributes: attributes,
+            stopIntent: nil,
+            secondaryIntent: nil,
             sound: settings.sound.fileName.map { AlertConfiguration.AlertSound.named($0) } ?? .default
         )
     }
