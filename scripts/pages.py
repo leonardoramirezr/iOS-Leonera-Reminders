@@ -5,6 +5,8 @@
                            (DIR ya contiene el .ipa y los iconos; los datos llegan por entorno)
   pages.py site SITE KEEP  borra los builds de ramas más allá de los KEEP más recientes y
                            escribe la portada (index.html) y .nojekyll
+  pages.py titles SITE     adds commit_title to the build.json files published before that
+                           field existed, reading the commit title from GitHub
 """
 
 import html
@@ -12,6 +14,7 @@ import json
 import os
 import plistlib
 import shutil
+import subprocess
 import sys
 import urllib.parse
 from datetime import datetime, timezone
@@ -36,6 +39,8 @@ ul.builds li { display:flex; justify-content:space-between; align-items:center; 
                padding:12px 0; border-top:1px solid var(--line); }
 ul.builds li:first-child { border-top:0; }
 ul.builds a.name { color:var(--text); font-weight:600; text-decoration:none; }
+ul.builds li > div { min-width:0; }
+.commit { font-size:15px; margin-top:2px; overflow-wrap:anywhere; }
 .badge { font-size:12px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:6px;
          background:var(--line); color:var(--text); }
 .badge.stable { background:#2e8b57; color:#fff; }
@@ -150,6 +155,33 @@ def version_key(tag):
         return (-1,)
 
 
+def cmd_titles(site):
+    # Builds published before commit_title was stored only have the commit hash, so ask GitHub for its title.
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if not repo or not shutil.which("gh"):
+        return
+    for name in os.listdir(site):
+        path = os.path.join(site, name, "build.json")
+        if not os.path.isfile(path):
+            continue
+        with open(path) as handle:
+            info = json.load(handle)
+        if info.get("commit_title"):
+            continue
+        result = subprocess.run(
+            ["gh", "api", f"repos/{repo}/commits/{info['commit']}", "--jq", ".commit.message"],
+            capture_output=True, text=True, check=False,
+        )
+        lines = result.stdout.splitlines()
+        if result.returncode != 0 or not lines:
+            print(f"warning: no commit title for {name}: {result.stderr.strip()}", file=sys.stderr)
+            continue
+        info["commit_title"] = lines[0]
+        with open(path, "w") as handle:
+            json.dump(info, handle, indent=2, ensure_ascii=False)
+            handle.write("\n")
+
+
 def cmd_site(site, keep):
     builds = []
     for name in os.listdir(site):
@@ -189,8 +221,10 @@ def cmd_site(site, keep):
     for b in builds:
         badge = '<span class="badge stable">estable</span>' if b["channel"] == "stable" else \
             f'<span class="badge">{esc(b["branch"])}</span>'
+        commit_line = f'<div class="commit">{esc(b["commit_title"])}</div>' if b.get("commit_title") else ""
         rows.append(f"""  <li>
     <div><a class="name" href="{esc(b['tag'])}/">{esc(b['tag'])}</a>{badge}
+      {commit_line}
       <div class="muted">{esc(b['version'])} ({esc(b['build'])}) · {esc(b['commit'][:7])} · {esc(b['created_at'][:16].replace('T', ' '))} UTC</div></div>
     <a class="button small" href="{esc(b['install_url'])}">Instalar</a>
   </li>""")
@@ -210,6 +244,8 @@ def cmd_site(site, keep):
 def main(argv):
     if len(argv) == 3 and argv[1] == "build":
         cmd_build(argv[2])
+    elif len(argv) == 3 and argv[1] == "titles":
+        cmd_titles(argv[2])
     elif len(argv) == 4 and argv[1] == "site":
         cmd_site(argv[2], int(argv[3]))
     else:
