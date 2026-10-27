@@ -9,16 +9,26 @@ struct ReminderReview: Identifiable, Hashable {
     var photoCount = 0
 }
 
+/// What the review offers to change the dictated text, when the reminders come from the voice.
+struct TranscriptActions {
+    let onEdit: () -> Void
+    let onRedo: () -> Void
+    let onAddMore: () -> Void
+}
+
 /// Revisión antes de guardar: todos los recordatorios en una sola lista, cada uno con su título, fecha y repetición
 /// editables ahí mismo, para revisarlos y corregirlos sólo desplazándose.
 struct ReminderReviewView: View {
     let review: ReminderReview
+    /// Si se pasa, la sección del texto muestra el dictado con botones para cambiarlo.
+    let transcriptActions: TranscriptActions?
     let onSave: ([Reminder]) -> Void
 
     @State private var drafts: [ReminderExtraction.Draft]
 
-    init(review: ReminderReview, onSave: @escaping ([Reminder]) -> Void) {
+    init(review: ReminderReview, transcriptActions: TranscriptActions? = nil, onSave: @escaping ([Reminder]) -> Void) {
         self.review = review
+        self.transcriptActions = transcriptActions
         self.onSave = onSave
         _drafts = State(initialValue: review.drafts)
     }
@@ -75,7 +85,29 @@ struct ReminderReviewView: View {
     @ViewBuilder
     private var sourceSection: some View {
         let text = review.sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !text.isEmpty || review.photoCount > 0 {
+        if let transcriptActions {
+            Section {
+                Text(text)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Button(action: transcriptActions.onRedo) {
+                    Label("Volver a hacer", systemImage: "arrow.counterclockwise")
+                }
+                Button(action: transcriptActions.onAddMore) {
+                    Label("Agregar más", systemImage: "mic.badge.plus")
+                }
+            } header: {
+                HStack {
+                    Text("Lo que dijiste")
+                    Spacer()
+                    Button(action: transcriptActions.onEdit) {
+                        Label("Editar el texto", systemImage: "pencil")
+                            .labelStyle(.iconOnly)
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+        } else if !text.isEmpty || review.photoCount > 0 {
             Section {
                 if review.photoCount > 0 {
                     Label(review.photoCount == 1 ? "1 foto" : "\(review.photoCount) fotos", systemImage: "photo")

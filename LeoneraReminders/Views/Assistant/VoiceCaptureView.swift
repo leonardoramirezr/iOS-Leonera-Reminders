@@ -1,56 +1,76 @@
 import SwiftUI
 
-/// Crear recordatorios con la voz: primero sólo se graba; ya convertido en texto se puede corregir (o dictar más)
-/// antes de mandarlo al modelo, y al final se revisan los recordatorios que propuso.
+/// Creates reminders by voice. Stopping the recording turns it into text and creates the reminders right away, which
+/// are reviewed on the same screen. From there the text can be edited, recorded again from scratch, or added to by
+/// voice; each change creates the reminders again from the whole text.
 struct VoiceCaptureView: View {
     @Environment(ReminderStore.self) private var store
     @Environment(GroqKeyStore.self) private var keyStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var dictation = DictationSession()
+    /// Text the reminders were created from: everything dictated so far, with the corrections made to it.
     @State private var transcript = ""
-    /// Ya hubo una transcripción: se muestra el texto para corregirlo.
-    @State private var showsTranscript = false
     @State private var isProcessing = false
     @State private var processError: String?
     @State private var processTask: Task<Void, Never>?
     @State private var review: ReminderReview?
+    @State private var isEditingText = false
+    @State private var editedText = ""
 
     private var trimmedTranscript: String { transcript.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+    private var transcriptActions: TranscriptActions {
+        TranscriptActions(onEdit: startEditing, onRedo: startOver, onAddMore: addMore)
+    }
 
     var body: some View {
         NavigationStack {
             Group {
-                if !keyStore.hasKey {
-                    AssistantSetupPrompt()
-                } else if showsTranscript {
-                    transcriptStage
+                if let review {
+                    ReminderReviewView(review: review, transcriptActions: transcriptActions) { reminders in
+                        store.add(contentsOf: reminders)
+                        close()
+                    }
+                    .id(review.id)
                 } else {
-                    recordingStage
+                    captureStage
+                        .navigationTitle("Nuevo con la voz")
+                        .navigationBarTitleDisplayMode(.inline)
                 }
             }
-            .navigationTitle("Nuevo con la voz")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") { close() }
                 }
             }
-            .navigationDestination(item: $review) { review in
-                ReminderReviewView(review: review) { reminders in
-                    store.add(contentsOf: reminders)
-                    close()
-                }
+            .sheet(isPresented: $isEditingText) {
+                editTextSheet
             }
         }
-        .interactiveDismissDisabled(showsTranscript)
+        .interactiveDismissDisabled(!transcript.isEmpty || isProcessing)
         .task {
             // Tocar «Voz» ya es la intención de hablar: empieza a grabar sin otro toque.
             if keyStore.hasKey { await dictation.start() }
         }
         .onDisappear {
+            // Presenting the edit sheet also triggers this, and nothing needs stopping then.
+            guard !isEditingText else { return }
             dictation.cancel()
             processTask?.cancel()
+        }
+    }
+
+    @ViewBuilder
+    private var captureStage: some View {
+        if !keyStore.hasKey {
+            AssistantSetupPrompt()
+        } else if isProcessing {
+            processingStage
+        } else if processError != nil {
+            processErrorStage
+        } else {
+            recordingStage
         }
     }
 
@@ -106,44 +126,96 @@ struct VoiceCaptureView: View {
         }
     }
 
+    /// Adds dictated text to what is already there and creates the reminders from all of it.
     private func append(_ text: String) {
         transcript = trimmedTranscript.isEmpty ? text : trimmedTranscript + " " + text
-        showsTranscript = true
+        process()
     }
 
-    // MARK: - Corregir y procesar
+    private func startOver() {
+        transcript = ""
+        startRecording()
+    }
 
-    private var transcriptStage: some View {
-        Form {
-            Section {
-                TextField("Lo que dijiste", text: $transcript, axis: .vertical)
-                    .lineLimit(4...12)
-            } header: {
-                Text("Lo que dijiste")
-            } footer: {
-                Text("Corrige el texto si hace falta antes de crear los recordatorios.")
-            }
+    private func addMore() {
+        startRecording()
+    }
 
-            Section {
-                DictationRow(session: dictation, title: "Dictar más", onText: append)
-            }
+    private func startRecording() {
+        review = nil
+        processError = nil
+        Task { await dictation.start() }
+    }
 
-            if let processError {
+    // MARK: - Editar el texto
+
+    private func startEditing() {
+        editedText = transcript
+        isEditingText = true
+    }
+
+    private var editTextSheet: some View {
+        NavigationStack {
+            Form {
                 Section {
-                    Label(processError, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote)
-                        .foregroundStyle(.red)
+                    TextField("Lo que dijiste", text: $editedText, axis: .vertical)
+                        .lineLimit(4...12)
+                } footer: {
+                    Text("Al guardar, los recordatorios se vuelven a crear con este texto.")
+                }
+            }
+            .navigationTitle("Editar el texto")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { isEditingText = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Listo") { applyEdit() }
+                        .disabled(editedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            ProcessButton(isProcessing: isProcessing, action: process)
-                .disabled(trimmedTranscript.isEmpty || dictation.phase != .idle)
+        .presentationDetents([.medium, .large])
+    }
+
+    private func applyEdit() {
+        isEditingText = false
+        let text = editedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard text != trimmedTranscript else { return }
+        transcript = text
+        process()
+    }
+
+    // MARK: - Procesar
+
+    private var processingStage: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .controlSize(.large)
+            Text("Creando recordatorios…")
+                .font(.headline)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var processErrorStage: some View {
+        ContentUnavailableView {
+            Label("No se pudieron crear los recordatorios", systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(processError ?? "")
+        } actions: {
+            Button("Reintentar") { process() }
+                .buttonStyle(.borderedProminent)
+            Button("Editar el texto", action: startEditing)
+            Button("Volver a grabar", action: startOver)
         }
     }
 
+    /// Creates the reminders from the current text. The review replaces the capture screen once they are ready.
     private func process() {
         let text = trimmedTranscript
+        review = nil
         processError = nil
         isProcessing = true
         processTask = Task {

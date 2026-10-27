@@ -16,7 +16,9 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   tres formas de crear: **Foto**, **Voz** y **Manual** (el editor de siempre). Foto y Voz usan Groq y terminan
   en la misma pantalla de revisión:
   - **Voz**: al tocarla empieza a grabar (al principio sólo se habla, no se escribe). Al detener, Whisper la
-    convierte en texto; ese texto ya se puede corregir (o *Dictar más*) antes de tocar *Crear recordatorios*.
+    convierte en texto y los recordatorios aparecen de inmediato para revisarlos. Desde esa pantalla, el lápiz edita
+    el texto a mano, *Volver a hacer* lo graba de nuevo desde cero y *Agregar más* dicta más texto; cada cambio vuelve
+    a crear los recordatorios con todo el texto.
     En una sola nota caben varios recordatorios («mañana a las 9 llamar al dentista y todos los lunes sacar la basura»).
   - **Foto**: hasta 3 fotos de la cámara o de Fotos (notas, listas, citas, recibos, capturas de pantalla) y, si se
     quiere, indicaciones escritas o dictadas («sólo lo del viernes», «avísame un día antes»).
