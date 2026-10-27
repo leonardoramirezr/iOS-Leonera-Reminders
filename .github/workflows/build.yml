@@ -250,7 +250,9 @@ jobs:
           sips -z 57 57 "$ICON_SOURCE" --out "$RUNNER_TEMP/icon-57.png" >/dev/null
           sips -z 512 512 "$ICON_SOURCE" --out "$RUNNER_TEMP/icon-512.png" >/dev/null
 
-          BASE_URL="$BASE_URL" IPA="$IPA" \
+          COMMIT_TITLE=$(git log -1 --format=%s "$GITHUB_SHA")
+
+          BASE_URL="$BASE_URL" IPA="$IPA" COMMIT_TITLE="$COMMIT_TITLE" \
             ICON_57="$RUNNER_TEMP/icon-57.png" ICON_512="$RUNNER_TEMP/icon-512.png" \
             scripts/publish-pages.sh
 
