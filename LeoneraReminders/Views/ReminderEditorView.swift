@@ -60,6 +60,11 @@ struct ReminderEditorView: View {
                         }
                         .onDelete(perform: deleteChecklistItems)
                         .onMove(perform: moveChecklistItems)
+                        Button {
+                            addChecklistItem()
+                        } label: {
+                            Label("Agregar casilla", systemImage: "plus")
+                        }
                         // Shown while reordering even with a single checkbox, so there is always a way out of edit mode.
                         if editMode.isEditing || (draft.checklist?.count ?? 0) > 1 {
                             Button {
@@ -67,11 +72,6 @@ struct ReminderEditorView: View {
                             } label: {
                                 Label(editMode.isEditing ? "Listo" : "Reordenar casillas", systemImage: "arrow.up.arrow.down")
                             }
-                        }
-                        Button {
-                            addChecklistItem()
-                        } label: {
-                            Label("Agregar casilla", systemImage: "plus")
                         }
                     }
                 }
