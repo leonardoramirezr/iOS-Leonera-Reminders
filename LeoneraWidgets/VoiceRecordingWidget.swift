@@ -59,10 +59,16 @@ struct VoiceRecordingWidgetView: View {
         case .accessoryInline:
             Label("Grabar recordatorio", systemImage: "mic.fill")
         default:
-            ZStack {
-                AccessoryWidgetBackground()
+            ZStack(alignment: .bottomTrailing) {
+                Image("AppLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(Circle())
                 Image(systemName: "mic.fill")
-                    .font(.title2)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white)
+                    .padding(4)
+                    .background(Circle().fill(Color.black))
             }
             .accessibilityLabel("Grabar recordatorio")
         }
