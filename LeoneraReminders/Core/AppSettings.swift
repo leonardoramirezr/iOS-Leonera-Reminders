@@ -213,6 +213,8 @@ struct AppSettings: Codable, Hashable, Sendable {
     var fireworksInteraction: FireworksInteraction = .blocksApp
     /// Modelos de Groq para crear recordatorios con voz, texto o fotos.
     var assistant: AssistantSettings = .default
+    /// Calendars of the Apple Calendar app whose events ring 5 and 1 minutes before they start.
+    var calendarAlarms: CalendarAlarmSettings = .default
 
     static let defaultSnoozeOptions: [TimeAmount] = [
         .minutes(1), .minutes(5), .minutes(10), .minutes(20), .minutes(40), .minutes(60), .hours(2), .hours(3),
@@ -231,7 +233,8 @@ struct AppSettings: Codable, Hashable, Sendable {
         swipeCompleteDirection: .rightToLeft,
         celebratesCompletion: true,
         fireworksInteraction: .blocksApp,
-        assistant: .default
+        assistant: .default,
+        calendarAlarms: .default
     )
 
     /// Opciones ordenadas y sin repetir.
@@ -249,7 +252,7 @@ struct AppSettings: Codable, Hashable, Sendable {
 extension AppSettings {
     private enum CodingKeys: String, CodingKey {
         case snoozeOptions, defaultSnooze, stopAction, secondaryAction, quickAdjustGrid, overdueAdditionBase, followUp, sound, ignoresSilentMode
-        case swipeCompleteDirection, celebratesCompletion, fireworksInteraction, assistant
+        case swipeCompleteDirection, celebratesCompletion, fireworksInteraction, assistant, calendarAlarms
     }
 
     init(from decoder: any Decoder) throws {
@@ -270,7 +273,8 @@ extension AppSettings {
             celebratesCompletion: (try? c.decodeIfPresent(Bool.self, forKey: .celebratesCompletion)) ?? fallback.celebratesCompletion,
             fireworksInteraction: (try? c.decodeIfPresent(FireworksInteraction.self, forKey: .fireworksInteraction))
                 ?? fallback.fireworksInteraction,
-            assistant: (try? c.decodeIfPresent(AssistantSettings.self, forKey: .assistant)) ?? fallback.assistant
+            assistant: (try? c.decodeIfPresent(AssistantSettings.self, forKey: .assistant)) ?? fallback.assistant,
+            calendarAlarms: (try? c.decodeIfPresent(CalendarAlarmSettings.self, forKey: .calendarAlarms)) ?? fallback.calendarAlarms
         )
     }
 }

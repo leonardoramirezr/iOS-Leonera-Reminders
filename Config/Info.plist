@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(APP_BUNDLE_ID).calendarRefresh</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleURLTypes</key>
@@ -21,7 +25,13 @@
 	<string>Leonera usa alarmas para que cada recordatorio suene a su hora, aunque el teléfono esté en silencio o en un modo de concentración.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Leonera usa el micrófono para que dictes recordatorios; el audio se envía a Groq para convertirlo en texto.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Leonera lee los eventos de los calendarios que elijas para que suene una alarma 5 minutos y 1 minuto antes de cada uno.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Leonera usa la cámara para crear recordatorios a partir de una foto; la foto se envía a Groq para leerla.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

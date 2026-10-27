@@ -10,10 +10,25 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
     static let maxPending = 64
 
     nonisolated private static let categoryID = "reminder"
+    nonisolated private static let calendarEventCategoryID = "calendarEvent"
     nonisolated private static let snoozeActionID = "snooze"
     nonisolated private static let optionsActionID = "options"
     nonisolated private static let reminderKey = "reminderID"
     nonisolated private static let alarmKey = "alarmID"
+    nonisolated private static let calendarEventKey = "calendarEvent"
+
+    /// A pending notification: a reminder alarm or the alarm before a calendar event.
+    enum Item {
+        case reminder(Reminder, ScheduledAlarm)
+        case calendarEvent(CalendarEventAlarm)
+
+        var fireDate: Date {
+            switch self {
+            case let .reminder(_, record): record.fireDate
+            case let .calendarEvent(alarm): alarm.fireDate
+            }
+        }
+    }
 
     private let center = UNUserNotificationCenter.current()
 
@@ -27,24 +42,35 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
     }
 
     /// Reemplaza todas las notificaciones pendientes por `items`.
-    func replaceAll(_ items: [(reminder: Reminder, record: ScheduledAlarm)], settings: AppSettings) async {
+    func replaceAll(_ items: [Item], settings: AppSettings) async {
         registerCategory(settings: settings)
         center.removeAllPendingNotificationRequests()
         let calendar = Calendar.current
         for item in items {
             let content = UNMutableNotificationContent()
-            content.title = item.reminder.title
-            content.body = item.record.fireDate == item.reminder.dueDate ? "Recordatorio" : "Sigue pendiente"
+            let identifier: String
+            switch item {
+            case let .reminder(reminder, record):
+                identifier = record.id.uuidString
+                content.title = reminder.title
+                content.body = record.fireDate == reminder.dueDate ? "Recordatorio" : "Sigue pendiente"
+                content.categoryIdentifier = Self.categoryID
+                content.userInfo = [
+                    Self.reminderKey: reminder.id.uuidString,
+                    Self.alarmKey: record.id.uuidString,
+                ]
+            case let .calendarEvent(alarm):
+                identifier = alarm.id.uuidString
+                content.title = alarm.eventTitle.isEmpty ? "Evento" : alarm.eventTitle
+                content.body = "Empieza en \(alarm.leadMinutes) min"
+                content.categoryIdentifier = Self.calendarEventCategoryID
+                content.userInfo = [Self.calendarEventKey: true]
+            }
             content.sound = Self.sound(for: settings.sound)
-            content.categoryIdentifier = Self.categoryID
             content.interruptionLevel = .active
-            content.userInfo = [
-                Self.reminderKey: item.reminder.id.uuidString,
-                Self.alarmKey: item.record.id.uuidString,
-            ]
-            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: item.record.fireDate)
+            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: item.fireDate)
             let request = UNNotificationRequest(
-                identifier: item.record.id.uuidString,
+                identifier: identifier,
                 content: content,
                 trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             )
@@ -60,6 +86,8 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
     /// Quita del Centro de notificaciones las de recordatorios que ya no están pendientes.
     func removeDelivered(keeping pending: Set<UUID>) async {
         let stale = await center.deliveredNotifications().compactMap { notification -> String? in
+            // Calendar event notifications have no reminder: they stay until the user clears them.
+            if notification.request.content.userInfo[Self.calendarEventKey] != nil { return nil }
             let id = (notification.request.content.userInfo[Self.reminderKey] as? String).flatMap(UUID.init(uuidString:))
             return id.map(pending.contains) == true ? nil : notification.request.identifier
         }
@@ -84,7 +112,10 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
         let category = UNNotificationCategory(
             identifier: Self.categoryID, actions: actions, intentIdentifiers: [], options: [.customDismissAction]
         )
-        center.setNotificationCategories([category])
+        let calendarEventCategory = UNNotificationCategory(
+            identifier: Self.calendarEventCategoryID, actions: [], intentIdentifiers: [], options: []
+        )
+        center.setNotificationCategories([category, calendarEventCategory])
     }
 
     private static func sound(for sound: AlarmSound) -> UNNotificationSound? {
@@ -109,6 +140,8 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse
     ) async {
         let info = response.notification.request.content.userInfo
+        // A calendar event notification only opens the app; the reminder actions do not apply to it.
+        if info[Self.calendarEventKey] != nil { return }
         let reminderID = info[Self.reminderKey] as? String ?? ""
         let alarmID = info[Self.alarmKey] as? String ?? ""
         switch response.actionIdentifier {

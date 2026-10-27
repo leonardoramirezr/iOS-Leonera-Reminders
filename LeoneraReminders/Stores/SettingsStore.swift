@@ -21,6 +21,7 @@ final class SettingsStore {
             }
             guard value != stored else { return }
             let alarmsChanged = value.alarmSignature != stored.alarmSignature || value.followUp != stored.followUp
+                || value.calendarAlarms != stored.calendarAlarms
             stored = value
             persist()
             if alarmsChanged { AlarmSyncService.shared.requestSync() }
