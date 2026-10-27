@@ -70,14 +70,25 @@ final class CalendarEventSource {
         return store.events(matching: predicate).compactMap { event in
             guard let startDate = event.startDate else { return nil }
             let declined = event.attendees?.contains { $0.isCurrentUser && $0.participantStatus == .declined } ?? false
+            let notes = event.notes?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let location = event.location?.trimmingCharacters(in: .whitespacesAndNewlines)
             return CalendarEventSnapshot(
                 eventID: event.calendarItemIdentifier,
                 title: event.title ?? "",
                 startDate: startDate,
                 isAllDay: event.isAllDay,
-                isSkipped: event.status == .canceled || declined
+                isSkipped: event.status == .canceled || declined,
+                calendarID: event.calendar?.calendarIdentifier ?? "",
+                endDate: event.endDate,
+                location: location?.isEmpty == false ? location : nil,
+                notes: notes?.isEmpty == false ? notes : nil
             )
         }
+    }
+
+    /// The calendar with `id` among the ones last read, for its name and color.
+    func calendar(id: String) -> EKCalendar? {
+        calendars.first { $0.calendarIdentifier == id }
     }
 
     /// Asks iOS to wake the app in a few hours to refresh the event alarms (only when the feature is on).

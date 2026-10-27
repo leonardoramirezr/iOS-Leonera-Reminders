@@ -19,13 +19,32 @@ struct CalendarEventSnapshot: Hashable, Sendable {
     var isAllDay: Bool
     /// Canceled, or declined by the user: it does not ring.
     var isSkipped: Bool
+    /// `EKCalendar.calendarIdentifier` of the calendar the event belongs to.
+    var calendarID: String
+    var endDate: Date?
+    var location: String?
+    var notes: String?
 
-    init(eventID: String, title: String, startDate: Date, isAllDay: Bool = false, isSkipped: Bool = false) {
+    init(
+        eventID: String,
+        title: String,
+        startDate: Date,
+        isAllDay: Bool = false,
+        isSkipped: Bool = false,
+        calendarID: String = "",
+        endDate: Date? = nil,
+        location: String? = nil,
+        notes: String? = nil
+    ) {
         self.eventID = eventID
         self.title = title
         self.startDate = startDate
         self.isAllDay = isAllDay
         self.isSkipped = isSkipped
+        self.calendarID = calendarID
+        self.endDate = endDate
+        self.location = location
+        self.notes = notes
     }
 }
 
@@ -33,10 +52,13 @@ struct CalendarEventSnapshot: Hashable, Sendable {
 struct CalendarEventAlarm: Identifiable, Hashable, Sendable {
     /// Stable for the same event occurrence, lead time and signature (see `UUID(stableFrom:)`).
     var id: UUID
-    var eventTitle: String
-    var eventStart: Date
+    /// The event as it was read in the sync that produced this alarm.
+    var event: CalendarEventSnapshot
     var leadMinutes: Int
     var fireDate: Date
+
+    var eventTitle: String { event.title }
+    var eventStart: Date { event.startDate }
 
     /// Text shown by the alarm, e.g. "Junta · en 5 min".
     var alarmTitle: String {
@@ -71,11 +93,41 @@ enum CalendarEventAlarmPlanner {
                 let key = "\(event.eventID)|\(Int(event.startDate.timeIntervalSince1970))|\(lead)|\(event.title)|\(signature)"
                 let id = UUID(stableFrom: key)
                 guard seen.insert(id).inserted else { continue }
-                alarms.append(CalendarEventAlarm(
-                    id: id, eventTitle: event.title, eventStart: event.startDate, leadMinutes: lead, fireDate: fireDate
-                ))
+                alarms.append(CalendarEventAlarm(id: id, event: event, leadMinutes: lead, fireDate: fireDate))
             }
         }
         return alarms.sorted { ($0.fireDate, $0.id.uuidString) < ($1.fireDate, $1.id.uuidString) }
+    }
+
+    /// The events behind `scheduled` alarms, one per occurrence, sorted by start.
+    ///
+    /// An event is listed while at least one of its alarms is still ahead or is ringing (`alerting`), so it
+    /// leaves the list on its own once its last alarm has rung.
+    static func syncedEvents(
+        from scheduled: [CalendarEventAlarm],
+        now: Date,
+        alerting: Set<UUID> = []
+    ) -> [SyncedCalendarEvent] {
+        let groups = Dictionary(grouping: scheduled) { SyncedCalendarEvent.id(for: $0.event) }
+        return groups.values.compactMap { alarms -> SyncedCalendarEvent? in
+            guard let first = alarms.first,
+                  alarms.contains(where: { $0.fireDate > now || alerting.contains($0.id) })
+            else { return nil }
+            return SyncedCalendarEvent(event: first.event, alarms: alarms.sorted { $0.fireDate < $1.fireDate })
+        }
+        .sorted { ($0.event.startDate, $0.id) < ($1.event.startDate, $1.id) }
+    }
+}
+
+/// A calendar event that already has its alarms scheduled, as shown in the reminder list.
+struct SyncedCalendarEvent: Identifiable, Hashable, Sendable {
+    var event: CalendarEventSnapshot
+    /// Sorted by fire date.
+    var alarms: [CalendarEventAlarm]
+
+    var id: String { Self.id(for: event) }
+
+    static func id(for event: CalendarEventSnapshot) -> String {
+        "\(event.eventID)|\(Int(event.startDate.timeIntervalSince1970))"
     }
 }

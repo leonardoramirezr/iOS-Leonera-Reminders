@@ -89,7 +89,7 @@ struct CalendarSettingsView: View {
         } label: {
             HStack {
                 Circle()
-                    .fill(Color(cgColor: calendar.cgColor ?? UIColor.systemGray.cgColor))
+                    .fill(calendar.swiftUIColor)
                     .frame(width: 12, height: 12)
                 Text(calendar.title)
                     .foregroundStyle(.primary)

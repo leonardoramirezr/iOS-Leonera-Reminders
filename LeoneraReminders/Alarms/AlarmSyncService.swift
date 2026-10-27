@@ -23,6 +23,9 @@ final class AlarmSyncService {
     private(set) var lastError: String?
     /// Permiso de notificaciones (sólo se usa en el modo que respeta el silencio).
     private(set) var notificationsAuthorized = true
+    /// Alarms before Apple Calendar events that are actually scheduled (AlarmKit or notifications), so the
+    /// list shows only events that will ring.
+    private(set) var scheduledEventAlarms: [CalendarEventAlarm] = []
 
     private let manager = AlarmManager.shared
     private let logger = Logger(subsystem: "LeoneraReminders", category: "alarms")
@@ -131,7 +134,10 @@ final class AlarmSyncService {
         let delivery = NotificationDelivery.shared
         let authorized = await delivery.requestAuthorization()
         if notificationsAuthorized != authorized { notificationsAuthorized = authorized }
-        guard notificationsAuthorized else { return }
+        guard notificationsAuthorized else {
+            setScheduledEventAlarms([])
+            return
+        }
 
         let store = ReminderStore.shared
         let now = Date()
@@ -152,15 +158,23 @@ final class AlarmSyncService {
         await delivery.replaceAll(scheduled, settings: settings)
 
         var records: [UUID: [ScheduledAlarm]] = [:]
-        for case let .reminder(reminder, record) in scheduled {
-            records[reminder.id, default: []].append(record)
+        var events: [CalendarEventAlarm] = []
+        for item in scheduled {
+            switch item {
+            case let .reminder(reminder, record): records[reminder.id, default: []].append(record)
+            case let .calendarEvent(alarm): events.append(alarm)
+            }
         }
         store.setScheduledAlarms(records)
+        setScheduledEventAlarms(events)
         await delivery.removeDelivered(keeping: Set(store.reminders.filter { !$0.isCompleted }.map(\.id)))
     }
 
     private func syncAlarmKit(settings: AppSettings, eventAlarms: [CalendarEventAlarm]) async {
-        guard authorizationState == .authorized else { return }
+        guard authorizationState == .authorized else {
+            setScheduledEventAlarms([])
+            return
+        }
 
         let existing: [Alarm]
         do {
@@ -168,6 +182,7 @@ final class AlarmSyncService {
         } catch {
             lastError = error.localizedDescription
             logger.error("No se pudieron leer las alarmas: \(error.localizedDescription, privacy: .public)")
+            setScheduledEventAlarms([])
             return
         }
         let existingByID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -216,6 +231,7 @@ final class AlarmSyncService {
         missing.sort { ($0.isMain ? 0 : 1, $0.date) < ($1.isMain ? 0 : 1, $1.date) }
         var reachedLimit = false
         var syncError: String?
+        var scheduledEvents = Set(eventAlarms.map(\.id).filter(keep.contains))
         for item in missing where !reachedLimit {
             do {
                 switch item {
@@ -227,6 +243,7 @@ final class AlarmSyncService {
                     kept[reminder.id, default: []].append(record)
                 case let .calendarEvent(alarm):
                     _ = try await manager.schedule(id: alarm.id, configuration: Self.configuration(for: alarm, settings: settings))
+                    scheduledEvents.insert(alarm.id)
                 }
             } catch AlarmManager.AlarmError.maximumLimitReached {
                 reachedLimit = true
@@ -236,8 +253,13 @@ final class AlarmSyncService {
             }
         }
         store.setScheduledAlarms(kept.mapValues { records in records.sorted { $0.fireDate < $1.fireDate } })
+        setScheduledEventAlarms(eventAlarms.filter { scheduledEvents.contains($0.id) })
         if lastError != syncError { lastError = syncError }
         if limitReached != reachedLimit { limitReached = reachedLimit }
+    }
+
+    private func setScheduledEventAlarms(_ alarms: [CalendarEventAlarm]) {
+        if scheduledEventAlarms != alarms { scheduledEventAlarms = alarms }
     }
 
     /// An alarm that still has to be scheduled with AlarmKit.

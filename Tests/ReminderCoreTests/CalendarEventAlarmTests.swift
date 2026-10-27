@@ -79,6 +79,34 @@ struct CalendarEventAlarmTests {
         #expect(alarms.first?.alarmTitle == "Evento · en 5 min")
     }
 
+    @Test func syncedEventsGroupTheAlarmsOfEachOccurrenceSortedByStart() {
+        let later = CalendarEventSnapshot(eventID: "b", title: "Comida", startDate: local(2026, 10, 27, 14))
+        let sooner = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
+        let alarms = CalendarEventAlarmPlanner.alarms(for: [later, sooner], from: windowStart, through: windowEnd, signature: "s")
+        let synced = CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: windowStart)
+        #expect(synced.map(\.event.title) == ["Junta", "Comida"])
+        #expect(synced.first?.alarms.map(\.leadMinutes) == [5, 1])
+    }
+
+    @Test func syncedEventLeavesOnceItsLastAlarmHasPassedUnlessItIsRinging() {
+        let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
+        let alarms = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")
+        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 57)).count == 1)
+        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 59)).isEmpty)
+        let ringing = Set(alarms.filter { $0.leadMinutes == 1 }.map(\.id))
+        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 59), alerting: ringing).count == 1)
+    }
+
+    @Test func syncedEventKeepsTheEventDetails() throws {
+        let event = CalendarEventSnapshot(
+            eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10),
+            calendarID: "work", endDate: local(2026, 10, 27, 11), location: "Sala 2", notes: "Llevar laptop"
+        )
+        let alarms = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")
+        let synced = try #require(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: windowStart).first)
+        #expect(synced.event == event)
+    }
+
     @Test func settingsWithoutCalendarAlarmsDecodeToTheDefault() throws {
         let data = Data(#"{"ignoresSilentMode": false}"#.utf8)
         let settings = try JSONDecoder().decode(AppSettings.self, from: data)

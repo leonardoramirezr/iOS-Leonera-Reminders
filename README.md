@@ -64,6 +64,9 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   alarm rings 5 minutes and 1 minute before each of their events, with the reminders' sound and silent-mode setting.
   Events of the next 7 days are scheduled; they are refreshed when the app opens, when the calendar changes while it
   runs, and every few hours with a background refresh. All-day, canceled and declined events do not ring.
+  Events whose alarms are scheduled also appear in the reminder list, by date, with a calendar icon instead of the
+  clock. They have no swipe actions, and tapping one shows its details read-only (date, calendar, location, notes and
+  alarm times), with a button that opens it in the Calendar app.
 - **Matriz de ajuste rápido** en el editor: la primera fila fija una hora (10:00, 14:00, 18:00, 21:00), la segunda suma
   (+10 min, +1 h, +1 día, +1 sem.) y la tercera resta. Todas las celdas se cambian en *Configuración*.
   Ahí también se elige desde dónde suman en un recordatorio **vencido** (*Sumar a un vencido*): **desde la fecha
