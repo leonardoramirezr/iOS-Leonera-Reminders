@@ -99,7 +99,7 @@ struct CalendarEventDetailView: View {
 
                 if let notes = event.notes {
                     Section("Notas") {
-                        Text(notes)
+                        Text(linkedNotes(notes))
                             .textSelection(.enabled)
                     }
                 }
@@ -144,6 +144,20 @@ struct CalendarEventDetailView: View {
     private func durationText(_ end: Date) -> String {
         Duration.seconds(end.timeIntervalSince(event.startDate))
             .formatted(.units(allowed: [.days, .hours, .minutes], width: .wide))
+    }
+
+    /// The notes with every link detected and drawn as blue underlined text that opens it when tapped.
+    private func linkedNotes(_ notes: String) -> AttributedString {
+        var text = AttributedString(notes)
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: notes, range: NSRange(notes.startIndex..., in: notes)) ?? []
+        for match in matches {
+            guard let url = match.url, let range = Range(match.range, in: text) else { continue }
+            text[range].link = url
+            text[range].foregroundColor = .blue
+            text[range].underlineStyle = .single
+        }
+        return text
     }
 }
 
