@@ -25,6 +25,8 @@ struct ReminderListView: View {
     @State private var completedTrigger = 0
     /// Reminder completed from the action sheet; the list removes it once the sheet has closed.
     @State private var completingFromSheet: UUID?
+    /// Link that opened the app (such as the lock screen widget), applied once the scene is active.
+    @State private var pendingDeepLink: DeepLink?
 
     var body: some View {
         NavigationStack {
@@ -141,6 +143,23 @@ struct ReminderListView: View {
             editing = nil
             assistant = nil
             acting = ReminderSheetID(id: id)
+        }
+        .onOpenURL { url in
+            pendingDeepLink = DeepLink(url: url)
+        }
+        // Like the alarm's options above, a link waits for the scene to be active so the sheet is not presented
+        // while the system is still bringing the app to the foreground.
+        .onChange(of: scenePhase == .active ? pendingDeepLink : nil, initial: true) { _, link in
+            guard let link else { return }
+            pendingDeepLink = nil
+            switch link {
+            case .voiceRecording:
+                // Voice capture starts recording as soon as it appears, so the widget goes straight to recording.
+                editing = nil
+                acting = nil
+                showSettings = false
+                assistant = .voice
+            }
         }
     }
 

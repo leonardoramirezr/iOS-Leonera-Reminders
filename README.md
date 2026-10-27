@@ -26,6 +26,10 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
     repetición (frecuencia, cada cuánto, días de la semana o del mes) editables ahí mismo, así que se revisan y
     corrigen sólo desplazándose. Se pueden quitar o agregar más; los que ya pasaron se marcan en rojo. Al guardar
     aparece «N recordatorios agregados» con *Deshacer*.
+- **Lock screen widget**: add the «Grabar recordatorio» widget to the lock screen. Tapping it opens the app already
+  recording, like the microphone button. Stop the recording and the reminders it describes appear on the review screen,
+  where you can add more or save them. The widget opens the `leonera://voice-recording` link
+  (see `LeoneraReminders/Core/DeepLink.swift`).
 - **Asistente** (*Configuración → Asistente*): la clave de API de Groq (se guarda en el llavero del iPhone), el
   modelo de **voz a texto** (`whisper-large-v3-turbo` por defecto), el de **texto a recordatorios**
   (`openai/gpt-oss-120b`) y el de **fotos** (`qwen/qwen3.8-27b`, que acepta imágenes), y el idioma del dictado.
@@ -87,6 +91,7 @@ LeoneraReminders/
   Assistant/  Groq (peticiones), clave en el llavero, grabación del dictado y fotos
   Stores/     Persistencia (JSON en Application Support y UserDefaults)
   Views/      SwiftUI (Views/Assistant: barra para crear, voz, fotos, revisión y configuración del asistente)
+LeoneraWidgets/  Lock screen widget (WidgetKit extension) that opens the app on voice capture
 Config/Info.plist
 Tests/ReminderCoreTests/
 scripts/      Builds firmados: API de App Store Connect (asc.py) y GitHub Pages (publish-pages.sh, pages.py)
