@@ -10,6 +10,7 @@ struct ReminderEditorView: View {
     @State private var draft: Reminder
     @State private var confirmDelete = false
     @State private var choosingChecklist = false
+    @State private var editMode = EditMode.inactive
     @FocusState private var titleFocused: Bool
     @FocusState private var focusedItemID: ChecklistItem.ID?
 
@@ -58,6 +59,15 @@ struct ReminderEditorView: View {
                             }
                         }
                         .onDelete(perform: deleteChecklistItems)
+                        .onMove(perform: moveChecklistItems)
+                        // Shown while reordering even with a single checkbox, so there is always a way out of edit mode.
+                        if editMode.isEditing || (draft.checklist?.count ?? 0) > 1 {
+                            Button {
+                                withAnimation { editMode = editMode.isEditing ? .inactive : .active }
+                            } label: {
+                                Label(editMode.isEditing ? "Listo" : "Reordenar casillas", systemImage: "arrow.up.arrow.down")
+                            }
+                        }
                         Button {
                             addChecklistItem()
                         } label: {
@@ -128,6 +138,7 @@ struct ReminderEditorView: View {
                     }
                 }
             }
+            .environment(\.editMode, $editMode)
             .navigationTitle(isNew ? "Nuevo recordatorio" : "Editar recordatorio")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -174,6 +185,10 @@ struct ReminderEditorView: View {
 
     private func deleteChecklistItems(at offsets: IndexSet) {
         draft.checklist?.remove(atOffsets: offsets)
+    }
+
+    private func moveChecklistItems(from offsets: IndexSet, to destination: Int) {
+        draft.checklist?.move(fromOffsets: offsets, toOffset: destination)
     }
 
     /// La misma vibración que al completar (`SlideToConfirm` ya vibra por su cuenta).
