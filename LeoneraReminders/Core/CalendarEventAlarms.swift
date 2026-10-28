@@ -4,14 +4,33 @@ import Foundation
 struct CalendarAlarmSettings: Codable, Hashable, Sendable {
     /// `EKCalendar.calendarIdentifier` of each selected calendar; empty means the feature is off.
     var calendarIDs: [String]
+    /// Minutes before the start of an event at which its first alarm rings (one of `leadMinuteOptions`).
+    var leadMinutes: Int
 
-    static let `default` = CalendarAlarmSettings(calendarIDs: [])
+    static let leadMinuteOptions = [1, 5, 10, 15]
+    static let defaultLeadMinutes = 5
+    static let `default` = CalendarAlarmSettings(calendarIDs: [], leadMinutes: defaultLeadMinutes)
 
     var isEnabled: Bool { !calendarIDs.isEmpty }
 }
 
+extension CalendarAlarmSettings {
+    private enum CodingKeys: String, CodingKey {
+        case calendarIDs, leadMinutes
+    }
+
+    /// Settings saved before the lead time could be chosen keep the default.
+    init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            calendarIDs: try c.decodeIfPresent([String].self, forKey: .calendarIDs) ?? [],
+            leadMinutes: try c.decodeIfPresent(Int.self, forKey: .leadMinutes) ?? Self.defaultLeadMinutes
+        )
+    }
+}
+
 /// An event read from the Apple Calendar app, without any EventKit type so it can be tested anywhere.
-struct CalendarEventSnapshot: Hashable, Sendable {
+struct CalendarEventSnapshot: Hashable, Codable, Sendable {
     /// `EKEvent.calendarItemIdentifier`; every occurrence of a recurring event shares it.
     var eventID: String
     var title: String
@@ -48,32 +67,43 @@ struct CalendarEventSnapshot: Hashable, Sendable {
     }
 }
 
-/// One alarm that rings some minutes before a calendar event.
-struct CalendarEventAlarm: Identifiable, Hashable, Sendable {
-    /// Stable for the same event occurrence, lead time and signature (see `UUID(stableFrom:)`).
+/// One alarm of a calendar event: the first one rings `leadMinutes` before it starts, and each repeat rings
+/// after the previous alarm is stopped, until the event is acknowledged (see `CalendarEventRings`).
+struct CalendarEventAlarm: Identifiable, Hashable, Codable, Sendable {
+    /// Stable for the first alarm of an occurrence, lead time and signature (see `UUID(stableFrom:)`); a repeat
+    /// gets a random one.
     var id: UUID
     /// The event as it was read in the sync that produced this alarm.
     var event: CalendarEventSnapshot
     var leadMinutes: Int
     var fireDate: Date
+    /// 0 for the alarm before the event, then 1, 2… for the repeats.
+    var ringIndex = 0
 
     var eventTitle: String { event.title }
     var eventStart: Date { event.startDate }
+    /// The occurrence the alarm belongs to (see `SyncedCalendarEvent.id`).
+    var occurrenceID: String { SyncedCalendarEvent.id(for: event) }
+    var isRepeat: Bool { ringIndex > 0 }
 
-    /// Text shown by the alarm, e.g. "Junta · en 5 min".
+    /// The repeat that rings at `date`, once this alarm has been stopped.
+    func repeated(at date: Date) -> CalendarEventAlarm {
+        CalendarEventAlarm(id: UUID(), event: event, leadMinutes: leadMinutes, fireDate: date, ringIndex: ringIndex + 1)
+    }
+
+    /// Text shown by the alarm, e.g. "Junta · en 5 min", or "Junta · sin confirmar" for a repeat.
     var alarmTitle: String {
         let title = eventTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        return "\(title.isEmpty ? "Evento" : title) · en \(leadMinutes) min"
+        let name = title.isEmpty ? "Evento" : title
+        return isRepeat ? "\(name) · sin confirmar" : "\(name) · en \(leadMinutes) min"
     }
 }
 
 enum CalendarEventAlarmPlanner {
-    /// Minutes before the start of each event at which an alarm rings.
-    static let leadMinutes = [5, 1]
     /// How far ahead event alarms are scheduled.
     static let lookAheadDays = 7
 
-    /// The alarms of `events` whose fire date falls in `from...through`, sorted by fire date.
+    /// The first alarm of each event in `events` whose fire date falls in `from...through`, sorted by fire date.
     ///
     /// All-day and skipped events are left out. `signature` changes when anything the alarm shows or does
     /// changes, so that the alarm gets a new identity and is scheduled again.
@@ -82,19 +112,17 @@ enum CalendarEventAlarmPlanner {
         from start: Date,
         through end: Date,
         signature: String,
-        leadMinutes: [Int] = leadMinutes
+        leadMinutes: Int = CalendarAlarmSettings.defaultLeadMinutes
     ) -> [CalendarEventAlarm] {
         var seen = Set<UUID>()
         var alarms: [CalendarEventAlarm] = []
         for event in events where !event.isAllDay && !event.isSkipped {
-            for lead in leadMinutes {
-                let fireDate = event.startDate.addingTimeInterval(-TimeInterval(lead * 60))
-                guard fireDate >= start, fireDate <= end else { continue }
-                let key = "\(event.eventID)|\(Int(event.startDate.timeIntervalSince1970))|\(lead)|\(event.title)|\(signature)"
-                let id = UUID(stableFrom: key)
-                guard seen.insert(id).inserted else { continue }
-                alarms.append(CalendarEventAlarm(id: id, event: event, leadMinutes: lead, fireDate: fireDate))
-            }
+            let fireDate = event.startDate.addingTimeInterval(-TimeInterval(leadMinutes * 60))
+            guard fireDate >= start, fireDate <= end else { continue }
+            let key = "\(event.eventID)|\(Int(event.startDate.timeIntervalSince1970))|\(leadMinutes)|\(event.title)|\(signature)"
+            let id = UUID(stableFrom: key)
+            guard seen.insert(id).inserted else { continue }
+            alarms.append(CalendarEventAlarm(id: id, event: event, leadMinutes: leadMinutes, fireDate: fireDate))
         }
         return alarms.sorted { ($0.fireDate, $0.id.uuidString) < ($1.fireDate, $1.id.uuidString) }
     }

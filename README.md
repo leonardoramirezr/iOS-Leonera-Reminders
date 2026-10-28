@@ -61,7 +61,11 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   iPhone esté en silencio o en Concentración. Apagado usa notificaciones locales, que respetan el silencio (sólo
   vibran); tienen los mismos botones, pero iOS sólo guarda 64 pendientes, así que se programan las más próximas.
 - **Apple Calendar alarms** (*Configuración → Calendario de Apple*): pick calendars from the Calendar app and an
-  alarm rings 5 minutes and 1 minute before each of their events, with the reminders' sound and silent-mode setting.
+  alarm rings before each of their events, with the reminders' sound and silent-mode setting. The lead time is
+  chosen there: 1, 5, 10 or 15 minutes (5 by default). The alarms are teal, so they differ from the reminders' orange.
+  Stopping an event alarm plans the next one a minute later, and so on until the event is acknowledged with
+  *Enterado* in its details (localized: «Acknowledge» on English devices). In silent-mode-respecting notification
+  mode, the next repeat follows when the notification is cleared.
   Events of the next 7 days are scheduled; they are refreshed when the app opens, when the calendar changes while it
   runs, and every few hours with a background refresh. All-day, canceled and declined events do not ring.
   Events whose alarms are scheduled also appear in the reminder list, by date, with a calendar icon instead of the
@@ -89,9 +93,11 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   reprograma si cambian los botones o el tiempo de posponer. Si AlarmKit llega a su límite de alarmas, se programan
   primero las más cercanas.
 - The same sync owns the Apple Calendar event alarms (`CalendarEventSource` reads EventKit,
-  `CalendarEventAlarmPlanner` in `Core/` computes them). Each one has a UUID derived from the event occurrence, the
-  lead time and the alarm settings, so an existing alarm is kept as is and a moved, renamed or deleted event gets its
-  old alarm cancelled, without storing anything.
+  `CalendarEventAlarmPlanner` in `Core/` computes the first alarm of each event). Its UUID is derived from the event
+  occurrence, the lead time and the alarm settings, so an existing alarm is kept as is and a moved, renamed or deleted
+  event gets its old alarm cancelled. The repeats after each stop are kept in `CalendarEventRings` (`Core/`, saved in
+  `UserDefaults`): one current alarm per unacknowledged event, with a random UUID, and the stop button
+  (`CalendarEventRingStopIntent`) or a cleared notification plans the next one.
 
 ```
 LeoneraReminders/

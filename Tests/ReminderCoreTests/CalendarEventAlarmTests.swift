@@ -6,12 +6,35 @@ struct CalendarEventAlarmTests {
     private let windowStart = local(2026, 10, 27, 8)
     private let windowEnd = local(2026, 11, 3, 8)
 
-    @Test func eachEventRingsFiveAndOneMinuteBefore() {
+    @Test func eachEventRingsTheChosenLeadTimeBeforeItStarts() {
         let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
-        let alarms = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")
-        #expect(alarms.map(\.fireDate) == [local(2026, 10, 27, 9, 55), local(2026, 10, 27, 9, 59)])
-        #expect(alarms.map(\.leadMinutes) == [5, 1])
-        #expect(alarms.map(\.alarmTitle) == ["Junta · en 5 min", "Junta · en 1 min"])
+        let five = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")
+        #expect(five.map(\.fireDate) == [local(2026, 10, 27, 9, 55)])
+        #expect(five.map(\.leadMinutes) == [5])
+        #expect(five.map(\.alarmTitle) == ["Junta · en 5 min"])
+        #expect(five.map(\.ringIndex) == [0])
+
+        let fifteen = CalendarEventAlarmPlanner.alarms(
+            for: [event], from: windowStart, through: windowEnd, signature: "s", leadMinutes: 15
+        )
+        #expect(fifteen.map(\.fireDate) == [local(2026, 10, 27, 9, 45)])
+        #expect(fifteen.map(\.alarmTitle) == ["Junta · en 15 min"])
+    }
+
+    @Test func leadTimeOptionsAreOneFiveTenAndFifteenMinutes() {
+        #expect(CalendarAlarmSettings.leadMinuteOptions == [1, 5, 10, 15])
+        #expect(CalendarAlarmSettings.default.leadMinutes == 5)
+    }
+
+    @Test func repeatAlarmHasItsOwnIDAndSaysItIsUnconfirmed() {
+        let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
+        let first = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")[0]
+        let repeated = first.repeated(at: local(2026, 10, 27, 9, 56))
+        #expect(repeated.ringIndex == 1)
+        #expect(repeated.isRepeat)
+        #expect(repeated.id != first.id)
+        #expect(repeated.occurrenceID == first.occurrenceID)
+        #expect(repeated.alarmTitle == "Junta · sin confirmar")
     }
 
     @Test func allDayAndSkippedEventsDoNotRing() {
@@ -24,18 +47,20 @@ struct CalendarEventAlarmTests {
 
     @Test func onlyFireDatesInsideTheWindowAreKept() {
         let events = [
-            // The 5-minute alarm already passed; only the 1-minute one is left.
+            // Its alarm would have rung before the window started.
             CalendarEventSnapshot(eventID: "a", title: "Ya casi", startDate: local(2026, 10, 27, 8, 3)),
             CalendarEventSnapshot(eventID: "b", title: "Muy lejos", startDate: local(2026, 11, 10, 9)),
+            CalendarEventSnapshot(eventID: "c", title: "Pronto", startDate: local(2026, 10, 27, 8, 6)),
         ]
         let alarms = CalendarEventAlarmPlanner.alarms(for: events, from: windowStart, through: windowEnd, signature: "s")
-        #expect(alarms.map(\.fireDate) == [local(2026, 10, 27, 8, 2)])
+        #expect(alarms.map(\.event.title) == ["Pronto"])
+        #expect(alarms.map(\.fireDate) == [local(2026, 10, 27, 8, 1)])
     }
 
-    @Test func duplicateEventsGetOneAlarmPerLeadTime() {
+    @Test func duplicateEventsGetOneAlarm() {
         let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
         let alarms = CalendarEventAlarmPlanner.alarms(for: [event, event], from: windowStart, through: windowEnd, signature: "s")
-        #expect(alarms.count == 2)
+        #expect(alarms.count == 1)
     }
 
     @Test func occurrencesOfARecurringEventAreDistinct() {
@@ -43,7 +68,7 @@ struct CalendarEventAlarmTests {
         var second = first
         second.startDate = local(2026, 10, 28, 10)
         let alarms = CalendarEventAlarmPlanner.alarms(for: [first, second], from: windowStart, through: windowEnd, signature: "s")
-        #expect(Set(alarms.map(\.id)).count == 4)
+        #expect(Set(alarms.map(\.id)).count == 2)
     }
 
     @Test func alarmIDIsStableAndChangesWithTheEvent() {
@@ -85,16 +110,16 @@ struct CalendarEventAlarmTests {
         let alarms = CalendarEventAlarmPlanner.alarms(for: [later, sooner], from: windowStart, through: windowEnd, signature: "s")
         let synced = CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: windowStart)
         #expect(synced.map(\.event.title) == ["Junta", "Comida"])
-        #expect(synced.first?.alarms.map(\.leadMinutes) == [5, 1])
+        #expect(synced.first?.alarms.map(\.leadMinutes) == [5])
     }
 
-    @Test func syncedEventLeavesOnceItsLastAlarmHasPassedUnlessItIsRinging() {
+    @Test func syncedEventLeavesOnceItsAlarmHasPassedUnlessItIsRinging() {
         let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
         let alarms = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")
-        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 57)).count == 1)
-        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 59)).isEmpty)
-        let ringing = Set(alarms.filter { $0.leadMinutes == 1 }.map(\.id))
-        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 59), alerting: ringing).count == 1)
+        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 54)).count == 1)
+        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 56)).isEmpty)
+        let ringing = Set(alarms.map(\.id))
+        #expect(CalendarEventAlarmPlanner.syncedEvents(from: alarms, now: local(2026, 10, 27, 9, 56), alerting: ringing).count == 1)
     }
 
     @Test func syncedEventKeepsTheEventDetails() throws {
@@ -118,7 +143,16 @@ struct CalendarEventAlarmTests {
     @Test func calendarAlarmSettingsRoundTrip() throws {
         var settings = AppSettings.default
         settings.calendarAlarms.calendarIDs = ["work", "home"]
+        settings.calendarAlarms.leadMinutes = 15
         let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
         #expect(decoded.calendarAlarms.calendarIDs == ["work", "home"])
+        #expect(decoded.calendarAlarms.leadMinutes == 15)
+    }
+
+    @Test func calendarSettingsSavedBeforeTheLeadTimeKeepTheirCalendarsAndUseTheDefault() throws {
+        let data = Data(#"{"calendarIDs": ["work"]}"#.utf8)
+        let settings = try JSONDecoder().decode(CalendarAlarmSettings.self, from: data)
+        #expect(settings.calendarIDs == ["work"])
+        #expect(settings.leadMinutes == CalendarAlarmSettings.defaultLeadMinutes)
     }
 }

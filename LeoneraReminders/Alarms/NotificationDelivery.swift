@@ -62,9 +62,9 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
             case let .calendarEvent(alarm):
                 identifier = alarm.id.uuidString
                 content.title = alarm.eventTitle.isEmpty ? "Evento" : alarm.eventTitle
-                content.body = "Empieza en \(alarm.leadMinutes) min"
+                content.body = alarm.isRepeat ? "Sin confirmar" : "Empieza en \(alarm.leadMinutes) min"
                 content.categoryIdentifier = Self.calendarEventCategoryID
-                content.userInfo = [Self.calendarEventKey: true]
+                content.userInfo = [Self.calendarEventKey: true, Self.alarmKey: alarm.id.uuidString]
             }
             content.sound = Self.sound(for: settings.sound)
             content.interruptionLevel = .active
@@ -81,6 +81,11 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
     func removeAll() {
         center.removeAllPendingNotificationRequests()
         center.removeAllDeliveredNotifications()
+    }
+
+    /// Takes the delivered notification of a calendar event off the Notification Center, once it is acknowledged.
+    func removeDeliveredCalendarEvent(_ alarmID: UUID) {
+        center.removeDeliveredNotifications(withIdentifiers: [alarmID.uuidString])
     }
 
     /// Quita del Centro de notificaciones las de recordatorios que ya no están pendientes.
@@ -112,8 +117,9 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
         let category = UNNotificationCategory(
             identifier: Self.categoryID, actions: actions, intentIdentifiers: [], options: [.customDismissAction]
         )
+        // Clearing the notification of an event counts as stopping its alarm, which plans the next repeat.
         let calendarEventCategory = UNNotificationCategory(
-            identifier: Self.calendarEventCategoryID, actions: [], intentIdentifiers: [], options: []
+            identifier: Self.calendarEventCategoryID, actions: [], intentIdentifiers: [], options: [.customDismissAction]
         )
         center.setNotificationCategories([category, calendarEventCategory])
     }
@@ -140,8 +146,14 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse
     ) async {
         let info = response.notification.request.content.userInfo
-        // A calendar event notification only opens the app; the reminder actions do not apply to it.
-        if info[Self.calendarEventKey] != nil { return }
+        // A calendar event notification has no reminder actions: clearing it stops the alarm, anything else opens the app.
+        if info[Self.calendarEventKey] != nil {
+            guard response.actionIdentifier == UNNotificationDismissActionIdentifier,
+                  let alarmID = info[Self.alarmKey] as? String
+            else { return }
+            await CalendarEventRingHandler.stopped(alarmID: alarmID)
+            return
+        }
         let reminderID = info[Self.reminderKey] as? String ?? ""
         let alarmID = info[Self.alarmKey] as? String ?? ""
         switch response.actionIdentifier {
