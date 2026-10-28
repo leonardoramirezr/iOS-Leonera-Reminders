@@ -127,13 +127,24 @@ final class AlarmSyncService {
         let events = CalendarEventSource.shared.events(
             calendarIDs: settings.calendarAlarms.calendarIDs, from: min(oldestRepeating, now), to: through
         )
-        let planned = CalendarEventAlarmPlanner.alarms(
+        let signature = "\(settings.alarmSignature)|\(Self.buttonsVersion)"
+        var planned = CalendarEventAlarmPlanner.alarms(
             for: events,
             from: now.addingTimeInterval(1),
             through: through,
-            signature: "\(settings.alarmSignature)|\(Self.buttonsVersion)",
+            signature: signature,
             leadMinutes: settings.calendarAlarms.leadMinutes
         )
+        if settings.calendarAlarms.ringsAcknowledgedAtStart {
+            // Reconciled only for the events already acknowledged, see `CalendarEventRings.reconcile`.
+            planned += CalendarEventAlarmPlanner.alarms(
+                for: events,
+                from: now.addingTimeInterval(1),
+                through: through,
+                signature: signature,
+                leadMinutes: CalendarEventAlarm.startLeadMinutes
+            )
+        }
         var rings = ringStore.rings
         rings.reconcile(planned: planned, events: events, scheduled: scheduled, now: now)
         ringStore.rings = rings

@@ -26,6 +26,23 @@ struct CalendarEventAlarmTests {
         #expect(CalendarAlarmSettings.default.leadMinutes == 5)
     }
 
+    @Test func theAlarmAtTheStartRingsWhenTheEventStarts() {
+        let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
+        let atStart = CalendarEventAlarmPlanner.alarms(
+            for: [event], from: windowStart, through: windowEnd, signature: "s", leadMinutes: CalendarEventAlarm.startLeadMinutes
+        )
+        #expect(atStart.map(\.fireDate) == [local(2026, 10, 27, 10)])
+        #expect(atStart.map(\.alarmTitle) == ["Junta · ahora"])
+        #expect(atStart.first?.ringsAtStart == true)
+    }
+
+    @Test func acknowledgedEventsRingAtTheStartByDefault() throws {
+        #expect(CalendarAlarmSettings.default.ringsAcknowledgedAtStart)
+        let saved = Data(#"{"calendarIDs":["work"],"leadMinutes":5}"#.utf8)
+        let decoded = try JSONDecoder().decode(CalendarAlarmSettings.self, from: saved)
+        #expect(decoded.ringsAcknowledgedAtStart)
+    }
+
     @Test func repeatAlarmHasItsOwnIDAndSaysItIsUnconfirmed() {
         let event = CalendarEventSnapshot(eventID: "a", title: "Junta", startDate: local(2026, 10, 27, 10))
         let first = CalendarEventAlarmPlanner.alarms(for: [event], from: windowStart, through: windowEnd, signature: "s")[0]

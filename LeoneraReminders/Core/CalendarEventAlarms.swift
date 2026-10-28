@@ -6,6 +6,8 @@ struct CalendarAlarmSettings: Codable, Hashable, Sendable {
     var calendarIDs: [String]
     /// Minutes before the start of an event at which its first alarm rings (one of `leadMinuteOptions`).
     var leadMinutes: Int
+    /// Whether an event already acknowledged in the app still rings once, at the time it starts.
+    var ringsAcknowledgedAtStart: Bool = true
 
     static let leadMinuteOptions = [1, 5, 10, 15]
     static let defaultLeadMinutes = 5
@@ -16,15 +18,16 @@ struct CalendarAlarmSettings: Codable, Hashable, Sendable {
 
 extension CalendarAlarmSettings {
     private enum CodingKeys: String, CodingKey {
-        case calendarIDs, leadMinutes
+        case calendarIDs, leadMinutes, ringsAcknowledgedAtStart
     }
 
-    /// Settings saved before the lead time could be chosen keep the default.
+    /// Settings saved before these options existed keep their defaults.
     init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.init(
             calendarIDs: try c.decodeIfPresent([String].self, forKey: .calendarIDs) ?? [],
-            leadMinutes: try c.decodeIfPresent(Int.self, forKey: .leadMinutes) ?? Self.defaultLeadMinutes
+            leadMinutes: try c.decodeIfPresent(Int.self, forKey: .leadMinutes) ?? Self.defaultLeadMinutes,
+            ringsAcknowledgedAtStart: try c.decodeIfPresent(Bool.self, forKey: .ringsAcknowledgedAtStart) ?? true
         )
     }
 }
@@ -80,22 +83,28 @@ struct CalendarEventAlarm: Identifiable, Hashable, Codable, Sendable {
     /// 0 for the alarm before the event, then 1, 2… for the repeats.
     var ringIndex = 0
 
+    /// The lead time of the alarm that rings when the event starts, for an event already acknowledged.
+    static let startLeadMinutes = 0
+
     var eventTitle: String { event.title }
     var eventStart: Date { event.startDate }
     /// The occurrence the alarm belongs to (see `SyncedCalendarEvent.id`).
     var occurrenceID: String { SyncedCalendarEvent.id(for: event) }
     var isRepeat: Bool { ringIndex > 0 }
+    /// Rings when the event starts. It is planned only for acknowledged events, and it never repeats.
+    var ringsAtStart: Bool { leadMinutes == Self.startLeadMinutes }
 
     /// The repeat that rings at `date`, once this alarm has been stopped.
     func repeated(at date: Date) -> CalendarEventAlarm {
         CalendarEventAlarm(id: UUID(), event: event, leadMinutes: leadMinutes, fireDate: date, ringIndex: ringIndex + 1)
     }
 
-    /// Text shown by the alarm, e.g. "Junta · en 5 min", or "Junta · sin confirmar" for a repeat.
+    /// Text shown by the alarm, e.g. "Junta · en 5 min", "Junta · ahora", or "Junta · sin confirmar" for a repeat.
     var alarmTitle: String {
         let title = eventTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         let name = title.isEmpty ? "Evento" : title
-        return isRepeat ? "\(name) · sin confirmar" : "\(name) · en \(leadMinutes) min"
+        if isRepeat { return "\(name) · sin confirmar" }
+        return ringsAtStart ? "\(name) · ahora" : "\(name) · en \(leadMinutes) min"
     }
 }
 
