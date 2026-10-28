@@ -34,6 +34,7 @@ struct CalendarSettingsView: View {
         Form {
             accessSection
             if calendarEvents.hasAccess {
+                leadSection
                 if calendarEvents.calendars.isEmpty {
                     Section {
                         Text("No hay calendarios en este iPhone.")
@@ -78,8 +79,28 @@ struct CalendarSettingsView: View {
                 Text(error).font(.footnote).foregroundStyle(.secondary)
             }
         } footer: {
-            Text("Por cada evento de los calendarios que elijas suena una alarma 5 minutos y 1 minuto antes, con el sonido y el modo de silencio de los recordatorios. Se programan los eventos de los próximos \(CalendarEventAlarmPlanner.lookAheadDays) días; se actualizan al abrir la app y, cada pocas horas, en segundo plano. Los eventos de todo el día, cancelados o rechazados no suenan.")
+            Text("Por cada evento de los calendarios que elijas suena una alarma, con el sonido y el modo de silencio de los recordatorios. Se programan los eventos de los próximos \(CalendarEventAlarmPlanner.lookAheadDays) días; se actualizan al abrir la app y, cada pocas horas, en segundo plano. Los eventos de todo el día, cancelados o rechazados no suenan.")
         }
+    }
+
+    @ViewBuilder
+    private var leadSection: some View {
+        Section {
+            Picker("Sonar", selection: leadMinutes) {
+                ForEach(CalendarAlarmSettings.leadMinuteOptions, id: \.self) { minutes in
+                    Text(minutes == 1 ? "1 minuto antes" : "\(minutes) minutos antes").tag(minutes)
+                }
+            }
+        } footer: {
+            Text("Cada evento suena este tiempo antes de empezar. Al detener la alarma, vuelve a sonar un minuto después, y así hasta que confirmes el evento con «Enterado» en la app.")
+        }
+    }
+
+    private var leadMinutes: Binding<Int> {
+        Binding(
+            get: { settingsStore.settings.calendarAlarms.leadMinutes },
+            set: { settingsStore.settings.calendarAlarms.leadMinutes = $0 }
+        )
     }
 
     private func row(_ calendar: EKCalendar) -> some View {

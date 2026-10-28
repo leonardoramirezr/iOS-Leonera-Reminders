@@ -1,0 +1,22 @@
+{
+  "sourceLanguage" : "es",
+  "strings" : {
+    "Enterado" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enterado"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

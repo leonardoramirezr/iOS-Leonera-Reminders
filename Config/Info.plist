@@ -26,7 +26,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Leonera usa el micrófono para que dictes recordatorios; el audio se envía a Groq para convertirlo en texto.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Leonera lee los eventos de los calendarios que elijas para que suene una alarma 5 minutos y 1 minuto antes de cada uno.</string>
+	<string>Leonera lee los eventos de los calendarios que elijas para que suene una alarma antes de cada uno.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Leonera usa la cámara para crear recordatorios a partir de una foto; la foto se envía a Groq para leerla.</string>
 	<key>UIBackgroundModes</key>

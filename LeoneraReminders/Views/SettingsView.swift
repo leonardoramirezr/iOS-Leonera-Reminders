@@ -89,7 +89,7 @@ struct SettingsView: View {
         } header: {
             Text("Eventos")
         } footer: {
-            Text("Suena una alarma 5 minutos y 1 minuto antes de cada evento de los calendarios que elijas.")
+            Text("Suena una alarma antes de cada evento de los calendarios que elijas, y sigue sonando hasta que lo confirmes en la app.")
         }
     }
 

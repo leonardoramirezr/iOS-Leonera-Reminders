@@ -33,7 +33,7 @@ struct CalendarEventRow: View {
             Spacer(minLength: 0)
             if isRinging {
                 Image(systemName: "alarm.waves.left.and.right.fill")
-                    .foregroundStyle(Color.brand)
+                    .foregroundStyle(Color.calendarEvent)
                     .symbolEffect(.wiggle, options: .repeating)
                     .accessibilityLabel("Sonando")
             }
@@ -52,6 +52,7 @@ struct CalendarEventDetailView: View {
     let synced: SyncedCalendarEvent
 
     @Environment(CalendarEventSource.self) private var calendarEvents
+    @Environment(AlarmSyncService.self) private var alarms
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -107,7 +108,7 @@ struct CalendarEventDetailView: View {
                 Section {
                     ForEach(synced.alarms) { alarm in
                         LabeledContent {
-                            Text("\(alarm.leadMinutes) min antes")
+                            Text(alarm.isRepeat ? "Sin confirmar" : "\(alarm.leadMinutes) min antes")
                         } label: {
                             Label(DateText.time(alarm.fireDate), systemImage: "alarm")
                         }
@@ -116,6 +117,17 @@ struct CalendarEventDetailView: View {
                     Text("Alarmas")
                 } footer: {
                     Text("El evento viene de Calendario de Apple; para cambiarlo, edítalo ahí.")
+                }
+
+                Section {
+                    Button("Enterado") {
+                        Task {
+                            await alarms.acknowledgeCalendarEvent(synced)
+                            dismiss()
+                        }
+                    }
+                } footer: {
+                    Text("Mientras no lo confirmes, la alarma vuelve a sonar un minuto después de cada vez que la detengas.")
                 }
 
                 Section {

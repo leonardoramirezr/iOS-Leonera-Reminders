@@ -99,38 +99,61 @@ final class AlarmSyncService {
     private func performSync() async {
         let settings = SettingsStore.shared.settings
         if authorizationState != manager.authorizationState { authorizationState = manager.authorizationState }
-        let eventAlarms = calendarEventAlarms(settings: settings, now: Date())
         if settings.ignoresSilentMode {
             NotificationDelivery.shared.removeAll()
-            await syncAlarmKit(settings: settings, eventAlarms: eventAlarms)
+            await syncAlarmKit(settings: settings)
         } else {
             // Modo que respeta el silencio: nada de AlarmKit, sólo notificaciones.
             if authorizationState == .authorized {
                 for alarm in (try? manager.alarms) ?? [] { try? manager.cancel(id: alarm.id) }
             }
-            await syncNotifications(settings: settings, eventAlarms: eventAlarms)
+            await syncNotifications(settings: settings)
         }
     }
 
-    /// Alarms 5 and 1 minutes before each event of the selected Apple Calendar calendars.
+    /// The alarms of the Apple Calendar events that should be scheduled now: the first alarm of each upcoming
+    /// event and the current repeat of each event not yet acknowledged.
     ///
-    /// They start an hour back so that an event alarm ringing right now is kept instead of cancelled;
-    /// only the future ones are scheduled.
-    private func calendarEventAlarms(settings: AppSettings, now: Date) -> [CalendarEventAlarm] {
-        guard settings.calendarAlarms.isEnabled else { return [] }
-        let from = now.addingTimeInterval(-60 * 60)
+    /// The events are read from the start of the oldest event still repeating, so that a deleted or moved event
+    /// drops its repeats. `scheduled` holds the alarms the system still has, or `nil` when they are not known.
+    private func calendarEventAlarms(settings: AppSettings, scheduled: Set<UUID>?, now: Date) -> [CalendarEventAlarm] {
+        let ringStore = CalendarEventRingStore.shared
+        guard settings.calendarAlarms.isEnabled else {
+            ringStore.rings = CalendarEventRings()
+            return []
+        }
         let through = now.addingTimeInterval(TimeInterval(CalendarEventAlarmPlanner.lookAheadDays * 24 * 60 * 60))
-        let maxLead = TimeInterval((CalendarEventAlarmPlanner.leadMinutes.max() ?? 0) * 60)
+        let oldestRepeating = ringStore.rings.current.values.map(\.eventStart).min() ?? now
         let events = CalendarEventSource.shared.events(
-            calendarIDs: settings.calendarAlarms.calendarIDs, from: from, to: through.addingTimeInterval(maxLead)
+            calendarIDs: settings.calendarAlarms.calendarIDs, from: min(oldestRepeating, now), to: through
         )
-        return CalendarEventAlarmPlanner.alarms(
-            for: events, from: from, through: through, signature: "\(settings.alarmSignature)|\(Self.buttonsVersion)"
+        let planned = CalendarEventAlarmPlanner.alarms(
+            for: events,
+            from: now.addingTimeInterval(1),
+            through: through,
+            signature: "\(settings.alarmSignature)|\(Self.buttonsVersion)",
+            leadMinutes: settings.calendarAlarms.leadMinutes
         )
+        var rings = ringStore.rings
+        rings.reconcile(planned: planned, events: events, scheduled: scheduled, now: now)
+        ringStore.rings = rings
+        return rings.current.values.sorted { ($0.fireDate, $0.id.uuidString) < ($1.fireDate, $1.id.uuidString) }
+    }
+
+    /// The user acknowledged an event in the app: its alarm stops, and it does not ring again.
+    func acknowledgeCalendarEvent(_ synced: SyncedCalendarEvent) async {
+        let ringStore = CalendarEventRingStore.shared
+        var rings = ringStore.rings
+        if let current = rings.current[synced.id] {
+            NotificationDelivery.shared.removeDeliveredCalendarEvent(current.id)
+        }
+        rings.acknowledge(synced.id, start: synced.event.startDate)
+        ringStore.rings = rings
+        await syncNow()
     }
 
     /// Notificaciones locales: iOS permite 64 pendientes, así que se programan las más próximas.
-    private func syncNotifications(settings: AppSettings, eventAlarms: [CalendarEventAlarm]) async {
+    private func syncNotifications(settings: AppSettings) async {
         let delivery = NotificationDelivery.shared
         let authorized = await delivery.requestAuthorization()
         if notificationsAuthorized != authorized { notificationsAuthorized = authorized }
@@ -141,6 +164,7 @@ final class AlarmSyncService {
 
         let store = ReminderStore.shared
         let now = Date()
+        let eventAlarms = calendarEventAlarms(settings: settings, scheduled: nil, now: now)
         var items: [NotificationDelivery.Item] = []
         for reminder in store.reminders where !reminder.isCompleted {
             let signature = signature(for: reminder, settings: settings)
@@ -170,7 +194,7 @@ final class AlarmSyncService {
         await delivery.removeDelivered(keeping: Set(store.reminders.filter { !$0.isCompleted }.map(\.id)))
     }
 
-    private func syncAlarmKit(settings: AppSettings, eventAlarms: [CalendarEventAlarm]) async {
+    private func syncAlarmKit(settings: AppSettings) async {
         guard authorizationState == .authorized else {
             setScheduledEventAlarms([])
             return
@@ -188,6 +212,7 @@ final class AlarmSyncService {
         let existingByID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         let store = ReminderStore.shared
         let now = Date()
+        let eventAlarms = calendarEventAlarms(settings: settings, scheduled: Set(existingByID.keys), now: now)
 
         var keep = Set<UUID>()
         var kept: [UUID: [ScheduledAlarm]] = [:]
@@ -290,7 +315,7 @@ final class AlarmSyncService {
     }
 
     /// Sube cuando cambia el texto o el ícono de los botones, para reprogramar las alarmas ya creadas.
-    private static let buttonsVersion = 2
+    private static let buttonsVersion = 3
 
     private func signature(for reminder: Reminder, settings: AppSettings) -> String {
         "\(reminder.title)|\(settings.alarmSignature)|\(Self.buttonsVersion)"
@@ -343,7 +368,8 @@ final class AlarmSyncService {
         )
     }
 
-    /// The alarm of a calendar event: only a stop button, since there is nothing to snooze, and no intents.
+    /// The alarm of a calendar event: only a stop button, since there is nothing to snooze. Stopping it plans the
+    /// next repeat, see `CalendarEventRingStopIntent`.
     nonisolated private static func configuration(
         for alarm: CalendarEventAlarm,
         settings: AppSettings
@@ -363,12 +389,12 @@ final class AlarmSyncService {
         let attributes = AlarmAttributes<CalendarEventAlarmMetadata>(
             presentation: AlarmPresentation(alert: alert),
             metadata: CalendarEventAlarmMetadata(eventTitle: alarm.eventTitle, eventStart: alarm.eventStart),
-            tintColor: .brand
+            tintColor: .calendarEvent
         )
         return AlarmManager.AlarmConfiguration<CalendarEventAlarmMetadata>.alarm(
             schedule: .fixed(alarm.fireDate),
             attributes: attributes,
-            stopIntent: nil,
+            stopIntent: CalendarEventRingStopIntent(alarmID: alarm.id),
             secondaryIntent: nil,
             sound: settings.sound.fileName.map { AlertConfiguration.AlertSound.named($0) } ?? .default
         )
@@ -401,4 +427,6 @@ final class AlarmSyncService {
 extension Color {
     /// Color de la app (también tiñe las alarmas, que no pueden usar el AccentColor del catálogo).
     static let brand = Color(red: 0.95, green: 0.38, blue: 0.20)
+    /// Tints the alarms of Apple Calendar events, so they can be told apart from the reminders' alarms.
+    static let calendarEvent = Color(red: 0.00, green: 0.60, blue: 0.66)
 }
