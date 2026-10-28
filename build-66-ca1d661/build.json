@@ -1,0 +1,18 @@
+{
+  "tag": "build-66-ca1d661",
+  "channel": "branch",
+  "branch": "voice-review-text-actions",
+  "commit": "ca1d6618bc15f57f14ec2aaa59c6c91b3853a295",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.22.0",
+  "build": "66",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-66-ca1d661.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40429131158",
+  "created_at": "2026-10-27T00:54:33Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-66-ca1d661/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-66-ca1d661/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-66-ca1d661%2Fmanifest.plist",
+  "commit_title": "Show voice reminders right after recording, with text actions"
+}

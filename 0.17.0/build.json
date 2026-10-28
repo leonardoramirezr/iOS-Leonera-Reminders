@@ -1,0 +1,18 @@
+{
+  "tag": "0.17.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "2462872930ab1ae0b8dcb2dd8b881e1fee1a111b",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.17.0",
+  "build": "52",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.17.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39329101502",
+  "created_at": "2026-10-19T21:41:10Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.17.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.17.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.17.0%2Fmanifest.plist",
+  "commit_title": "Keep the action sheet at its fitted height when opened from the alarm (#19)"
+}

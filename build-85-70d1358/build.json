@@ -1,0 +1,18 @@
+{
+  "tag": "build-85-70d1358",
+  "channel": "branch",
+  "branch": "calendar-alarm-at-start-when-acknowledged",
+  "commit": "70d13584f31deb00897b80ccf2d43eabc16c7f26",
+  "commit_title": "Ring acknowledged Apple Calendar events at their start",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.29.0",
+  "build": "85",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-85-70d1358.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40613638617",
+  "created_at": "2026-10-28T01:15:25Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-85-70d1358/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-85-70d1358/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-85-70d1358%2Fmanifest.plist"
+}

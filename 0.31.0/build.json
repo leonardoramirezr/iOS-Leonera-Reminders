@@ -1,0 +1,18 @@
+{
+  "tag": "0.31.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "f8f578c5ca23c055bd139d1692f7aeed3e6ed161",
+  "commit_title": "Show the app logo with a microphone badge on the lock screen widget (#35)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.31.0",
+  "build": "88",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.31.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40711861355",
+  "created_at": "2026-10-28T15:05:32Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.31.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.31.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.31.0%2Fmanifest.plist"
+}

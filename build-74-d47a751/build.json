@@ -1,0 +1,18 @@
+{
+  "tag": "build-74-d47a751",
+  "channel": "branch",
+  "branch": "claude/lock-screen-voice-widget",
+  "commit": "d47a75140c649211ddbcddf0cc237578f40c3115",
+  "commit_title": "Add a lock screen widget that opens voice recording",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.25.0",
+  "build": "74",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-74-d47a751.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40455569367",
+  "created_at": "2026-10-27T05:33:24Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-74-d47a751/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-74-d47a751/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-74-d47a751%2Fmanifest.plist"
+}
