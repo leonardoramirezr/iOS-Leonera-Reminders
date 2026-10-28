@@ -51,7 +51,7 @@ struct CalendarEventRingsTests {
         var rings = CalendarEventRings()
         sync(&rings, at: local(2026, 10, 27, 9, 50))
         let first = try #require(rings.current[occurrence])
-        let now = local(2026, 10, 27, 9, 55, 20)
+        let now = local(2026, 10, 27, 9, 55).addingTimeInterval(20)
         rings.stopped(first.id, now: now)
         let repeated = rings.current[occurrence]
         rings.stopped(first.id, now: now.addingTimeInterval(1))
@@ -72,7 +72,7 @@ struct CalendarEventRingsTests {
         var rings = CalendarEventRings()
         sync(&rings, at: local(2026, 10, 27, 9, 50))
         let ringing = try #require(rings.current[occurrence])
-        sync(&rings, at: local(2026, 10, 27, 9, 55, 10), scheduled: [ringing.id])
+        sync(&rings, at: local(2026, 10, 27, 9, 55).addingTimeInterval(10), scheduled: [ringing.id])
         #expect(rings.current[occurrence] == ringing)
     }
 
@@ -111,13 +111,13 @@ struct CalendarEventRingsTests {
         var rings = CalendarEventRings()
         sync(&rings, at: local(2026, 10, 27, 9, 50))
         let first = try #require(rings.current[occurrence])
-        rings.stopped(first.id, now: local(2026, 10, 27, 9, 55, 20))
+        rings.stopped(first.id, now: local(2026, 10, 27, 9, 55).addingTimeInterval(20))
         let repeated = try #require(rings.current[occurrence])
         rings.reconcile(
             planned: planned(at: local(2026, 10, 27, 9, 50)),
             events: [event],
             scheduled: nil,
-            now: local(2026, 10, 27, 9, 56, 30)
+            now: local(2026, 10, 27, 9, 56).addingTimeInterval(30)
         )
         #expect(rings.current[occurrence] == repeated)
     }
