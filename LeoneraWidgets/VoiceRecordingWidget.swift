@@ -50,21 +50,63 @@ struct VoiceRecordingWidgetView: View {
     private var content: some View {
         switch family {
         case .accessoryRectangular:
-            VStack(alignment: .leading, spacing: 2) {
-                Label("Leonera", systemImage: "mic.fill")
-                    .font(.headline)
-                Text("Grabar recordatorio")
-                    .font(.caption)
+            HStack(spacing: 8) {
+                LogoWithMicBadge()
+                    .frame(width: 44, height: 44)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Leonera")
+                        .font(.headline)
+                    Text("Grabar recordatorio")
+                        .font(.caption)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         case .accessoryInline:
+            // Inline widgets only show one symbol next to the text, so the microphone stays on its own.
             Label("Grabar recordatorio", systemImage: "mic.fill")
         default:
             ZStack {
                 AccessoryWidgetBackground()
-                Image(systemName: "mic.fill")
-                    .font(.title2)
+                LogoWithMicBadge()
+                    .padding(10)
             }
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel("Grabar recordatorio")
         }
+    }
+}
+
+/// The app logo with a small microphone badge on its bottom-right corner.
+/// The logo is a one-color glyph (`LogoGlyph` in the widget assets) because the lock screen renders widgets without color.
+struct LogoWithMicBadge: View {
+    var body: some View {
+        GeometryReader { proxy in
+            let side = min(proxy.size.width, proxy.size.height)
+            let badge = side * 0.36
+            let gap = side * 0.07
+            ZStack(alignment: .bottomTrailing) {
+                Image("LogoGlyph")
+                    .resizable()
+                    .scaledToFit()
+                    // Cut a ring around the badge out of the logo so both stay readable.
+                    .mask {
+                        Rectangle()
+                            .overlay(alignment: .bottomTrailing) {
+                                Circle()
+                                    .frame(width: badge + gap * 2, height: badge + gap * 2)
+                                    .offset(x: gap, y: gap)
+                                    .blendMode(.destinationOut)
+                            }
+                            .compositingGroup()
+                    }
+                Image(systemName: "mic.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: badge, height: badge)
+            }
+            .frame(width: side, height: side)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .accessibilityHidden(true)
     }
 }
