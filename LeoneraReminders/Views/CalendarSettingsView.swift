@@ -35,6 +35,7 @@ struct CalendarSettingsView: View {
             accessSection
             if calendarEvents.hasAccess {
                 leadSection
+                startSection
                 if calendarEvents.calendars.isEmpty {
                     Section {
                         Text("No hay calendarios en este iPhone.")
@@ -96,10 +97,26 @@ struct CalendarSettingsView: View {
         }
     }
 
+    @ViewBuilder
+    private var startSection: some View {
+        Section {
+            Toggle("Sonar a la hora aunque ya esté confirmado", isOn: ringsAcknowledgedAtStart)
+        } footer: {
+            Text("Un evento que ya confirmaste con «Enterado» vuelve a sonar una vez cuando empieza. Apagado, los eventos confirmados ya no suenan.")
+        }
+    }
+
     private var leadMinutes: Binding<Int> {
         Binding(
             get: { settingsStore.settings.calendarAlarms.leadMinutes },
             set: { settingsStore.settings.calendarAlarms.leadMinutes = $0 }
+        )
+    }
+
+    private var ringsAcknowledgedAtStart: Binding<Bool> {
+        Binding(
+            get: { settingsStore.settings.calendarAlarms.ringsAcknowledgedAtStart },
+            set: { settingsStore.settings.calendarAlarms.ringsAcknowledgedAtStart = $0 }
         )
     }
 

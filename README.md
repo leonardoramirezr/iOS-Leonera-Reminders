@@ -66,6 +66,8 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   Stopping an event alarm plans the next one a minute later, and so on until the event is acknowledged with
   *Enterado* in its details (localized: «Acknowledge» on English devices). In silent-mode-respecting notification
   mode, the next repeat follows when the notification is cleared.
+  An event already acknowledged still rings once when it starts, unless *Sonar a la hora aunque ya esté confirmado*
+  is turned off in the same settings screen (on by default).
   Events of the next 7 days are scheduled; they are refreshed when the app opens, when the calendar changes while it
   runs, and every few hours with a background refresh. All-day, canceled and declined events do not ring.
   Events whose alarms are scheduled also appear in the reminder list, by date, with a calendar icon instead of the

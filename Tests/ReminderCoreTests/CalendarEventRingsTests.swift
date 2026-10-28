@@ -92,6 +92,47 @@ struct CalendarEventRingsTests {
         #expect(rings.current[occurrence] == nil)
     }
 
+    @Test func anAcknowledgedEventRingsOnceAtItsStart() throws {
+        var rings = CalendarEventRings()
+        let now = local(2026, 10, 27, 9, 50)
+        sync(&rings, at: now)
+        rings.acknowledge(occurrence, start: event.startDate)
+        let startAlarms = planned(at: now, leadMinutes: CalendarEventAlarm.startLeadMinutes)
+        rings.reconcile(planned: startAlarms, events: [event], scheduled: Set(), now: now)
+        let atStart = try #require(rings.current[occurrence])
+        #expect(atStart.fireDate == event.startDate)
+        #expect(atStart.ringsAtStart)
+
+        // Stopped when it rings: it does not repeat.
+        rings.stopped(atStart.id, now: event.startDate.addingTimeInterval(10))
+        rings.reconcile(planned: [], events: [event], scheduled: Set(), now: event.startDate.addingTimeInterval(20))
+        #expect(rings.current[occurrence] == nil)
+    }
+
+    @Test func aNotAcknowledgedEventIgnoresTheAlarmAtItsStart() {
+        var rings = CalendarEventRings()
+        let now = local(2026, 10, 27, 9, 50)
+        rings.reconcile(
+            planned: planned(at: now) + planned(at: now, leadMinutes: CalendarEventAlarm.startLeadMinutes),
+            events: [event],
+            scheduled: Set(),
+            now: now
+        )
+        #expect(rings.current[occurrence]?.leadMinutes == 5)
+    }
+
+    @Test func theAlarmAtTheStartIsDroppedWhenTheSettingIsTurnedOff() {
+        var rings = CalendarEventRings()
+        let now = local(2026, 10, 27, 9, 50)
+        sync(&rings, at: now)
+        rings.acknowledge(occurrence, start: event.startDate)
+        rings.reconcile(planned: planned(at: now, leadMinutes: CalendarEventAlarm.startLeadMinutes), events: [event], scheduled: Set(), now: now)
+        #expect(rings.current[occurrence] != nil)
+
+        rings.reconcile(planned: [], events: [event], scheduled: Set(), now: local(2026, 10, 27, 9, 51))
+        #expect(rings.current[occurrence] == nil)
+    }
+
     @Test func anEventNoLongerInTheCalendarDropsItsAlarm() {
         var rings = CalendarEventRings()
         sync(&rings, at: local(2026, 10, 27, 9, 50))
