@@ -256,7 +256,7 @@ struct ReminderListView: View {
         .contextMenu { menuItems(for: reminder) }
     }
 
-    /// An Apple Calendar event: no swipe actions or menu, a tap only shows its details.
+    /// An Apple Calendar event: a tap shows its details, and swiping from right to left acknowledges it.
     private func eventRow(_ synced: SyncedCalendarEvent, now: Date) -> some View {
         Button { showingEvent = synced } label: {
             CalendarEventRow(
@@ -267,6 +267,22 @@ struct ReminderListView: View {
             )
             .contentShape(Rectangle())
         }
+        .swipeActions(edge: .trailing) {
+            // When acknowledging leaves the event without alarms, it drops off the list, so the row slides out
+            // as when deleting instead of springing back into place and then vanishing.
+            Button(role: leavesListWhenAcknowledged(synced, now: now) ? .destructive : nil) {
+                Task { await alarms.acknowledgeCalendarEvent(synced) }
+            } label: {
+                Label("Enterado", systemImage: "checkmark.circle")
+            }
+            .tint(Color.calendarEvent)
+        }
+    }
+
+    /// Whether acknowledging the event leaves it without alarms to ring: only the alarm at its start remains, and
+    /// only when that setting is on and the event has not started yet.
+    private func leavesListWhenAcknowledged(_ synced: SyncedCalendarEvent, now: Date) -> Bool {
+        !settingsStore.settings.calendarAlarms.ringsAcknowledgedAtStart || synced.event.startDate <= now
     }
 
     @ViewBuilder

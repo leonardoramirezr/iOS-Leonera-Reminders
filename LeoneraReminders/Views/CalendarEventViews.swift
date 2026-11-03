@@ -2,7 +2,7 @@ import EventKit
 import SwiftUI
 import UIKit
 
-/// Row of an Apple Calendar event in the reminder list. It has no swipe actions: the event is only read.
+/// Row of an Apple Calendar event in the reminder list. The event is only read; its one swipe action acknowledges it.
 struct CalendarEventRow: View {
     let synced: SyncedCalendarEvent
     let now: Date
