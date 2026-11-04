@@ -151,6 +151,22 @@ struct ReminderListView: View {
             assistant = nil
             acting = ReminderSheetID(id: id)
         }
+        // «Abrir app» on the alarm before an event: its details open, so it can be acknowledged. Like above, the
+        // sheet waits until the scene is active.
+        .onChange(of: scenePhase == .active ? alarms.pendingOpenedEventID : nil, initial: true) { _, id in
+            guard let id else { return }
+            alarms.pendingOpenedEventID = nil
+            let events = CalendarEventAlarmPlanner.syncedEvents(
+                from: alarms.scheduledEventAlarms, now: Date(), alerting: alarms.alertingAlarmIDs
+            )
+            guard let synced = events.first(where: { $0.id == id }) else { return }
+            Haptics.success()
+            editing = nil
+            assistant = nil
+            acting = nil
+            showSettings = false
+            showingEvent = synced
+        }
         .onOpenURL { url in
             pendingDeepLink = DeepLink(url: url)
         }

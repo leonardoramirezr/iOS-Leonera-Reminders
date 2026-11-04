@@ -93,7 +93,7 @@ struct CalendarSettingsView: View {
                 }
             }
         } footer: {
-            Text("Cada evento suena este tiempo antes de empezar. Al detener la alarma, vuelve a sonar un minuto después, y así hasta que confirmes el evento con «Enterado» en la app.")
+            Text("Cada evento suena este tiempo antes de empezar. Al detener la alarma, vuelve a sonar un minuto después, y así hasta que confirmes el evento con «Enterado» en la app; «Abrir app» en la alarma te lleva directo al evento.")
         }
     }
 

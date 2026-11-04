@@ -26,6 +26,9 @@ final class AlarmSyncService {
     /// Alarms before Apple Calendar events that are actually scheduled (AlarmKit or notifications), so the
     /// list shows only events that will ring.
     private(set) var scheduledEventAlarms: [CalendarEventAlarm] = []
+    /// Occurrence (`SyncedCalendarEvent.id`) opened from the «Abrir app» button of its alarm: the list shows its
+    /// details once the app is in front, so it can be acknowledged.
+    var pendingOpenedEventID: String?
 
     private let manager = AlarmManager.shared
     private let logger = Logger(subsystem: "LeoneraReminders", category: "alarms")
@@ -326,7 +329,7 @@ final class AlarmSyncService {
     }
 
     /// Sube cuando cambia el texto o el ícono de los botones, para reprogramar las alarmas ya creadas.
-    private static let buttonsVersion = 3
+    private static let buttonsVersion = 4
 
     private func signature(for reminder: Reminder, settings: AppSettings) -> String {
         "\(reminder.title)|\(settings.alarmSignature)|\(Self.buttonsVersion)"
@@ -379,22 +382,32 @@ final class AlarmSyncService {
         )
     }
 
-    /// The alarm of a calendar event: only a stop button, since there is nothing to snooze. Stopping it plans the
-    /// next repeat, see `CalendarEventRingStopIntent`.
+    /// The alarm of a calendar event. Stopping it plans the next repeat, see `CalendarEventRingStopIntent`.
+    ///
+    /// The alarms before the event (and their repeats) also have «Abrir app», which opens the event in the app so it
+    /// can be acknowledged; the alarm at its start has no secondary button, since the event is already acknowledged.
     nonisolated private static func configuration(
         for alarm: CalendarEventAlarm,
         settings: AppSettings
     ) -> AlarmManager.AlarmConfiguration<CalendarEventAlarmMetadata> {
         let title = LocalizedStringResource(stringLiteral: alarm.alarmTitle)
+        let secondaryButton = alarm.ringsAtStart
+            ? nil
+            : AlarmButton(text: "Abrir app", textColor: .white, systemImageName: "arrow.up.forward.app")
+        let secondaryBehavior: AlarmPresentation.Alert.SecondaryButtonBehavior? = secondaryButton == nil ? nil : .custom
         let alert: AlarmPresentation.Alert
         if #available(iOS 26.1, *) {
-            alert = AlarmPresentation.Alert(title: title, secondaryButton: nil, secondaryButtonBehavior: nil)
+            alert = AlarmPresentation.Alert(
+                title: title,
+                secondaryButton: secondaryButton,
+                secondaryButtonBehavior: secondaryBehavior
+            )
         } else {
             alert = AlarmPresentation.Alert(
                 title: title,
                 stopButton: AlarmButton(text: "Detener", textColor: .white, systemImageName: "stop.circle"),
-                secondaryButton: nil,
-                secondaryButtonBehavior: nil
+                secondaryButton: secondaryButton,
+                secondaryButtonBehavior: secondaryBehavior
             )
         }
         let attributes = AlarmAttributes<CalendarEventAlarmMetadata>(
@@ -406,7 +419,7 @@ final class AlarmSyncService {
             schedule: .fixed(alarm.fireDate),
             attributes: attributes,
             stopIntent: CalendarEventRingStopIntent(alarmID: alarm.id),
-            secondaryIntent: nil,
+            secondaryIntent: secondaryButton == nil ? nil : CalendarEventOpenAppIntent(alarmID: alarm.id),
             sound: settings.sound.fileName.map { AlertConfiguration.AlertSound.named($0) } ?? .default
         )
     }
