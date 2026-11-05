@@ -5,5 +5,6 @@ import WidgetKit
 struct LeoneraWidgetsBundle: WidgetBundle {
     var body: some Widget {
         VoiceRecordingWidget()
+        HomeWidget()
     }
 }

@@ -182,6 +182,15 @@ struct ReminderListView: View {
                 acting = nil
                 showSettings = false
                 assistant = .voice
+            case .home:
+                // The home widget lands on the reminder list itself, so close whatever is on top of it.
+                editing = nil
+                assistant = nil
+                acting = nil
+                showingEvent = nil
+                showSettings = false
+                importPreview = nil
+                showImporter = false
             }
         }
     }
