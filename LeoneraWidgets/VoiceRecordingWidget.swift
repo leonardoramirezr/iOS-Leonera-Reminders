@@ -6,32 +6,13 @@ struct VoiceRecordingWidget: Widget {
     private let kind = "VoiceRecordingWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: VoiceRecordingProvider()) { _ in
+        StaticConfiguration(kind: kind, provider: StaticWidgetProvider()) { _ in
             VoiceRecordingWidgetView()
         }
         .configurationDisplayName("Grabar recordatorio")
         .description("Abre Leonera grabando para crear recordatorios con la voz.")
         .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
-}
-
-/// The widget never changes, so a single entry is enough.
-struct VoiceRecordingProvider: TimelineProvider {
-    func placeholder(in context: Context) -> VoiceRecordingEntry {
-        VoiceRecordingEntry(date: .now)
-    }
-
-    func getSnapshot(in context: Context, completion: @escaping (VoiceRecordingEntry) -> Void) {
-        completion(VoiceRecordingEntry(date: .now))
-    }
-
-    func getTimeline(in context: Context, completion: @escaping (Timeline<VoiceRecordingEntry>) -> Void) {
-        completion(Timeline(entries: [VoiceRecordingEntry(date: .now)], policy: .never))
-    }
-}
-
-struct VoiceRecordingEntry: TimelineEntry {
-    let date: Date
 }
 
 /// What each lock screen slot shows. Tapping it opens the app on voice capture.
@@ -76,8 +57,7 @@ struct VoiceRecordingWidgetView: View {
     }
 }
 
-/// The app logo with a small microphone badge on its bottom-right corner.
-/// The logo is a one-color glyph (`LogoGlyph` in the widget assets) because the lock screen renders widgets without color.
+/// The app logo (`LogoGlyph`) with a small microphone badge on its bottom-right corner.
 struct LogoWithMicBadge: View {
     var body: some View {
         GeometryReader { proxy in
@@ -85,9 +65,7 @@ struct LogoWithMicBadge: View {
             let badge = side * 0.36
             let gap = side * 0.07
             ZStack(alignment: .bottomTrailing) {
-                Image("LogoGlyph")
-                    .resizable()
-                    .scaledToFit()
+                LogoGlyph()
                     // Cut a ring around the badge out of the logo so both stay readable.
                     .mask {
                         Rectangle()

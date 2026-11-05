@@ -7,9 +7,14 @@ struct DeepLinkTests {
         #expect(DeepLink(url: DeepLink.voiceRecordingURL) == .voiceRecording)
     }
 
+    @Test func theHomeWidgetLinkOpensHome() {
+        #expect(DeepLink(url: DeepLink.homeURL) == .home)
+    }
+
     @Test func otherLinksAreNotHandled() throws {
         #expect(try DeepLink(url: #require(URL(string: "leonera://reminders"))) == nil)
         #expect(try DeepLink(url: #require(URL(string: "https://example.com/voice-recording"))) == nil)
         #expect(try DeepLink(url: #require(URL(string: "other://voice-recording"))) == nil)
+        #expect(try DeepLink(url: #require(URL(string: "other://home"))) == nil)
     }
 }
