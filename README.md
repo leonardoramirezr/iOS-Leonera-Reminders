@@ -67,8 +67,11 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   *Enterado* in its details or by swiping its row in the list from right to left (localized: «Acknowledge» on English
   devices). In silent-mode-respecting notification
   mode, the next repeat follows when the notification is cleared.
+  The alarms before an event (and their repeats) also have an *Abrir app* button: it stops the alarm like *Detener*
+  (so it still repeats a minute later) and opens the event's details in the app, where it is acknowledged with
+  *Enterado*. In notification mode the notification has the same *Abrir app* action, and tapping it does the same.
   An event already acknowledged still rings once when it starts, unless *Sonar a la hora aunque ya esté confirmado*
-  is turned off in the same settings screen (on by default).
+  is turned off in the same settings screen (on by default); that alarm has no secondary button.
   Events of the next 7 days are scheduled; they are refreshed when the app opens, when the calendar changes while it
   runs, and every few hours with a background refresh. All-day, canceled and declined events do not ring.
   Events whose alarms are scheduled also appear in the reminder list, by date, with a calendar icon instead of the
@@ -101,7 +104,8 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   occurrence, the lead time and the alarm settings, so an existing alarm is kept as is and a moved, renamed or deleted
   event gets its old alarm cancelled. The repeats after each stop are kept in `CalendarEventRings` (`Core/`, saved in
   `UserDefaults`): one current alarm per unacknowledged event, with a random UUID, and the stop button
-  (`CalendarEventRingStopIntent`) or a cleared notification plans the next one.
+  (`CalendarEventRingStopIntent`), the *Abrir app* button (`CalendarEventOpenAppIntent`) or a cleared notification
+  plans the next one.
 
 ```
 LeoneraReminders/
