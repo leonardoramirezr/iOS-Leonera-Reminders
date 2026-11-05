@@ -114,6 +114,12 @@ final class ReminderStore {
         mutate(reminderID) { $0.toggleChecklistItem(id: itemID) }
     }
 
+    /// Saves the checkboxes of a reminder as they are in the editor. Like checking a box from the list,
+    /// it leaves nothing to undo.
+    func saveChecklist(reminderID: UUID, items: [ChecklistItem]) {
+        mutate(reminderID) { $0.checklist = items }
+    }
+
     /// Agrega un recordatorio sin lista como una casilla más de otro que tiene lista, y borra el original.
     /// «Deshacer» devuelve los dos como estaban.
     func moveIntoChecklist(_ sourceID: UUID, title: String, checklistID: UUID) {
