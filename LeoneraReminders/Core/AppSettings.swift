@@ -215,6 +215,8 @@ struct AppSettings: Codable, Hashable, Sendable {
     var assistant: AssistantSettings = .default
     /// Calendars of the Apple Calendar app whose events ring 5 and 1 minutes before they start.
     var calendarAlarms: CalendarAlarmSettings = .default
+    /// `true`: checking a checkbox while editing a reminder saves it right away, without tapping «Guardar».
+    var autoSavesChecklist = false
 
     static let defaultSnoozeOptions: [TimeAmount] = [
         .minutes(1), .minutes(5), .minutes(10), .minutes(20), .minutes(40), .minutes(60), .hours(2), .hours(3),
@@ -234,7 +236,8 @@ struct AppSettings: Codable, Hashable, Sendable {
         celebratesCompletion: true,
         fireworksInteraction: .blocksApp,
         assistant: .default,
-        calendarAlarms: .default
+        calendarAlarms: .default,
+        autoSavesChecklist: false
     )
 
     /// Opciones ordenadas y sin repetir.
@@ -252,7 +255,7 @@ struct AppSettings: Codable, Hashable, Sendable {
 extension AppSettings {
     private enum CodingKeys: String, CodingKey {
         case snoozeOptions, defaultSnooze, stopAction, secondaryAction, quickAdjustGrid, overdueAdditionBase, followUp, sound, ignoresSilentMode
-        case swipeCompleteDirection, celebratesCompletion, fireworksInteraction, assistant, calendarAlarms
+        case swipeCompleteDirection, celebratesCompletion, fireworksInteraction, assistant, calendarAlarms, autoSavesChecklist
     }
 
     init(from decoder: any Decoder) throws {
@@ -274,7 +277,8 @@ extension AppSettings {
             fireworksInteraction: (try? c.decodeIfPresent(FireworksInteraction.self, forKey: .fireworksInteraction))
                 ?? fallback.fireworksInteraction,
             assistant: (try? c.decodeIfPresent(AssistantSettings.self, forKey: .assistant)) ?? fallback.assistant,
-            calendarAlarms: (try? c.decodeIfPresent(CalendarAlarmSettings.self, forKey: .calendarAlarms)) ?? fallback.calendarAlarms
+            calendarAlarms: (try? c.decodeIfPresent(CalendarAlarmSettings.self, forKey: .calendarAlarms)) ?? fallback.calendarAlarms,
+            autoSavesChecklist: (try? c.decodeIfPresent(Bool.self, forKey: .autoSavesChecklist)) ?? fallback.autoSavesChecklist
         )
     }
 }

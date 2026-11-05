@@ -29,6 +29,7 @@ struct SettingsView: View {
                 snoozeSection
                 gridSection
                 listSection
+                checklistSection
                 permissionSection
                 aboutSection
             }
@@ -250,6 +251,18 @@ struct SettingsView: View {
             Text("Lista")
         } footer: {
             Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y «Posponer». Al completar un recordatorio hay fuegos artificiales, nunca iguales. «Bloquear la app» impide usarla mientras se ven; «Tocar para terminar» lo impide hasta que un toque los acaba; «Permitir usar la app» no impide nada.")
+        }
+    }
+
+    private var checklistSection: some View {
+        Section {
+            Toggle("Guardar casillas automáticamente", isOn: settings.autoSavesChecklist)
+        } header: {
+            Text("Listas con casillas")
+        } footer: {
+            Text(settingsStore.settings.autoSavesChecklist
+                ? "Al marcar o desmarcar una casilla mientras editas un recordatorio, el cambio se guarda al instante, sin tocar «Guardar». Cancelar no revierte esos cambios."
+                : "Mientras editas un recordatorio, las casillas se guardan al tocar «Guardar»; Cancelar descarta los cambios. Marcar una casilla desde la lista siempre se guarda al instante.")
         }
     }
 

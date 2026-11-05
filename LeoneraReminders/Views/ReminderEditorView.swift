@@ -47,6 +47,7 @@ struct ReminderEditorView: View {
                             HStack(spacing: 12) {
                                 Button {
                                     $item.isDone.wrappedValue.toggle()
+                                    saveChecklistIfAutomatic()
                                 } label: {
                                     Image(systemName: item.isDone ? "checkmark.square.fill" : "square")
                                         .font(.title3)
@@ -191,18 +192,30 @@ struct ReminderEditorView: View {
         draft.checklist?.move(fromOffsets: offsets, toOffset: destination)
     }
 
+    /// With the «save checkboxes automatically» setting on, a checkbox change is saved at once. Only the
+    /// checkboxes are saved: the title and the other fields keep waiting for «Guardar». New reminders have
+    /// nothing stored yet, so they keep waiting too.
+    private func saveChecklistIfAutomatic() {
+        guard settingsStore.settings.autoSavesChecklist, !isNew, let items = draft.checklist else { return }
+        store.saveChecklist(reminderID: draft.id, items: Self.cleanedChecklist(items))
+    }
+
+    /// Checkboxes left without a title are dropped rather than saved empty.
+    private static func cleanedChecklist(_ items: [ChecklistItem]) -> [ChecklistItem] {
+        items.compactMap { item -> ChecklistItem? in
+            var trimmed = item
+            trimmed.title = item.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.title.isEmpty ? nil : trimmed
+        }
+    }
+
     /// La misma vibración que al completar (`SlideToConfirm` ya vibra por su cuenta).
     private func save(vibrating: Bool = true) {
         guard !trimmedTitle.isEmpty else { return }
         if vibrating { vibrate() }
         var reminder = draft
         reminder.title = trimmedTitle
-        // Checkboxes left without a title are dropped rather than saved empty.
-        reminder.checklist = reminder.checklist?.compactMap { item -> ChecklistItem? in
-            var trimmed = item
-            trimmed.title = item.title.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed.title.isEmpty ? nil : trimmed
-        }
+        reminder.checklist = reminder.checklist.map(Self.cleanedChecklist)
         if isNew {
             store.add(reminder)
         } else {

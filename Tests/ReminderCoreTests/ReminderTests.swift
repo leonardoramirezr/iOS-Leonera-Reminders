@@ -243,6 +243,16 @@ struct AppSettingsTests {
         #expect(settings.overdueAdditionBase == .dueDate)
     }
 
+    @Test func autoSavesChecklistIsOffByDefaultAndRoundTrips() throws {
+        #expect(AppSettings.default.autoSavesChecklist == false)
+        let fromEmptyJSON = try JSONDecoder().decode(AppSettings.self, from: Data("{}".utf8))
+        #expect(fromEmptyJSON.autoSavesChecklist == false)
+        var settings = AppSettings.default
+        settings.autoSavesChecklist = true
+        let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
+        #expect(decoded.autoSavesChecklist)
+    }
+
     @Test func overdueAdditionBaseRoundTrips() throws {
         var settings = AppSettings.default
         settings.overdueAdditionBase = .now
