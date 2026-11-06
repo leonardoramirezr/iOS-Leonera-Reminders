@@ -228,7 +228,7 @@ struct QuickAdjustGridTests {
 struct AppSettingsTests {
     @Test func defaultsMatchTheRequestedSnoozeOptions() {
         #expect(AppSettings.default.sortedSnoozeOptions.map(\.shortLabel)
-            == ["1 min", "5 min", "10 min", "20 min", "40 min", "60 min", "2 h", "3 h"])
+            == ["1 min", "5 min", "10 min", "15 min", "30 min", "60 min", "2 h", "3 h"])
         #expect(AppSettings.default.stopAction == .snooze)
         #expect(AppSettings.default.secondaryAction == .snoozeOptions)
     }

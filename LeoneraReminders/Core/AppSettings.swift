@@ -219,7 +219,7 @@ struct AppSettings: Codable, Hashable, Sendable {
     var autoSavesChecklist = false
 
     static let defaultSnoozeOptions: [TimeAmount] = [
-        .minutes(1), .minutes(5), .minutes(10), .minutes(20), .minutes(40), .minutes(60), .hours(2), .hours(3),
+        .minutes(1), .minutes(5), .minutes(10), .minutes(15), .minutes(30), .minutes(60), .hours(2), .hours(3),
     ]
 
     static let `default` = AppSettings(
