@@ -48,7 +48,7 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
 - **Al sonar** la alarma, ningún botón la completa (un toque rápido como «Detener» no debe marcarla por error):
   - **Detener** pospone el tiempo por defecto (10 min).
   - **Abrir app** pospone también y abre la app, donde se completa **deslizando** «Desliza para completar» o se
-    elige otro tiempo de "Recordar en…" (1, 5, 10, 20, 40 y 60 min, 2 h y 3 h por defecto; se pueden quitar y agregar).
+    elige otro tiempo de "Recordar en…" (1, 5, 10, 15, 30 y 60 min, 2 h y 3 h por defecto; se pueden quitar y agregar).
   - En la lista, deslizar la fila de derecha a izquierda completa directamente (se puede invertir en Configuración → Lista).
   - Desde iOS 26.1 el control Detener lo dibuja el sistema (no se puede cambiar su texto); la app sólo decide qué hace.
 - **Si ignoras la alarma, vuelve a sonar**: cada recordatorio deja programadas alarmas extra cada minuto (hasta 10 veces,
