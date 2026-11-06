@@ -267,7 +267,7 @@ struct ReminderListView: View {
                 Button(role: .destructive) { store.delete(ids: [reminder.id]) } label: {
                     Label("Eliminar", systemImage: "trash")
                 }
-                // The swipe from right to left never offers «Posponer»: it stays on the leading edge, in the tap menu and in the long press.
+                // The swipe from right to left never offers «Posponer»: it stays on the leading edge and in the long press.
                 if !reminder.isCompleted && secondaryEdge == .leading {
                     Button { acting = ReminderSheetID(id: reminder.id) } label: {
                         Label("Posponer", systemImage: "zzz")
@@ -287,11 +287,8 @@ struct ReminderListView: View {
             // A completed reminder cannot be postponed, so it keeps its menu, where it can be marked as pending again.
             .contextMenu { menuItems(for: reminder) }
         } else {
-            // A tap opens the menu («Completar…», «Posponer», «Editar», «Eliminar»). A long press opens the same
-            // sheet as the swipe's «Posponer». The gesture is on the label, inside the menu.
-            Menu {
-                menuItems(for: reminder)
-            } label: {
+            // A long press opens the same sheet as the swipe's «Posponer». The gesture is on the label, inside the button.
+            Button { editing = .edit(reminder.id) } label: {
                 reminderLabel(reminder, now: now)
                     .onLongPressGesture { acting = ReminderSheetID(id: reminder.id) }
             }
@@ -337,24 +334,11 @@ struct ReminderListView: View {
         !settingsStore.settings.calendarAlarms.ringsAcknowledgedAtStart || synced.event.startDate <= now
     }
 
-    /// The menu of a reminder: opened by a tap on a pending one, and by a long press on a completed one.
+    /// The menu of a completed reminder. Pending ones have no menu: a long press opens the «Posponer» sheet.
     @ViewBuilder
     private func menuItems(for reminder: Reminder) -> some View {
-        if reminder.isCompleted {
-            Button { store.markIncomplete(id: reminder.id) } label: {
-                Label("Marcar como pendiente", systemImage: "arrow.uturn.backward")
-            }
-        } else {
-            Button { acting = ReminderSheetID(id: reminder.id) } label: {
-                Label("Completar…", systemImage: "checkmark")
-            }
-            Menu {
-                ForEach(settingsStore.settings.sortedSnoozeOptions) { option in
-                    Button("Recordar en \(option.longLabel)") { store.snooze(id: reminder.id, by: option) }
-                }
-            } label: {
-                Label("Posponer", systemImage: "zzz")
-            }
+        Button { store.markIncomplete(id: reminder.id) } label: {
+            Label("Marcar como pendiente", systemImage: "arrow.uturn.backward")
         }
         Button { editing = .edit(reminder.id) } label: {
             Label("Editar", systemImage: "pencil")
