@@ -249,7 +249,7 @@ struct ReminderListView: View {
     }
 
     private func row(_ reminder: Reminder, now: Date) -> some View {
-        rowButton(reminder, now: now)
+        rowContent(reminder, now: now)
             .swipeActions(edge: completeEdge) {
                 if !reminder.isCompleted {
                     // If completing moves it to another section (also a repeating one whose next date falls on
@@ -278,20 +278,25 @@ struct ReminderListView: View {
     }
 
     @ViewBuilder
-    private func rowButton(_ reminder: Reminder, now: Date) -> some View {
-        // Un botón (y no `onTapGesture`) para que el toque no compita con el gesto de deslizar.
+    private func rowContent(_ reminder: Reminder, now: Date) -> some View {
         if reminder.isCompleted {
+            // Un botón (y no `onTapGesture`) para que el toque no compita con el gesto de deslizar.
             Button { editing = .edit(reminder.id) } label: {
                 reminderLabel(reminder, now: now)
             }
             // A completed reminder cannot be postponed, so it keeps its menu, where it can be marked as pending again.
             .contextMenu { menuItems(for: reminder) }
         } else {
-            // A long press opens the same sheet as the swipe's «Posponer». The gesture is on the label, inside the button.
-            Button { editing = .edit(reminder.id) } label: {
-                reminderLabel(reminder, now: now)
-                    .onLongPressGesture { acting = ReminderSheetID(id: reminder.id) }
-            }
+            // A quick tap opens the editor; holding opens the same sheet as the swipe's «Posponer». The two are one
+            // gesture with an order: once the hold is recognized the tap is cancelled, so releasing a long press does
+            // not open the editor too. (A Button with a long press inside its label fired both on release.)
+            reminderLabel(reminder, now: now)
+                .gesture(
+                    LongPressGesture(minimumDuration: 0.5)
+                        .onEnded { _ in acting = ReminderSheetID(id: reminder.id) }
+                        .exclusively(before: TapGesture().onEnded { editing = .edit(reminder.id) })
+                )
+                .accessibilityAddTraits(.isButton)
         }
     }
 
