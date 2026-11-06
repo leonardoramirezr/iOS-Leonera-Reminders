@@ -1,0 +1,18 @@
+{
+  "tag": "build-72-b76f97a",
+  "channel": "branch",
+  "branch": "claude/build-page-commit-titles",
+  "commit": "b76f97a762bf568be9c906c81e0ed491ffcba1ce",
+  "commit_title": "Show each build's commit title on the GitHub Pages list",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.24.0",
+  "build": "72",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-72-b76f97a.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40454304790",
+  "created_at": "2026-10-27T05:17:10Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-72-b76f97a/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-72-b76f97a/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-72-b76f97a%2Fmanifest.plist"
+}

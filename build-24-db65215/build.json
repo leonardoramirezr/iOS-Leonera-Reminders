@@ -1,0 +1,18 @@
+{
+  "tag": "build-24-db65215",
+  "channel": "branch",
+  "branch": "claude/fix-pbxproj-display-name",
+  "commit": "db65215db7ce12d055b59e4af3c40a2fb210aaad",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.6.0",
+  "build": "24",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-24-db65215.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38524942432",
+  "created_at": "2026-10-14T06:56:16Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-24-db65215/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-24-db65215/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-24-db65215%2Fmanifest.plist",
+  "commit_title": "Quote the display name in the project file"
+}

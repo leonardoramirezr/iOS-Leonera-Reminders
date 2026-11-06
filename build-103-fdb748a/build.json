@@ -1,0 +1,18 @@
+{
+  "tag": "build-103-fdb748a",
+  "channel": "branch",
+  "branch": "claude/affectionate-keller-lcvesy",
+  "commit": "fdb748affd28bd7a038d910cc0b9830aa512a03c",
+  "commit_title": "Open the editor on tap and the snooze sheet on long press",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.37.0",
+  "build": "103",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-103-fdb748a.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42160172747",
+  "created_at": "2026-11-06T04:06:00Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-103-fdb748a/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-103-fdb748a/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-103-fdb748a%2Fmanifest.plist"
+}

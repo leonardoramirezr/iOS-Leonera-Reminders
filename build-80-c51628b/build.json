@@ -1,0 +1,18 @@
+{
+  "tag": "build-80-c51628b",
+  "channel": "branch",
+  "branch": "linkify-calendar-event-notes",
+  "commit": "c51628b817ce6a12738962e4718e8aef324a866b",
+  "commit_title": "Make links in Apple Calendar event notes tappable",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.26.0",
+  "build": "80",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-80-c51628b.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40602515334",
+  "created_at": "2026-10-27T23:32:03Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-80-c51628b/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-80-c51628b/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-80-c51628b%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-89-f200fae",
+  "channel": "branch",
+  "branch": "feature/swipe-acknowledge-calendar-event",
+  "commit": "f200faeaaa20fd7755b47173999b656a6a9539e0",
+  "commit_title": "Acknowledge Apple Calendar events by swiping their row from right to left",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.31.0",
+  "build": "89",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-89-f200fae.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/41699163224",
+  "created_at": "2026-11-03T19:02:55Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-89-f200fae/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-89-f200fae/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-89-f200fae%2Fmanifest.plist"
+}

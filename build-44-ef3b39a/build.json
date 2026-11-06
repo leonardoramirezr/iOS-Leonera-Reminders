@@ -1,0 +1,18 @@
+{
+  "tag": "build-44-ef3b39a",
+  "channel": "branch",
+  "branch": "claude/quirky-maxwell-gdu2ty",
+  "commit": "ef3b39a0286d4f715497ace072cad8c388add35f",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.14.0",
+  "build": "44",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-44-ef3b39a.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39319837532",
+  "created_at": "2026-10-19T20:32:37Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-44-ef3b39a/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-44-ef3b39a/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-44-ef3b39a%2Fmanifest.plist",
+  "commit_title": "Open the action sheet straight at its fitted height"
+}

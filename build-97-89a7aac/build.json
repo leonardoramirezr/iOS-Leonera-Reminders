@@ -1,0 +1,18 @@
+{
+  "tag": "build-97-89a7aac",
+  "channel": "branch",
+  "branch": "claude/reminder-long-press-snooze-ndgo7i",
+  "commit": "89a7aac522f44010a902136295e9ae9240f2374e",
+  "commit_title": "Open the snooze sheet on long press and drop it from the right-to-left swipe",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.35.0",
+  "build": "97",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-97-89a7aac.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42148251158",
+  "created_at": "2026-11-06T02:09:02Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-97-89a7aac/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-97-89a7aac/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-97-89a7aac%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "0.13.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "f88fc5b9bd3ad1619e3ba9fbcc03c2a1ce4a52a7",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.13.0",
+  "build": "42",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.13.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39318013471",
+  "created_at": "2026-10-19T20:19:21Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.13.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.13.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.13.0%2Fmanifest.plist",
+  "commit_title": "Add CLAUDE.md: English-only code and docs, build name in task summaries (#16)"
+}

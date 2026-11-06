@@ -1,0 +1,18 @@
+{
+  "tag": "build-20-b063e57",
+  "channel": "branch",
+  "branch": "claude/pensive-hamilton-irit3w",
+  "commit": "b063e57c11192d22b4ac90f871579d5f9f6f3a7c",
+  "title": "Leonera",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.5.0",
+  "build": "20",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-20-b063e57.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38475283406",
+  "created_at": "2026-10-13T22:07:02Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-20-b063e57/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-20-b063e57/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-20-b063e57%2Fmanifest.plist",
+  "commit_title": "Add setting to invert swipe gestures on list rows"
+}

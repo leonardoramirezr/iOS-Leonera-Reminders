@@ -1,0 +1,18 @@
+{
+  "tag": "build-77-f0789d8",
+  "channel": "branch",
+  "branch": "claude/apple-calendar-alarm-integration-wo9xvc",
+  "commit": "f0789d8beefebc93192a98eb9f6a1a9c0d4e4318",
+  "commit_title": "Ring alarms 5 and 1 minutes before Apple Calendar events",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.26.0",
+  "build": "77",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-77-f0789d8.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40588405248",
+  "created_at": "2026-10-27T21:40:41Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-77-f0789d8/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-77-f0789d8/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-77-f0789d8%2Fmanifest.plist"
+}

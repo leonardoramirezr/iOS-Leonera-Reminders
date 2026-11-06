@@ -1,0 +1,18 @@
+{
+  "tag": "build-83-ddb686f",
+  "channel": "branch",
+  "branch": "claude/event-alerts-retries-ttwc2d",
+  "commit": "ddb686f3d5cd6b9fd2240c4d37877513e22e3b9b",
+  "commit_title": "Fix ring tests that passed seconds to local()",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.28.0",
+  "build": "83",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-83-ddb686f.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40606752619",
+  "created_at": "2026-10-28T00:10:14Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-83-ddb686f/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-83-ddb686f/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-83-ddb686f%2Fmanifest.plist"
+}

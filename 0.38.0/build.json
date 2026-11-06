@@ -1,0 +1,18 @@
+{
+  "tag": "0.38.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "45dd8614d5c6ea37a57b85a6bbbceab512bec1eb",
+  "commit_title": "Open the editor on tap and the snooze sheet on long press (#42)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.38.0",
+  "build": "104",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.38.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42162067910",
+  "created_at": "2026-11-06T04:24:55Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.38.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.38.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.38.0%2Fmanifest.plist"
+}

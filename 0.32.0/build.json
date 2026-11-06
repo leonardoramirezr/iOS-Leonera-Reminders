@@ -1,0 +1,18 @@
+{
+  "tag": "0.32.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "b2d3c26440a9c76cbac5fe3cfcb5e2ef548868a8",
+  "commit_title": "Acknowledge Apple Calendar events by swiping their row from right to left (#36)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.32.0",
+  "build": "90",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.32.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/41861220412",
+  "created_at": "2026-11-05T03:23:03Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.32.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.32.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.32.0%2Fmanifest.plist"
+}

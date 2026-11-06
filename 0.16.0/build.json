@@ -1,0 +1,18 @@
+{
+  "tag": "0.16.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "959adee0dcef66ea6ec9207442d2352eb9f9a578",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.16.0",
+  "build": "50",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.16.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39327002793",
+  "created_at": "2026-10-19T21:26:19Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.16.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.16.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.16.0%2Fmanifest.plist",
+  "commit_title": "Fix the action sheet's black flash and full-screen opening; show the build name in Settings (#18)"
+}
