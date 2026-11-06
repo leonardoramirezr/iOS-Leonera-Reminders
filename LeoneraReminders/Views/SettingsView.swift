@@ -250,7 +250,7 @@ struct SettingsView: View {
         } header: {
             Text("Lista")
         } footer: {
-            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y «Posponer». Al completar un recordatorio hay fuegos artificiales, nunca iguales. «Bloquear la app» impide usarla mientras se ven; «Tocar para terminar» lo impide hasta que un toque los acaba; «Permitir usar la app» no impide nada.")
+            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y, si es de izquierda a derecha, «Posponer». Mantener pulsado un recordatorio pendiente también abre «Posponer». Al completar un recordatorio hay fuegos artificiales, nunca iguales. «Bloquear la app» impide usarla mientras se ven; «Tocar para terminar» lo impide hasta que un toque los acaba; «Permitir usar la app» no impide nada.")
         }
     }
 

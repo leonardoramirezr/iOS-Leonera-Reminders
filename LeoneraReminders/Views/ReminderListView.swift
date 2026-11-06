@@ -243,42 +243,66 @@ struct ReminderListView: View {
         settingsStore.settings.swipeCompleteDirection == .rightToLeft ? .trailing : .leading
     }
 
+    /// The opposite edge of the completing one. Its swipe shows «Eliminar», and «Posponer» when it is the leading edge.
+    private var secondaryEdge: HorizontalEdge {
+        completeEdge == .trailing ? .leading : .trailing
+    }
+
     private func row(_ reminder: Reminder, now: Date) -> some View {
+        rowButton(reminder, now: now)
+            .swipeActions(edge: completeEdge) {
+                if !reminder.isCompleted {
+                    // If completing moves it to another section (also a repeating one whose next date falls on
+                    // another day), the row slides out as when deleting instead of springing back into place
+                    // and then vanishing.
+                    Button(role: leavesSectionWhenCompleted(reminder, now: now) ? .destructive : nil) {
+                        complete(reminder)
+                    } label: {
+                        Label("Completar", systemImage: "checkmark")
+                    }
+                    .tint(.green)
+                }
+            }
+            .swipeActions(edge: secondaryEdge) {
+                Button(role: .destructive) { store.delete(ids: [reminder.id]) } label: {
+                    Label("Eliminar", systemImage: "trash")
+                }
+                // The swipe from right to left never offers «Posponer»: it stays on the leading edge and in the long press.
+                if !reminder.isCompleted && secondaryEdge == .leading {
+                    Button { acting = ReminderSheetID(id: reminder.id) } label: {
+                        Label("Posponer", systemImage: "zzz")
+                    }
+                    .tint(.indigo)
+                }
+            }
+    }
+
+    @ViewBuilder
+    private func rowButton(_ reminder: Reminder, now: Date) -> some View {
         // Un botón (y no `onTapGesture`) para que el toque no compita con el gesto de deslizar.
-        Button { editing = .edit(reminder.id) } label: {
-            ReminderRow(
-                reminder: reminder,
-                now: now,
-                isRinging: reminder.scheduledAlarms.contains { alarms.alertingAlarmIDs.contains($0.id) },
-                onToggleItem: { store.toggleChecklistItem(reminderID: reminder.id, itemID: $0) }
-            )
-            .contentShape(Rectangle())
-        }
-        .swipeActions(edge: completeEdge) {
-            if !reminder.isCompleted {
-                // If completing moves it to another section (also a repeating one whose next date falls on
-                // another day), the row slides out as when deleting instead of springing back into place
-                // and then vanishing.
-                Button(role: leavesSectionWhenCompleted(reminder, now: now) ? .destructive : nil) {
-                    complete(reminder)
-                } label: {
-                    Label("Completar", systemImage: "checkmark")
-                }
-                .tint(.green)
+        if reminder.isCompleted {
+            Button { editing = .edit(reminder.id) } label: {
+                reminderLabel(reminder, now: now)
+            }
+            // A completed reminder cannot be postponed, so it keeps its menu, where it can be marked as pending again.
+            .contextMenu { menuItems(for: reminder) }
+        } else {
+            // A long press opens the same sheet as the swipe's «Posponer». The gesture is on the label, inside the button.
+            Button { editing = .edit(reminder.id) } label: {
+                reminderLabel(reminder, now: now)
+                    .onLongPressGesture { acting = ReminderSheetID(id: reminder.id) }
             }
         }
-        .swipeActions(edge: completeEdge == .trailing ? .leading : .trailing) {
-            Button(role: .destructive) { store.delete(ids: [reminder.id]) } label: {
-                Label("Eliminar", systemImage: "trash")
-            }
-            if !reminder.isCompleted {
-                Button { acting = ReminderSheetID(id: reminder.id) } label: {
-                    Label("Posponer", systemImage: "zzz")
-                }
-                .tint(.indigo)
-            }
-        }
-        .contextMenu { menuItems(for: reminder) }
+    }
+
+    private func reminderLabel(_ reminder: Reminder, now: Date) -> some View {
+        ReminderRow(
+            reminder: reminder,
+            now: now,
+            isRinging: reminder.scheduledAlarms.contains { alarms.alertingAlarmIDs.contains($0.id) },
+            onToggleItem: { store.toggleChecklistItem(reminderID: reminder.id, itemID: $0) }
+        )
+        .contentShape(Rectangle())
     }
 
     /// An Apple Calendar event: a tap shows its details, and swiping from right to left acknowledges it.
@@ -310,23 +334,11 @@ struct ReminderListView: View {
         !settingsStore.settings.calendarAlarms.ringsAcknowledgedAtStart || synced.event.startDate <= now
     }
 
+    /// The menu of a completed reminder. Pending ones have no menu: a long press opens the «Posponer» sheet.
     @ViewBuilder
     private func menuItems(for reminder: Reminder) -> some View {
-        if reminder.isCompleted {
-            Button { store.markIncomplete(id: reminder.id) } label: {
-                Label("Marcar como pendiente", systemImage: "arrow.uturn.backward")
-            }
-        } else {
-            Button { acting = ReminderSheetID(id: reminder.id) } label: {
-                Label("Completar…", systemImage: "checkmark")
-            }
-            Menu {
-                ForEach(settingsStore.settings.sortedSnoozeOptions) { option in
-                    Button("Recordar en \(option.longLabel)") { store.snooze(id: reminder.id, by: option) }
-                }
-            } label: {
-                Label("Posponer", systemImage: "zzz")
-            }
+        Button { store.markIncomplete(id: reminder.id) } label: {
+            Label("Marcar como pendiente", systemImage: "arrow.uturn.backward")
         }
         Button { editing = .edit(reminder.id) } label: {
             Label("Editar", systemImage: "pencil")
