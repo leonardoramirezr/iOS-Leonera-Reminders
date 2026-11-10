@@ -11,6 +11,7 @@ struct ReminderEditorView: View {
     @State private var confirmDelete = false
     @State private var choosingChecklist = false
     @State private var editMode = EditMode.inactive
+    @State private var showingChecklistFullScreen = false
     @FocusState private var titleFocused: Bool
     @FocusState private var focusedItemID: ChecklistItem.ID?
 
@@ -66,12 +67,23 @@ struct ReminderEditorView: View {
                         } label: {
                             Label("Agregar casilla", systemImage: "plus")
                         }
+                        // Discreet text buttons: secondary ways to use the checkboxes, not the main actions of the reminder.
                         // Shown while reordering even with a single checkbox, so there is always a way out of edit mode.
                         if editMode.isEditing || (draft.checklist?.count ?? 0) > 1 {
                             Button {
                                 withAnimation { editMode = editMode.isEditing ? .inactive : .active }
                             } label: {
-                                Label(editMode.isEditing ? "Listo" : "Reordenar casillas", systemImage: "arrow.up.arrow.down")
+                                discreetLabel(editMode.isEditing ? "Listo" : "Reordenar casillas")
+                            }
+                        }
+                        if hasTitledChecklistItems {
+                            Button {
+                                // Without this the keyboard would stay up behind the full screen.
+                                titleFocused = false
+                                focusedItemID = nil
+                                showingChecklistFullScreen = true
+                            } label: {
+                                discreetLabel("Ver en pantalla completa")
                             }
                         }
                     }
@@ -169,6 +181,11 @@ struct ReminderEditorView: View {
                     dismiss()
                 }
             }
+            .fullScreenCover(isPresented: $showingChecklistFullScreen) {
+                ChecklistFullScreenView(title: trimmedTitle, items: checklistItems) {
+                    saveChecklistIfAutomatic()
+                }
+            }
             .onAppear {
                 if isNew { titleFocused = true }
             }
@@ -177,6 +194,18 @@ struct ReminderEditorView: View {
 
     private var checklistItems: Binding<[ChecklistItem]> {
         Binding(get: { draft.checklist ?? [] }, set: { draft.checklist = $0 })
+    }
+
+    /// The full screen shows only checkboxes with a title, so it is offered once there is at least one.
+    private var hasTitledChecklistItems: Bool {
+        draft.checklist?.contains(where: { !$0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) ?? false
+    }
+
+    /// Small secondary text, so the checkbox options do not compete with the checkboxes themselves.
+    private func discreetLabel(_ title: LocalizedStringKey) -> some View {
+        Text(title)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
     }
 
     private func addChecklistItem() {
