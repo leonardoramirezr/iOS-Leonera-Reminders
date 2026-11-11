@@ -12,6 +12,11 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
 ## Qué hace
 
 - **Recordatorio** = título + fecha límite + repetición opcional.
+- **Notes**: in the editor, below the checkboxes, a reminder can have a note. It shows as read-only text, only as
+  tall as the text; without a note there is only the *Agregar nota* button (*Editar nota* once it has text). The
+  button opens a screen with nothing but the text and no save button: every change is saved as it is typed (a new
+  reminder keeps its note until it is saved). While the keyboard is up, a microphone above it records, turns the voice
+  into text with Groq (the same speech to text model as voice capture) and writes it where the cursor is.
 - **Barra flotante abajo**, al estilo de Instagram (una cápsula de vidrio con sólo íconos): **Buscar** (la cambia por el campo de búsqueda) y las
   tres formas de crear: **Foto**, **Voz** y **Manual** (el editor de siempre). Foto y Voz usan Groq y terminan
   en la misma pantalla de revisión:

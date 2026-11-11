@@ -120,7 +120,17 @@ final class ReminderStore {
         mutate(reminderID) { $0.checklist = items }
     }
 
+    /// Saves the note as it is typed in its editor, without the blank space around it. Like the checkboxes, it
+    /// leaves nothing to undo, and since the note is not part of the alarms they are not synced again.
+    func saveNote(reminderID: UUID, note: String) {
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let index = reminders.firstIndex(where: { $0.id == reminderID }), reminders[index].note != trimmed else { return }
+        reminders[index].note = trimmed
+        save()
+    }
+
     /// Agrega un recordatorio sin lista como una casilla más de otro que tiene lista, y borra el original.
+    /// A checkbox has no note, so the original's note is added at the end of the other's note instead of being lost.
     /// «Deshacer» devuelve los dos como estaban.
     func moveIntoChecklist(_ sourceID: UUID, title: String, checklistID: UUID) {
         guard sourceID != checklistID,
@@ -129,6 +139,10 @@ final class ReminderStore {
         else { return }
         registerUndo("Agregado a «\(reminders[targetIndex].title)»", ids: [sourceID, checklistID])
         reminders[targetIndex].appendChecklistItem(titled: title)
+        if !source.trimmedNote.isEmpty {
+            let targetNote = reminders[targetIndex].trimmedNote
+            reminders[targetIndex].note = targetNote.isEmpty ? source.trimmedNote : targetNote + "\n\n" + source.trimmedNote
+        }
         reminders.removeAll { $0.id == sourceID }
         didChange()
     }
