@@ -3,16 +3,22 @@ import UIKit
 
 /// The note of a reminder on a screen of its own, with nothing but its text. There is no «Guardar»: the presenter
 /// saves every change as it is typed. While the keyboard is up, a microphone above it dictates text where the
-/// cursor is.
+/// cursor is, and a switch next to it decides whether an LLM corrects that text before it is written.
 struct NoteEditorView: View {
     @Binding var note: String
 
     @Environment(GroqKeyStore.self) private var keyStore
+    @Environment(SettingsStore.self) private var settingsStore
 
     @State private var dictation = DictationSession()
     @State private var textViewProxy = NoteTextViewProxy()
     @State private var isEditing = false
     @State private var showingAssistantSettings = false
+    /// The dictated text is being corrected; it is written once the correction arrives.
+    @State private var isCorrecting = false
+    @State private var correctionTask: Task<Void, Never>?
+    /// The correction failed and the text was written as it was dictated.
+    @State private var correctionNotice: String?
 
     var body: some View {
         NoteTextView(text: $note, isEditing: $isEditing, proxy: textViewProxy)
@@ -32,9 +38,14 @@ struct NoteEditorView: View {
                     if showsDictationBar {
                         NoteDictationBar(
                             session: dictation,
+                            correctsText: correctsText,
+                            isCorrecting: isCorrecting,
+                            correctionNotice: correctionNotice,
                             onStart: startDictation,
                             onFinish: finishDictation,
-                            onRetry: retryDictation
+                            onRetry: retryDictation,
+                            onDiscardCorrection: discardCorrection,
+                            onDismissNotice: { correctionNotice = nil }
                         )
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
@@ -52,13 +63,22 @@ struct NoteEditorView: View {
             }
             .onDisappear {
                 dictation.cancel()
+                discardCorrection()
             }
     }
 
     /// The bar sits above the keyboard, so it shows only while the keyboard does. A dictation in progress keeps it
     /// even if the keyboard is lowered, so it can still be finished or discarded.
     private var showsDictationBar: Bool {
-        isEditing || dictation.phase != .idle
+        isEditing || dictation.phase != .idle || isCorrecting
+    }
+
+    /// Saved in the settings, so it stays as it was left for the next dictation.
+    private var correctsText: Binding<Bool> {
+        Binding(
+            get: { settingsStore.settings.assistant.correctsDictation },
+            set: { settingsStore.settings.assistant.correctsDictation = $0 }
+        )
     }
 
     /// Dictation needs the Groq key; without it the microphone leads to where it is added.
@@ -67,31 +87,70 @@ struct NoteEditorView: View {
             showingAssistantSettings = true
             return
         }
+        correctionNotice = nil
         Task { await dictation.start() }
     }
 
     private func finishDictation() {
         Task {
-            if let text = await dictation.finish() { textViewProxy.insertAtCursor(text) }
+            if let text = await dictation.finish() { write(text) }
         }
     }
 
     private func retryDictation() {
         Task {
-            if let text = await dictation.retry() { textViewProxy.insertAtCursor(text) }
+            if let text = await dictation.retry() { write(text) }
         }
+    }
+
+    /// Writes the transcript at the cursor, corrected first when the switch is on. If the correction fails, the
+    /// transcript is written as it is, so nothing that was said is lost.
+    private func write(_ transcript: String) {
+        guard correctsText.wrappedValue else {
+            textViewProxy.insertAtCursor(transcript)
+            return
+        }
+        isCorrecting = true
+        correctionNotice = nil
+        correctionTask = Task {
+            let text: String
+            do {
+                text = try await ReminderAssistant.correctDictation(transcript)
+            } catch {
+                guard !Task.isCancelled else { return }
+                correctionNotice = "No se pudo corregir el texto, así que se escribió tal como se dictó. \(error.localizedDescription)"
+                text = transcript
+            }
+            guard !Task.isCancelled else { return }
+            isCorrecting = false
+            correctionTask = nil
+            textViewProxy.insertAtCursor(text)
+        }
+    }
+
+    /// Drops the text being corrected without writing anything, like discarding a recording.
+    private func discardCorrection() {
+        correctionTask?.cancel()
+        correctionTask = nil
+        isCorrecting = false
     }
 }
 
 // MARK: - Dictation bar
 
-/// The bar above the keyboard, in the style of the Claude app: a microphone on the right that, while recording,
-/// becomes a capsule with the voice's waveform, a button to discard the recording and one to turn it into text.
+/// The bar above the keyboard, in the style of the Claude app: on the right, the correction switch and a microphone
+/// that, while recording, becomes a capsule with the voice's waveform, a button to discard the recording and one to
+/// turn it into text.
 private struct NoteDictationBar: View {
     let session: DictationSession
+    @Binding var correctsText: Bool
+    let isCorrecting: Bool
+    let correctionNotice: String?
     let onStart: () -> Void
     let onFinish: () -> Void
     let onRetry: () -> Void
+    let onDiscardCorrection: () -> Void
+    let onDismissNotice: () -> Void
 
     @Environment(\.openURL) private var openURL
 
@@ -99,22 +158,56 @@ private struct NoteDictationBar: View {
 
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
-            if session.phase == .idle, let error = session.error {
-                errorRow(error)
+            if session.phase == .idle, !isCorrecting {
+                if let error = session.error {
+                    errorRow(error)
+                } else if let correctionNotice {
+                    noticeRow(correctionNotice)
+                }
             }
-            switch session.phase {
-            case .idle:
-                microphoneButton
-            case .recording:
-                recordingCapsule
-            case .transcribing:
-                transcribingCapsule
+            if isCorrecting {
+                busyCapsule("Corrigiendo el texto…", onDiscard: onDiscardCorrection)
+            } else {
+                switch session.phase {
+                case .idle:
+                    HStack(spacing: 10) {
+                        correctionSwitch
+                        microphoneButton
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                case .recording:
+                    recordingCapsule
+                case .transcribing:
+                    busyCapsule("Convirtiendo a texto…", onDiscard: session.cancel)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .animation(.snappy, value: session.phase)
+        .animation(.snappy, value: isCorrecting)
+    }
+
+    /// An icon that works as a switch: in color while on, gray while off. On, an LLM corrects the punctuation, signs,
+    /// accents and spelling of the dictated text before it is written.
+    private var correctionSwitch: some View {
+        Button {
+            correctsText.toggle()
+        } label: {
+            Image(systemName: "sparkles")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(correctsText ? Color.brand : Color.secondary)
+                .frame(width: Self.controlSize, height: Self.controlSize)
+                .contentShape(.circle)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(correctsText ? Glass.regular.tint(Color.brand.opacity(0.2)).interactive() : Glass.regular.interactive(), in: .circle)
+        .animation(.snappy, value: correctsText)
+        .sensoryFeedback(.selection, trigger: correctsText)
+        .accessibilityLabel("Corregir el texto dictado")
+        .accessibilityValue(correctsText ? "Activado" : "Desactivado")
+        .accessibilityAddTraits(.isToggle)
     }
 
     private var microphoneButton: some View {
@@ -128,12 +221,11 @@ private struct NoteDictationBar: View {
         .buttonStyle(.plain)
         .glassEffect(.regular.interactive(), in: .circle)
         .accessibilityLabel("Dictar")
-        .transition(.scale.combined(with: .opacity))
     }
 
     private var recordingCapsule: some View {
         HStack(spacing: 10) {
-            discardButton
+            discardButton(action: session.cancel)
             DictationWaveform(recorder: session.recorder)
             ElapsedText(since: session.recorder.startedAt)
                 .font(.footnote.weight(.medium))
@@ -152,11 +244,12 @@ private struct NoteDictationBar: View {
         .modifier(DictationCapsule())
     }
 
-    private var transcribingCapsule: some View {
+    /// While the recording is turned into text, or that text is corrected.
+    private func busyCapsule(_ title: LocalizedStringKey, onDiscard: @escaping () -> Void) -> some View {
         HStack(spacing: 10) {
-            discardButton
+            discardButton(action: onDiscard)
             ProgressView()
-            Text("Convirtiendo a texto…")
+            Text(title)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 0)
@@ -164,11 +257,9 @@ private struct NoteDictationBar: View {
         .modifier(DictationCapsule())
     }
 
-    /// Discards the recording (or the text it is being turned into) without writing anything.
-    private var discardButton: some View {
-        Button {
-            session.cancel()
-        } label: {
+    /// Discards the recording (or the text it is being turned into or corrected) without writing anything.
+    private func discardButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
             Image(systemName: "xmark")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.secondary)
@@ -201,6 +292,28 @@ private struct NoteDictationBar: View {
             Button {
                 session.dismissError()
             } label: {
+                Image(systemName: "xmark")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Cerrar aviso")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .glassEffect(.regular, in: .rect(cornerRadius: 18))
+    }
+
+    /// The dictated text was written, but without the correction.
+    private func noticeRow(_ notice: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Label(notice, systemImage: "exclamationmark.triangle.fill")
+                .font(.footnote)
+                .foregroundStyle(.orange)
+                .lineLimit(3)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Button(action: onDismissNotice) {
                 Image(systemName: "xmark")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.secondary)

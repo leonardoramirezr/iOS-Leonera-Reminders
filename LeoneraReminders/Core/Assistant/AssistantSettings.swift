@@ -8,6 +8,8 @@ enum AssistantModelRole: String, CaseIterable, Sendable, Identifiable {
     case text
     /// Convierte fotos (con texto opcional) en recordatorios; tiene que aceptar imágenes.
     case vision
+    /// Corrects the punctuation, accents and spelling of text dictated into a note.
+    case correction
 
     var id: String { rawValue }
 
@@ -16,6 +18,7 @@ enum AssistantModelRole: String, CaseIterable, Sendable, Identifiable {
         case .transcription: "Voz a texto"
         case .text: "Texto a recordatorios"
         case .vision: "Fotos a recordatorios"
+        case .correction: "Corregir dictado"
         }
     }
 }
@@ -26,6 +29,9 @@ struct AssistantSettings: Codable, Hashable, Sendable {
     var transcriptionModel: String
     var textModel: String
     var visionModel: String
+    var correctionModel: String
+    /// Whether text dictated into a note goes through `correctionModel` before it is written.
+    var correctsDictation: Bool
     /// Idioma del dictado (código ISO 639-1); vacío para que Whisper lo detecte.
     var transcriptionLanguage: String
     /// Modelos que devolvió la API de Groq la última vez que se consultaron (para elegir en Configuración).
@@ -35,6 +41,8 @@ struct AssistantSettings: Codable, Hashable, Sendable {
         transcriptionModel: "whisper-large-v3-turbo",
         textModel: "openai/gpt-oss-120b",
         visionModel: "qwen/qwen3.8-27b",
+        correctionModel: "openai/gpt-oss-120b",
+        correctsDictation: false,
         transcriptionLanguage: "es",
         availableModels: []
     )
@@ -46,6 +54,7 @@ struct AssistantSettings: Codable, Hashable, Sendable {
         case .transcription: ["whisper-large-v3-turbo", "whisper-large-v3"]
         case .text: ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
         case .vision: ["qwen/qwen3.8-27b"]
+        case .correction: ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
         }
     }
 
@@ -68,6 +77,7 @@ struct AssistantSettings: Codable, Hashable, Sendable {
         case .transcription: transcriptionModel
         case .text: textModel
         case .vision: visionModel
+        case .correction: correctionModel
         }
     }
 
@@ -78,6 +88,7 @@ struct AssistantSettings: Codable, Hashable, Sendable {
         case .transcription: transcriptionModel = trimmed
         case .text: textModel = trimmed
         case .vision: visionModel = trimmed
+        case .correction: correctionModel = trimmed
         }
     }
 
@@ -93,7 +104,7 @@ struct AssistantSettings: Codable, Hashable, Sendable {
 
 extension AssistantSettings {
     private enum CodingKeys: String, CodingKey {
-        case transcriptionModel, textModel, visionModel, transcriptionLanguage, availableModels
+        case transcriptionModel, textModel, visionModel, correctionModel, correctsDictation, transcriptionLanguage, availableModels
     }
 
     init(from decoder: any Decoder) throws {
@@ -109,6 +120,8 @@ extension AssistantSettings {
             transcriptionModel: model(.transcriptionModel, fallback.transcriptionModel),
             textModel: model(.textModel, fallback.textModel),
             visionModel: model(.visionModel, fallback.visionModel),
+            correctionModel: model(.correctionModel, fallback.correctionModel),
+            correctsDictation: (try? c.decodeIfPresent(Bool.self, forKey: .correctsDictation)) ?? fallback.correctsDictation,
             transcriptionLanguage: (try? c.decodeIfPresent(String.self, forKey: .transcriptionLanguage)) ?? fallback.transcriptionLanguage,
             availableModels: (try? c.decodeIfPresent([String].self, forKey: .availableModels)) ?? fallback.availableModels
         )
@@ -126,7 +139,7 @@ enum GroqModelCatalog {
         func serves(_ role: AssistantModelRole) -> Bool {
             switch (self, role) {
             case (.transcription, .transcription): true
-            case (.chat, .text), (.chat, .vision): true
+            case (.chat, .text), (.chat, .vision), (.chat, .correction): true
             default: false
             }
         }

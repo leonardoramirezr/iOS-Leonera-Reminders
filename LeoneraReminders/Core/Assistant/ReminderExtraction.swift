@@ -149,11 +149,7 @@ enum ReminderExtraction {
 
     /// El JSON dentro de la respuesta: sin razonamiento (`<think>…</think>`), bloques de código ni texto alrededor.
     static func jsonText(in content: String) -> String? {
-        var text = content
-        while let open = text.range(of: "<think>") {
-            let close = text.range(of: "</think>", range: open.upperBound..<text.endIndex)
-            text.removeSubrange(open.lowerBound..<(close?.upperBound ?? text.endIndex))
-        }
+        let text = GroqAPI.removingReasoning(from: content)
         guard let start = text.firstIndex(where: { $0 == "{" || $0 == "[" }),
               let end = text.lastIndex(where: { $0 == "}" || $0 == "]" }),
               start < end

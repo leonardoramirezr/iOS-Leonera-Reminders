@@ -90,6 +90,17 @@ enum GroqAPI {
         }
     }
 
+    /// The reply without the reasoning that some models (such as Qwen) write before it, between
+    /// `<think>` and `</think>`. An unclosed block is dropped to the end.
+    static func removingReasoning(from content: String) -> String {
+        var text = content
+        while let open = text.range(of: "<think>") {
+            let close = text.range(of: "</think>", range: open.upperBound..<text.endIndex)
+            text.removeSubrange(open.lowerBound..<(close?.upperBound ?? text.endIndex))
+        }
+        return text
+    }
+
     struct ChatResponse: Decodable, Sendable {
         struct Choice: Decodable, Sendable {
             struct Message: Decodable, Sendable {

@@ -32,6 +32,19 @@ enum ReminderAssistant {
         return try ReminderExtraction.parse(content, now: Date())
     }
 
+    /// Text dictated into a note with its punctuation, signs, accents and spelling corrected by the correction
+    /// model (see `DictationCorrection`).
+    static func correctDictation(_ transcript: String) async throws -> String {
+        let model = SettingsStore.shared.settings.assistant.correctionModel
+        let content = try await client().complete(
+            model: model,
+            messages: DictationCorrection.messages(for: transcript),
+            responseFormat: nil
+        )
+        guard let corrected = DictationCorrection.correctedText(from: content) else { throw GroqAPI.APIError.emptyResponse }
+        return corrected
+    }
+
     static func listModels() async throws -> [String] {
         try await client().listModels()
     }

@@ -17,6 +17,11 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   button opens a screen with nothing but the text and no save button: every change is saved as it is typed (a new
   reminder keeps its note until it is saved). While the keyboard is up, a microphone above it records, turns the voice
   into text with Groq (the same speech to text model as voice capture) and writes it where the cursor is.
+  Next to it, a sparkles icon works as a switch (in color while on, gray while off; it is remembered and also appears in
+  *Configuración → Asistente*). While it is on, the transcript is first sent to an LLM, the *Corregir dictado* model
+  (`openai/gpt-oss-120b` by default), with a fixed prompt (`Core/Assistant/DictationCorrection.swift`) that corrects
+  punctuation, signs, accents, capitals and spelling and writes times like «cinco y media» as 5:30. If the correction
+  fails, the text is written as it was dictated.
 - **Barra flotante abajo**, al estilo de Instagram (una cápsula de vidrio con sólo íconos): **Buscar** (la cambia por el campo de búsqueda) y las
   tres formas de crear: **Foto**, **Voz** y **Manual** (el editor de siempre). Foto y Voz usan Groq y terminan
   en la misma pantalla de revisión:
