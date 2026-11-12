@@ -1,0 +1,18 @@
+{
+  "tag": "build-68-e576758",
+  "channel": "branch",
+  "branch": "claude/reorder-subreminders-hhd8x4",
+  "commit": "e576758e1c0a4ef45f60e7f82d59d58452b5598b",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.23.0",
+  "build": "68",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-68-e576758.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40452556549",
+  "created_at": "2026-10-27T04:59:43Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-68-e576758/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-68-e576758/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-68-e576758%2Fmanifest.plist",
+  "commit_title": "Let checkboxes of a reminder be reordered in the editor"
+}

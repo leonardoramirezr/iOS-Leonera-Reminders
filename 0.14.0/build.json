@@ -1,0 +1,18 @@
+{
+  "tag": "0.14.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "c253912e96143c1197e16a775432880174a0d27c",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.14.0",
+  "build": "43",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.14.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39319374155",
+  "created_at": "2026-10-19T20:28:54Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.14.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.14.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.14.0%2Fmanifest.plist",
+  "commit_title": "Vibrar al atender la alarma y en la hoja de posponer; hoja a la medida del contenido (#14)"
+}

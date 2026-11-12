@@ -1,0 +1,18 @@
+{
+  "tag": "build-70-3c0c598",
+  "channel": "branch",
+  "branch": "claude/reorder-subreminders-hhd8x4",
+  "commit": "3c0c598cbcaa18f63a5ea4c0f19498e15ac863a2",
+  "commit_title": "Put Agregar casilla before Reordenar casillas in the editor",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.23.0",
+  "build": "70",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-70-3c0c598.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40453273588",
+  "created_at": "2026-10-27T05:07:06Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-70-3c0c598/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-70-3c0c598/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-70-3c0c598%2Fmanifest.plist"
+}

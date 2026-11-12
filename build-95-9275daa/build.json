@@ -1,0 +1,18 @@
+{
+  "tag": "build-95-9275daa",
+  "channel": "branch",
+  "branch": "claude/checklist-autosave-setting",
+  "commit": "9275daa4b153b2370cb2e80a712f7b035cf6245a",
+  "commit_title": "Add a setting to save checkbox changes automatically while editing",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.33.0",
+  "build": "95",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-95-9275daa.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42033266560",
+  "created_at": "2026-11-05T13:12:08Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-95-9275daa/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-95-9275daa/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-95-9275daa%2Fmanifest.plist"
+}

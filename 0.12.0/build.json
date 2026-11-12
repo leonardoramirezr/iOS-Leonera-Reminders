@@ -1,0 +1,18 @@
+{
+  "tag": "0.12.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "2245093c5d52ccd0c67b575b7a82e69b71296332",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.12.0",
+  "build": "37",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.12.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39164499992",
+  "created_at": "2026-10-18T20:44:33Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.12.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.12.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.12.0%2Fmanifest.plist",
+  "commit_title": "Vibrar en el editor y hora fija al día siguiente si ya pasó (#13)"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-78-e20fbb8",
+  "channel": "branch",
+  "branch": "claude/apple-calendar-alarm-integration-wo9xvc",
+  "commit": "e20fbb8ca6959820f2bcf24445a80854a3441ea2",
+  "commit_title": "Show synced Apple Calendar events in the reminder list",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.26.0",
+  "build": "78",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-78-e20fbb8.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40601162885",
+  "created_at": "2026-10-27T23:20:48Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-78-e20fbb8/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-78-e20fbb8/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-78-e20fbb8%2Fmanifest.plist"
+}

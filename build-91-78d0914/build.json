@@ -1,0 +1,18 @@
+{
+  "tag": "build-91-78d0914",
+  "channel": "branch",
+  "branch": "claude/event-reminder-buttons-jfccin",
+  "commit": "78d09147f95cfe58818f8218aa97404e0b74dc69",
+  "commit_title": "Add an «Abrir app» button to the alarms before Apple Calendar events",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.31.0",
+  "build": "91",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-91-78d0914.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/41877919541",
+  "created_at": "2026-11-04T17:36:58Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-91-78d0914/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-91-78d0914/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-91-78d0914%2Fmanifest.plist"
+}

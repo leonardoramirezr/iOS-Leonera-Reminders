@@ -1,0 +1,18 @@
+{
+  "tag": "0.34.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "09703d9de3ac11c2bf09d50f5710b6355db82d47",
+  "commit_title": "Add an «Abrir Leonera» lock screen widget that opens the app's home screen (#38)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.34.0",
+  "build": "94",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.34.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42032835787",
+  "created_at": "2026-11-05T13:09:34Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.34.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.34.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.34.0%2Fmanifest.plist"
+}

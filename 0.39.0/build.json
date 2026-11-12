@@ -1,0 +1,18 @@
+{
+  "tag": "0.39.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "1e62eef1bc7c4a55e5569af460614b8a64bd19f8",
+  "commit_title": "Add a full-screen checklist view and make the checklist options discreet text buttons (#43)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.39.0",
+  "build": "106",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.39.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42958417275",
+  "created_at": "2026-11-11T04:21:22Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.39.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.39.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.39.0%2Fmanifest.plist"
+}

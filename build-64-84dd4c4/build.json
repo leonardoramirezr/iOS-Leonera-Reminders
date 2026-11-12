@@ -1,0 +1,18 @@
+{
+  "tag": "build-64-84dd4c4",
+  "channel": "branch",
+  "branch": "fix/fireworks-tap-to-finish",
+  "commit": "84dd4c4afaa7b5702506d62f6ac30da126d9317d",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.21.0",
+  "build": "64",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-64-84dd4c4.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40111921612",
+  "created_at": "2026-10-24T16:32:49Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-64-84dd4c4/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-64-84dd4c4/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-64-84dd4c4%2Fmanifest.plist",
+  "commit_title": "Make tapping the fireworks end the show"
+}

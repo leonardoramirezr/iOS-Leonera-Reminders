@@ -1,0 +1,18 @@
+{
+  "tag": "build-101-ec38e9f",
+  "channel": "branch",
+  "branch": "claude/upbeat-planck-a5j9y0",
+  "commit": "ec38e9f42b108970cf7bc00ea0e3497c19e60740",
+  "commit_title": "Revert \"Open the reminder menu on tap and keep the snooze sheet on long press\"",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.36.0",
+  "build": "101",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-101-ec38e9f.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42159499825",
+  "created_at": "2026-11-06T03:59:18Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-101-ec38e9f/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-101-ec38e9f/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-101-ec38e9f%2Fmanifest.plist"
+}
