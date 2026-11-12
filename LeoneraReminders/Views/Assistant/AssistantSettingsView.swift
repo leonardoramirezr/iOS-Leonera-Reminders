@@ -104,8 +104,9 @@ struct AssistantSettingsView: View {
                     Text(language.name).tag(language.code)
                 }
             }
+            Toggle("Corregir el dictado de las notas", isOn: assistant.correctsDictation)
         } footer: {
-            Text("Indicar el idioma mejora la conversión de voz a texto.")
+            Text("Indicar el idioma mejora la conversión de voz a texto. Al corregir, el modelo «Corregir dictado» arregla la puntuación, los signos, los acentos y la ortografía de lo que dictas en una nota antes de escribirlo; también se activa con el ícono de destellos junto al micrófono.")
         }
     }
 

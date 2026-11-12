@@ -28,6 +28,15 @@ struct ReminderEditorView: View {
         Binding(get: { draft.dueDate }, set: { draft.reschedule(to: $0) })
     }
 
+    /// The note editor has no «Guardar»: for a reminder already saved, each change to the note is saved as it is
+    /// typed. A new reminder has nothing stored yet, so its note is saved with it.
+    private var note: Binding<String> {
+        Binding(get: { draft.note }, set: { newValue in
+            draft.note = newValue
+            if !isNew { store.saveNote(reminderID: draft.id, note: newValue) }
+        })
+    }
+
     /// Turning the checklist on starts it empty; turning it off drops its checkboxes.
     private var checklistEnabled: Binding<Bool> {
         Binding(get: { draft.checklist != nil }, set: { draft.checklist = $0 ? (draft.checklist ?? []) : nil })
@@ -86,6 +95,21 @@ struct ReminderEditorView: View {
                                 discreetLabel("Ver en pantalla completa")
                             }
                         }
+                    }
+                }
+
+                // Below the checkboxes. Only as tall as its text, and without a row at all while there is none: then
+                // there is only the button. The text is read here and edited on its own screen.
+                Section {
+                    if !draft.trimmedNote.isEmpty {
+                        Text(draft.trimmedNote)
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    NavigationLink {
+                        NoteEditorView(note: note)
+                    } label: {
+                        Label(draft.trimmedNote.isEmpty ? "Agregar nota" : "Editar nota", systemImage: "note.text")
                     }
                 }
 
@@ -245,6 +269,7 @@ struct ReminderEditorView: View {
         var reminder = draft
         reminder.title = trimmedTitle
         reminder.checklist = reminder.checklist.map(Self.cleanedChecklist)
+        reminder.note = reminder.trimmedNote
         if isNew {
             store.add(reminder)
         } else {

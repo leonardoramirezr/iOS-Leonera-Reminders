@@ -167,6 +167,14 @@ final class DictationSession {
         phase = .idle
     }
 
+    /// Forgets the last error, along with the recording kept to retry it.
+    func dismissError() {
+        guard phase == .idle else { return }
+        error = nil
+        needsMicrophonePermission = false
+        discardFailedAudio()
+    }
+
     private func transcribe(_ url: URL) async -> String? {
         phase = .transcribing
         error = nil

@@ -18,11 +18,17 @@ struct GroqClient: Sendable {
         return response.text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// Respuesta del modelo de chat, en modo JSON.
-    func complete(model: String, messages: [GroqAPI.ChatMessage]) async throws -> String {
+    /// Respuesta del modelo de chat, en modo JSON salvo que `responseFormat` sea `nil` (texto libre).
+    func complete(
+        model: String,
+        messages: [GroqAPI.ChatMessage],
+        responseFormat: GroqAPI.ChatRequest.ResponseFormat? = .jsonObject
+    ) async throws -> String {
         var request = makeRequest(GroqAPI.chatPath, method: "POST", timeout: 120)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(GroqAPI.ChatRequest(model: model, messages: messages))
+        request.httpBody = try JSONEncoder().encode(
+            GroqAPI.ChatRequest(model: model, messages: messages, responseFormat: responseFormat)
+        )
         let data = try await send(request)
         guard let response = try? JSONDecoder().decode(GroqAPI.ChatResponse.self, from: data) else {
             throw GroqAPI.APIError.invalidResponse

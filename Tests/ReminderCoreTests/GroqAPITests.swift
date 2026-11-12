@@ -18,6 +18,20 @@ struct GroqAPITests {
         #expect(messages[1]["content"] as? String == "Nota:\nComprar pan")
     }
 
+    @Test func plainTextRequestsSendNoResponseFormat() throws {
+        let request = GroqAPI.ChatRequest(model: "openai/gpt-oss-120b", messages: [.user("hola")], responseFormat: nil)
+        let body = try json(request)
+        #expect(body["response_format"] == nil)
+        #expect(body["model"] as? String == "openai/gpt-oss-120b")
+    }
+
+    @Test func reasoningIsRemovedFromReplies() {
+        #expect(GroqAPI.removingReasoning(from: "<think>Primero…</think>\nHola.") == "\nHola.")
+        #expect(GroqAPI.removingReasoning(from: "<think>a</think>Uno <think>b</think>dos") == "Uno dos")
+        #expect(GroqAPI.removingReasoning(from: "Texto <think>sin cerrar") == "Texto ")
+        #expect(GroqAPI.removingReasoning(from: "Sin razonamiento") == "Sin razonamiento")
+    }
+
     @Test func imagesAreSentAsDataURLParts() throws {
         let image = Data([0xFF, 0xD8, 0xFF, 0xE0])
         let request = GroqAPI.ChatRequest(model: "qwen/qwen3.8-27b", messages: [.user("Indicaciones", images: [image, image])])
@@ -95,6 +109,7 @@ struct GroqAPITests {
         #expect(settings.otherAvailableModels(for: .transcription) == [])
         #expect(settings.otherAvailableModels(for: .text) == ["minimaxai/minimax-m2.7"])
         #expect(settings.otherAvailableModels(for: .vision) == ["minimaxai/minimax-m2.7", "openai/gpt-oss-120b"])
+        #expect(settings.otherAvailableModels(for: .correction) == ["minimaxai/minimax-m2.7"])
     }
 }
 
@@ -110,10 +125,13 @@ struct AssistantSettingsTests {
         var settings = AppSettings.default
         settings.assistant.setModel("  qwen/qwen3.8-27b ", for: .text)
         settings.assistant.setModel("", for: .vision)
+        settings.assistant.setModel("openai/gpt-oss-20b", for: .correction)
+        settings.assistant.correctsDictation = true
         settings.assistant.transcriptionLanguage = ""
         settings.assistant.availableModels = ["a", "b"]
         #expect(settings.assistant.textModel == "qwen/qwen3.8-27b")
         #expect(settings.assistant.visionModel == AssistantSettings.default.visionModel)
+        #expect(settings.assistant.model(for: .correction) == "openai/gpt-oss-20b")
         let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
         #expect(decoded.assistant == settings.assistant)
         #expect(decoded == settings)
@@ -130,5 +148,15 @@ struct AssistantSettingsTests {
         #expect(decoded.assistant.transcriptionModel == AssistantSettings.default.transcriptionModel)
         #expect(decoded.assistant.transcriptionLanguage == "")
         #expect(decoded.assistant.availableModels.isEmpty)
+        // Settings saved before the dictation correction existed: off, with the default model.
+        #expect(decoded.assistant.correctionModel == AssistantSettings.default.correctionModel)
+        #expect(!decoded.assistant.correctsDictation)
+    }
+
+    @Test func dictationCorrectionIsOffByDefault() {
+        #expect(!AssistantSettings.default.correctsDictation)
+        #expect(AssistantSettings.default.correctionModel == "openai/gpt-oss-120b")
+        #expect(GroqModelCatalog.kind(of: "openai/gpt-oss-20b").serves(.correction))
+        #expect(!GroqModelCatalog.kind(of: "whisper-large-v3").serves(.correction))
     }
 }

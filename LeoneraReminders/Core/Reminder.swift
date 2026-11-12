@@ -18,6 +18,8 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
     var scheduledAlarms: [ScheduledAlarm]
     /// Checkboxes of a reminder with a checklist; `nil` for a plain reminder. An empty list is still a checklist.
     var checklist: [ChecklistItem]?
+    /// Free text shown below the checkboxes; empty when the reminder has no note.
+    var note: String
 
     init(
         id: UUID = UUID(),
@@ -29,7 +31,8 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
         lastCompletedAt: Date? = nil,
         createdAt: Date = Date(),
         scheduledAlarms: [ScheduledAlarm] = [],
-        checklist: [ChecklistItem]? = nil
+        checklist: [ChecklistItem]? = nil,
+        note: String = ""
     ) {
         self.id = id
         self.title = title
@@ -41,9 +44,13 @@ struct Reminder: Identifiable, Codable, Hashable, Sendable {
         self.createdAt = createdAt
         self.scheduledAlarms = scheduledAlarms
         self.checklist = checklist
+        self.note = note
     }
 
     var isCompleted: Bool { completedAt != nil }
+
+    /// The note without the blank lines and spaces around it; empty when there is nothing to show.
+    var trimmedNote: String { note.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     /// Fecha límite de un recordatorio nuevo: la siguiente hora en punto.
     static func defaultDueDate(now: Date = Date(), calendar: Calendar = .current) -> Date {
@@ -162,7 +169,7 @@ struct ScheduledAlarm: Codable, Hashable, Sendable {
 
 extension Reminder {
     private enum CodingKeys: String, CodingKey {
-        case id, title, dueDate, repeatRule, retryFrom, completedAt, lastCompletedAt, createdAt, scheduledAlarms, checklist
+        case id, title, dueDate, repeatRule, retryFrom, completedAt, lastCompletedAt, createdAt, scheduledAlarms, checklist, note
         /// Versiones anteriores guardaban una sola alarma.
         case scheduledAlarm
         /// Versiones anteriores posponían sin mover la fecha límite; al leerlas, la fecha límite pasa a ser esa hora.
@@ -182,7 +189,8 @@ extension Reminder {
             createdAt: try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date(),
             scheduledAlarms: try c.decodeIfPresent([ScheduledAlarm].self, forKey: .scheduledAlarms)
                 ?? (try c.decodeIfPresent(ScheduledAlarm.self, forKey: .scheduledAlarm)).map { [$0] } ?? [],
-            checklist: try c.decodeIfPresent([ChecklistItem].self, forKey: .checklist)
+            checklist: try c.decodeIfPresent([ChecklistItem].self, forKey: .checklist),
+            note: try c.decodeIfPresent(String.self, forKey: .note) ?? ""
         )
     }
 }
@@ -200,5 +208,7 @@ extension Reminder {
         try c.encode(createdAt, forKey: .createdAt)
         try c.encode(scheduledAlarms, forKey: .scheduledAlarms)
         try c.encodeIfPresent(checklist, forKey: .checklist)
+        // Reminders without a note are saved as before.
+        if !note.isEmpty { try c.encode(note, forKey: .note) }
     }
 }
