@@ -82,8 +82,10 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
   The alarms before an event (and their repeats) also have an *Abrir app* button: it stops the alarm like *Detener*
   (so it still repeats a minute later) and opens the event's details in the app, where it is acknowledged with
   *Enterado*. In notification mode the notification has the same *Abrir app* action, and tapping it does the same.
-  An event already acknowledged still rings once when it starts, unless *Sonar a la hora aunque ya esté confirmado*
-  is turned off in the same settings screen (on by default); that alarm has no secondary button.
+  An acknowledged event rings when it starts, unless *Sonar a la hora aunque ya esté confirmado* is turned off in the
+  same settings screen (on by default). That first alarm has no *Abrir app* button, but its repeats do: each stop
+  plans the next one a minute later, until the event is acknowledged again. Before it starts, an acknowledged event
+  cannot be acknowledged again: its *Enterado* action in the list is greyed out, and the one in its details is disabled.
   Events of the next 7 days are scheduled; they are refreshed when the app opens, when the calendar changes while it
   runs, and every few hours with a background refresh. All-day, canceled and declined events do not ring.
   Events whose alarms are scheduled also appear in the reminder list, by date, with a calendar icon instead of the

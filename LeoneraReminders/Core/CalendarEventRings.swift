@@ -6,7 +6,8 @@ import Foundation
 /// minute later, and so on until the user acknowledges the event. Only the current alarm of each event is kept,
 /// so repeats are planned one at a time and nothing is scheduled far ahead.
 ///
-/// An acknowledged event does not repeat, but it can still ring once when it starts (see `reconcile`).
+/// An acknowledged event rings when it starts (see `reconcile`), and from then on it repeats in the same way until
+/// the user acknowledges it again. It can only be acknowledged again once it has started.
 struct CalendarEventRings: Codable, Hashable, Sendable {
     /// The alarm that is scheduled or ringing now, by occurrence (`SyncedCalendarEvent.id`).
     private(set) var current: [String: CalendarEventAlarm] = [:]
@@ -29,21 +30,20 @@ struct CalendarEventRings: Codable, Hashable, Sendable {
     ///   - scheduled: the IDs of the alarms the system still holds, or `nil` when they are not known.
     ///     A current alarm that the system no longer holds and whose time has passed was stopped without the app
     ///     hearing about it, so its next repeat is planned from `now`.
+    ///   - ringsAcknowledgedAtStart: whether the alarms at the start of acknowledged events are kept. When it is
+    ///     off, they are dropped, and so are their repeats.
     mutating func reconcile(
         planned: [CalendarEventAlarm],
         events: [CalendarEventSnapshot],
         scheduled: Set<UUID>?,
-        now: Date
+        now: Date,
+        ringsAcknowledgedAtStart: Bool = true
     ) {
         acknowledged = acknowledged.filter { $0.value > now.addingTimeInterval(-Self.retention) }
         let live = Set(events.filter { !$0.isAllDay && !$0.isSkipped }.map(SyncedCalendarEvent.id(for:)))
         current = current.filter { live.contains($0.key) }
-
-        // The alarm at the start is kept only while it is planned, or while the system still rings it, so that
-        // it is dropped when the setting is turned off and when it has rung.
-        let plannedIDs = Set(planned.map(\.id))
-        current = current.filter { entry in
-            !entry.value.ringsAtStart || plannedIDs.contains(entry.value.id) || scheduled?.contains(entry.value.id) == true
+        if !ringsAcknowledgedAtStart {
+            current = current.filter { !$0.value.ringsAtStart }
         }
 
         for alarm in planned where alarm.ringsAtStart == (acknowledged[alarm.occurrenceID] != nil) {
@@ -58,19 +58,15 @@ struct CalendarEventRings: Codable, Hashable, Sendable {
         }
     }
 
-    /// The user stopped the alarm `alarmID`: its repeat rings a minute after `now`, unless it was the alarm at the
-    /// start of an acknowledged event, which rings only once.
+    /// The user stopped the alarm `alarmID`, or its notification was cleared: its repeat rings a minute after `now`.
+    /// This applies to the alarm at the start of an acknowledged event too, which repeats until it is acknowledged.
     mutating func stopped(_ alarmID: UUID, now: Date) {
         guard let entry = current.first(where: { $0.value.id == alarmID }) else { return }
-        guard !entry.value.ringsAtStart else {
-            current[entry.key] = nil
-            return
-        }
         current[entry.key] = entry.value.repeated(at: now.addingTimeInterval(Self.repeatInterval))
     }
 
-    /// The user acknowledged the event in the app: its repeats stop, and it does not ring again except once at its
-    /// start, when that setting is on.
+    /// The user acknowledged the event in the app: its repeats stop. Until the event starts it cannot be
+    /// acknowledged again (see `SyncedCalendarEvent.isLocked`); the alarm at its start is planned by `reconcile`.
     mutating func acknowledge(_ occurrenceID: String, start: Date) {
         current[occurrenceID] = nil
         acknowledged[occurrenceID] = start

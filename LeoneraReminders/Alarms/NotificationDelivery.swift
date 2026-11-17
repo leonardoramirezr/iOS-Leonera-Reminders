@@ -11,7 +11,7 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
 
     nonisolated private static let categoryID = "reminder"
     nonisolated private static let calendarEventCategoryID = "calendarEvent"
-    /// The notification at the start of an acknowledged event: it has no buttons.
+    /// The first notification at the start of an acknowledged event: it has no buttons.
     nonisolated private static let calendarEventAtStartCategoryID = "calendarEventAtStart"
     nonisolated private static let snoozeActionID = "snooze"
     nonisolated private static let optionsActionID = "options"
@@ -67,7 +67,7 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
                 content.body = alarm.isRepeat
                     ? "Sin confirmar"
                     : alarm.ringsAtStart ? "Empieza ahora" : "Empieza en \(alarm.leadMinutes) min"
-                content.categoryIdentifier = alarm.ringsAtStart ? Self.calendarEventAtStartCategoryID : Self.calendarEventCategoryID
+                content.categoryIdentifier = alarm.hasOpenAppButton ? Self.calendarEventCategoryID : Self.calendarEventAtStartCategoryID
                 content.userInfo = [Self.calendarEventKey: true, Self.alarmKey: alarm.id.uuidString]
             }
             content.sound = Self.sound(for: settings.sound)
@@ -122,7 +122,8 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
             identifier: Self.categoryID, actions: actions, intentIdentifiers: [], options: [.customDismissAction]
         )
         // Clearing the notification of an event counts as stopping its alarm, which plans the next repeat.
-        // «Abrir app» does the same and opens the event in the app, so it can be acknowledged.
+        // «Abrir app» does the same and opens the event in the app, so it can be acknowledged. The first notification
+        // at the start of an acknowledged event has no buttons, but tapping it does the same.
         let calendarEventCategory = UNNotificationCategory(
             identifier: Self.calendarEventCategoryID,
             actions: [UNNotificationAction(identifier: Self.optionsActionID, title: "Abrir app", options: [.foreground])],
@@ -157,8 +158,8 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse
     ) async {
         let info = response.notification.request.content.userInfo
-        // A calendar event notification: clearing it stops the alarm; «Abrir app» or a tap also opens the event in
-        // the app (the one at the start of the event is already acknowledged, so a tap only opens the app).
+        // A calendar event notification: clearing it stops the alarm, which plans its repeat; «Abrir app» or a tap
+        // also opens the event in the app, where it can be acknowledged.
         if info[Self.calendarEventKey] != nil {
             guard let alarmID = info[Self.alarmKey] as? String else { return }
             switch response.actionIdentifier {

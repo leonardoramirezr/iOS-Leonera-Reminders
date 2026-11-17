@@ -149,7 +149,13 @@ final class AlarmSyncService {
             )
         }
         var rings = ringStore.rings
-        rings.reconcile(planned: planned, events: events, scheduled: scheduled, now: now)
+        rings.reconcile(
+            planned: planned,
+            events: events,
+            scheduled: scheduled,
+            now: now,
+            ringsAcknowledgedAtStart: settings.calendarAlarms.ringsAcknowledgedAtStart
+        )
         ringStore.rings = rings
         return rings.current.values.sorted { ($0.fireDate, $0.id.uuidString) < ($1.fireDate, $1.id.uuidString) }
     }
@@ -384,16 +390,16 @@ final class AlarmSyncService {
 
     /// The alarm of a calendar event. Stopping it plans the next repeat, see `CalendarEventRingStopIntent`.
     ///
-    /// The alarms before the event (and their repeats) also have «Abrir app», which opens the event in the app so it
-    /// can be acknowledged; the alarm at its start has no secondary button, since the event is already acknowledged.
+    /// The alarms before the event and their repeats have «Abrir app», which opens the event in the app so it can be
+    /// acknowledged. The first alarm at the start of an acknowledged event has no secondary button.
     nonisolated private static func configuration(
         for alarm: CalendarEventAlarm,
         settings: AppSettings
     ) -> AlarmManager.AlarmConfiguration<CalendarEventAlarmMetadata> {
         let title = LocalizedStringResource(stringLiteral: alarm.alarmTitle)
-        let secondaryButton = alarm.ringsAtStart
-            ? nil
-            : AlarmButton(text: "Abrir app", textColor: .white, systemImageName: "arrow.up.forward.app")
+        let secondaryButton = alarm.hasOpenAppButton
+            ? AlarmButton(text: "Abrir app", textColor: .white, systemImageName: "arrow.up.forward.app")
+            : nil
         let secondaryBehavior: AlarmPresentation.Alert.SecondaryButtonBehavior? = secondaryButton == nil ? nil : .custom
         let alert: AlarmPresentation.Alert
         if #available(iOS 26.1, *) {

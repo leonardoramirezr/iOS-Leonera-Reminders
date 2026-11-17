@@ -3,7 +3,7 @@ import AppIntents
 import Foundation
 
 /// The stop button of an event alarm. AlarmKit runs it in the app when the alarm is stopped; the repeat that
-/// follows rings a minute later, unless the event has been acknowledged.
+/// follows rings a minute later, until the event is acknowledged.
 struct CalendarEventRingStopIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Detener alarma de evento"
     static let isDiscoverable = false
@@ -20,14 +20,15 @@ struct CalendarEventRingStopIntent: LiveActivityIntent {
     }
 
     func perform() async throws -> some IntentResult {
+        if let id = UUID(uuidString: alarmID) { try? AlarmManager.shared.stop(id: id) }
         await CalendarEventRingHandler.stopped(alarmID: alarmID)
         return .result()
     }
 }
 
-/// «Abrir app» on the alarm before an event: stops it like the stop button (so its repeat still rings a minute later
-/// if the event is not acknowledged) and opens the app on the event's details, where it can be acknowledged.
-/// The alarm at the start of an event has no such button, since that event is already acknowledged.
+/// «Abrir app» on an alarm of an event: stops it like the stop button (so its repeat still rings a minute later
+/// until the event is acknowledged) and opens the app on the event's details, where it can be acknowledged.
+/// The first alarm at the start of an acknowledged event has no such button; its repeats do.
 struct CalendarEventOpenAppIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Abrir app"
     static let isDiscoverable = false

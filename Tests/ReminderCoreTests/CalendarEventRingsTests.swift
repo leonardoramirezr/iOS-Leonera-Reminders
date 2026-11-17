@@ -92,7 +92,7 @@ struct CalendarEventRingsTests {
         #expect(rings.current[occurrence] == nil)
     }
 
-    @Test func anAcknowledgedEventRingsOnceAtItsStart() throws {
+    @Test func anAcknowledgedEventRingsAtItsStartAndRepeatsUntilAcknowledgedAgain() throws {
         var rings = CalendarEventRings()
         let now = local(2026, 10, 27, 9, 50)
         sync(&rings, at: now)
@@ -102,11 +102,51 @@ struct CalendarEventRingsTests {
         let atStart = try #require(rings.current[occurrence])
         #expect(atStart.fireDate == event.startDate)
         #expect(atStart.ringsAtStart)
+        #expect(!atStart.hasOpenAppButton)
 
-        // Stopped when it rings: it does not repeat.
-        rings.stopped(atStart.id, now: event.startDate.addingTimeInterval(10))
+        // Stopped when it rings: it repeats a minute later, with «Abrir app».
+        let stop = event.startDate.addingTimeInterval(10)
+        rings.stopped(atStart.id, now: stop)
+        let repeated = try #require(rings.current[occurrence])
+        #expect(repeated.isRepeat)
+        #expect(repeated.ringsAtStart)
+        #expect(repeated.hasOpenAppButton)
+        #expect(repeated.fireDate == stop.addingTimeInterval(60))
+
+        // The system no longer holds the repeat yet: it is kept, not dropped, and it is not planned again.
         rings.reconcile(planned: [], events: [event], scheduled: Set(), now: event.startDate.addingTimeInterval(20))
+        #expect(rings.current[occurrence] == repeated)
+
+        // A repeat the system lost after its time has passed is planned again from the sync.
+        rings.reconcile(planned: [], events: [event], scheduled: Set(), now: repeated.fireDate.addingTimeInterval(5))
+        #expect(rings.current[occurrence]?.ringIndex == 2)
+
+        rings.acknowledge(occurrence, start: event.startDate)
         #expect(rings.current[occurrence] == nil)
+    }
+
+    @Test func anAcknowledgedEventIsLockedUntilItStarts() throws {
+        var rings = CalendarEventRings()
+        let now = local(2026, 10, 27, 9, 50)
+        sync(&rings, at: now)
+        rings.acknowledge(occurrence, start: event.startDate)
+        rings.reconcile(planned: planned(at: now, leadMinutes: CalendarEventAlarm.startLeadMinutes), events: [event], scheduled: Set(), now: now)
+
+        let listed = CalendarEventAlarmPlanner.syncedEvents(from: Array(rings.current.values), now: now)
+        let synced = try #require(listed.first)
+        #expect(synced.isAcknowledged)
+        #expect(synced.isLocked(now: now))
+        #expect(!synced.isLocked(now: event.startDate))
+    }
+
+    @Test func aNotAcknowledgedEventIsNotLocked() throws {
+        var rings = CalendarEventRings()
+        let now = local(2026, 10, 27, 9, 50)
+        sync(&rings, at: now)
+        let listed = CalendarEventAlarmPlanner.syncedEvents(from: Array(rings.current.values), now: now)
+        let synced = try #require(listed.first)
+        #expect(!synced.isAcknowledged)
+        #expect(!synced.isLocked(now: now))
     }
 
     @Test func aNotAcknowledgedEventIgnoresTheAlarmAtItsStart() {
@@ -129,7 +169,33 @@ struct CalendarEventRingsTests {
         rings.reconcile(planned: planned(at: now, leadMinutes: CalendarEventAlarm.startLeadMinutes), events: [event], scheduled: Set(), now: now)
         #expect(rings.current[occurrence] != nil)
 
-        rings.reconcile(planned: [], events: [event], scheduled: Set(), now: local(2026, 10, 27, 9, 51))
+        rings.reconcile(
+            planned: [],
+            events: [event],
+            scheduled: Set(),
+            now: local(2026, 10, 27, 9, 51),
+            ringsAcknowledgedAtStart: false
+        )
+        #expect(rings.current[occurrence] == nil)
+    }
+
+    @Test func aRepeatAtTheStartIsDroppedWhenTheSettingIsTurnedOff() throws {
+        var rings = CalendarEventRings()
+        let now = local(2026, 10, 27, 9, 50)
+        sync(&rings, at: now)
+        rings.acknowledge(occurrence, start: event.startDate)
+        rings.reconcile(planned: planned(at: now, leadMinutes: CalendarEventAlarm.startLeadMinutes), events: [event], scheduled: Set(), now: now)
+        let atStart = try #require(rings.current[occurrence])
+        rings.stopped(atStart.id, now: event.startDate.addingTimeInterval(10))
+        #expect(rings.current[occurrence]?.isRepeat == true)
+
+        rings.reconcile(
+            planned: [],
+            events: [event],
+            scheduled: Set(),
+            now: event.startDate.addingTimeInterval(20),
+            ringsAcknowledgedAtStart: false
+        )
         #expect(rings.current[occurrence] == nil)
     }
 
