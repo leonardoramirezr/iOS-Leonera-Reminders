@@ -11,8 +11,6 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
 
     nonisolated private static let categoryID = "reminder"
     nonisolated private static let calendarEventCategoryID = "calendarEvent"
-    /// The first notification at the start of an acknowledged event: it has no buttons.
-    nonisolated private static let calendarEventAtStartCategoryID = "calendarEventAtStart"
     nonisolated private static let snoozeActionID = "snooze"
     nonisolated private static let optionsActionID = "options"
     nonisolated private static let reminderKey = "reminderID"
@@ -67,7 +65,7 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
                 content.body = alarm.isRepeat
                     ? "Sin confirmar"
                     : alarm.ringsAtStart ? "Empieza ahora" : "Empieza en \(alarm.leadMinutes) min"
-                content.categoryIdentifier = alarm.hasOpenAppButton ? Self.calendarEventCategoryID : Self.calendarEventAtStartCategoryID
+                content.categoryIdentifier = Self.calendarEventCategoryID
                 content.userInfo = [Self.calendarEventKey: true, Self.alarmKey: alarm.id.uuidString]
             }
             content.sound = Self.sound(for: settings.sound)
@@ -122,18 +120,14 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
             identifier: Self.categoryID, actions: actions, intentIdentifiers: [], options: [.customDismissAction]
         )
         // Clearing the notification of an event counts as stopping its alarm, which plans the next repeat.
-        // «Abrir app» does the same and opens the event in the app, so it can be acknowledged. The first notification
-        // at the start of an acknowledged event has no buttons, but tapping it does the same.
+        // «Abrir app» does the same and opens the event in the app, so it can be acknowledged.
         let calendarEventCategory = UNNotificationCategory(
             identifier: Self.calendarEventCategoryID,
             actions: [UNNotificationAction(identifier: Self.optionsActionID, title: "Abrir app", options: [.foreground])],
             intentIdentifiers: [],
             options: [.customDismissAction]
         )
-        let calendarEventAtStartCategory = UNNotificationCategory(
-            identifier: Self.calendarEventAtStartCategoryID, actions: [], intentIdentifiers: [], options: [.customDismissAction]
-        )
-        center.setNotificationCategories([category, calendarEventCategory, calendarEventAtStartCategory])
+        center.setNotificationCategories([category, calendarEventCategory])
     }
 
     private static func sound(for sound: AlarmSound) -> UNNotificationSound? {

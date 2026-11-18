@@ -28,7 +28,6 @@ struct CalendarEventRingStopIntent: LiveActivityIntent {
 
 /// «Abrir app» on an alarm of an event: stops it like the stop button (so its repeat still rings a minute later
 /// until the event is acknowledged) and opens the app on the event's details, where it can be acknowledged.
-/// The first alarm at the start of an acknowledged event has no such button; its repeats do.
 struct CalendarEventOpenAppIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Abrir app"
     static let isDiscoverable = false

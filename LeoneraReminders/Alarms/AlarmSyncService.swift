@@ -390,16 +390,13 @@ final class AlarmSyncService {
 
     /// The alarm of a calendar event. Stopping it plans the next repeat, see `CalendarEventRingStopIntent`.
     ///
-    /// The alarms before the event and their repeats have «Abrir app», which opens the event in the app so it can be
-    /// acknowledged. The first alarm at the start of an acknowledged event has no secondary button.
+    /// Every alarm of a calendar event has «Abrir app», which opens the event in the app so it can be acknowledged.
     nonisolated private static func configuration(
         for alarm: CalendarEventAlarm,
         settings: AppSettings
     ) -> AlarmManager.AlarmConfiguration<CalendarEventAlarmMetadata> {
         let title = LocalizedStringResource(stringLiteral: alarm.alarmTitle)
-        let secondaryButton = alarm.hasOpenAppButton
-            ? AlarmButton(text: "Abrir app", textColor: .white, systemImageName: "arrow.up.forward.app")
-            : nil
+        let secondaryButton = AlarmButton(text: "Abrir app", textColor: .white, systemImageName: "arrow.up.forward.app")
         let secondaryBehavior: AlarmPresentation.Alert.SecondaryButtonBehavior? = secondaryButton == nil ? nil : .custom
         let alert: AlarmPresentation.Alert
         if #available(iOS 26.1, *) {

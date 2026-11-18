@@ -95,9 +95,6 @@ struct CalendarEventAlarm: Identifiable, Hashable, Codable, Sendable {
     /// Rings when the event starts. It is planned only for acknowledged events; like the others, its repeats follow
     /// each stop until the event is acknowledged again.
     var ringsAtStart: Bool { leadMinutes == Self.startLeadMinutes }
-    /// The alarms before the event and their repeats have «Abrir app»; the first alarm at its start does not, since
-    /// that event is already acknowledged.
-    var hasOpenAppButton: Bool { isRepeat || !ringsAtStart }
 
     /// The repeat that rings at `date`, once this alarm has been stopped.
     func repeated(at date: Date) -> CalendarEventAlarm {

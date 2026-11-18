@@ -102,15 +102,13 @@ struct CalendarEventRingsTests {
         let atStart = try #require(rings.current[occurrence])
         #expect(atStart.fireDate == event.startDate)
         #expect(atStart.ringsAtStart)
-        #expect(!atStart.hasOpenAppButton)
 
-        // Stopped when it rings: it repeats a minute later, with «Abrir app».
+        // Stopped when it rings: it repeats a minute later.
         let stop = event.startDate.addingTimeInterval(10)
         rings.stopped(atStart.id, now: stop)
         let repeated = try #require(rings.current[occurrence])
         #expect(repeated.isRepeat)
         #expect(repeated.ringsAtStart)
-        #expect(repeated.hasOpenAppButton)
         #expect(repeated.fireDate == stop.addingTimeInterval(60))
 
         // The system no longer holds the repeat yet: it is kept, not dropped, and it is not planned again.
