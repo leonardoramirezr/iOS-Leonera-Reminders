@@ -1,0 +1,18 @@
+{
+  "tag": "build-62-814ba47",
+  "channel": "branch",
+  "branch": "claude/reminders-fireworks-animation-jz23mn",
+  "commit": "814ba478b881ee7db5c1b791f446fb6a289924e7",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.20.0",
+  "build": "62",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-62-814ba47.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40073592992",
+  "created_at": "2026-10-24T07:21:10Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-62-814ba47/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-62-814ba47/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-62-814ba47%2Fmanifest.plist",
+  "commit_title": "Remove the list circle and add a fireworks interaction setting"
+}

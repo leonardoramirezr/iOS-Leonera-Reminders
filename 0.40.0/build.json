@@ -1,0 +1,18 @@
+{
+  "tag": "0.40.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "2eafcec9c46e48f3514d54ac14ce0cf8c1a4d9a7",
+  "commit_title": "Add a note to reminders, edited on its own screen with voice dictation and optional LLM correction (#44)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.40.0",
+  "build": "109",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.40.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/43222246597",
+  "created_at": "2026-11-12T12:57:18Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.40.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.40.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.40.0%2Fmanifest.plist"
+}

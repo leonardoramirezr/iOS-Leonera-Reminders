@@ -1,0 +1,18 @@
+{
+  "tag": "build-51-ec8f811",
+  "channel": "branch",
+  "branch": "claude/clever-hypatia-4itwtq",
+  "commit": "ec8f811a8c0ce11bbdeb7fbf28c5ae4e1c58c2b6",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.16.0",
+  "build": "51",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-51-ec8f811.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39327640991",
+  "created_at": "2026-10-19T21:30:30Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-51-ec8f811/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-51-ec8f811/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-51-ec8f811%2Fmanifest.plist",
+  "commit_title": "Keep the action sheet at its fitted height when opened from the alarm"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-49-7ad397b",
+  "channel": "branch",
+  "branch": "claude/zealous-goldberg-avgox0",
+  "commit": "7ad397b3ba0d39bce04e607161a6942849f34e6e",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.15.0",
+  "build": "49",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-49-7ad397b.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39326120649",
+  "created_at": "2026-10-19T21:18:34Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-49-7ad397b/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-49-7ad397b/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-49-7ad397b%2Fmanifest.plist",
+  "commit_title": "Show the build name in Settings"
+}

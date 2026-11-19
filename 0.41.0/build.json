@@ -1,0 +1,18 @@
+{
+  "tag": "0.41.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "22bd6f2c1fde1407036deec3e236a63de69e6e87",
+  "commit_title": "Repeat acknowledged event alarms until acknowledged again (#45)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.41.0",
+  "build": "112",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.41.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/44583245195",
+  "created_at": "2026-11-19T18:03:25Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.41.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.41.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.41.0%2Fmanifest.plist"
+}

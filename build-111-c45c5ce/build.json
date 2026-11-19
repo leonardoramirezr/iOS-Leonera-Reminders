@@ -1,0 +1,18 @@
+{
+  "tag": "build-111-c45c5ce",
+  "channel": "branch",
+  "branch": "claude/busy-ramanujan-r008bq",
+  "commit": "c45c5ce4f7c972d72faa4077e6ab065bfff532a8",
+  "commit_title": "Show the open-app button on the alarm at the start of acknowledged events",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.40.0",
+  "build": "111",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-111-c45c5ce.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/44342758687",
+  "created_at": "2026-11-18T16:11:00Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-111-c45c5ce/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-111-c45c5ce/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-111-c45c5ce%2Fmanifest.plist"
+}

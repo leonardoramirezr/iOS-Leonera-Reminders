@@ -1,0 +1,18 @@
+{
+  "tag": "build-57-32bd39e",
+  "channel": "branch",
+  "branch": "claude/compassionate-mendel-kxo21d",
+  "commit": "32bd39e8b5de54f12b25578f28e2d940f565ccc5",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.18.0",
+  "build": "57",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-57-32bd39e.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39347097964",
+  "created_at": "2026-10-20T00:24:03Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-57-32bd39e/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-57-32bd39e/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-57-32bd39e%2Fmanifest.plist",
+  "commit_title": "Make completing a reminder leave the list cleanly"
+}
