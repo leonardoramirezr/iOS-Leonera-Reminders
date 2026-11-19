@@ -6,7 +6,8 @@ struct CalendarAlarmSettings: Codable, Hashable, Sendable {
     var calendarIDs: [String]
     /// Minutes before the start of an event at which its first alarm rings (one of `leadMinuteOptions`).
     var leadMinutes: Int
-    /// Whether an event already acknowledged in the app still rings once, at the time it starts.
+    /// Whether an event already acknowledged in the app still rings at the time it starts, and repeats until it is
+    /// acknowledged again.
     var ringsAcknowledgedAtStart: Bool = true
 
     static let leadMinuteOptions = [1, 5, 10, 15]
@@ -91,7 +92,8 @@ struct CalendarEventAlarm: Identifiable, Hashable, Codable, Sendable {
     /// The occurrence the alarm belongs to (see `SyncedCalendarEvent.id`).
     var occurrenceID: String { SyncedCalendarEvent.id(for: event) }
     var isRepeat: Bool { ringIndex > 0 }
-    /// Rings when the event starts. It is planned only for acknowledged events, and it never repeats.
+    /// Rings when the event starts. It is planned only for acknowledged events; like the others, its repeats follow
+    /// each stop until the event is acknowledged again.
     var ringsAtStart: Bool { leadMinutes == Self.startLeadMinutes }
 
     /// The repeat that rings at `date`, once this alarm has been stopped.
@@ -163,6 +165,12 @@ struct SyncedCalendarEvent: Identifiable, Hashable, Sendable {
     var alarms: [CalendarEventAlarm]
 
     var id: String { Self.id(for: event) }
+
+    /// Acknowledged in the app: its alarms are the ones at its start (see `CalendarEventRings`).
+    var isAcknowledged: Bool { alarms.contains(where: \.ringsAtStart) }
+
+    /// Acknowledged before it starts: it can be acknowledged again only once it has started.
+    func isLocked(now: Date) -> Bool { isAcknowledged && event.startDate > now }
 
     static func id(for event: CalendarEventSnapshot) -> String {
         "\(event.eventID)|\(Int(event.startDate.timeIntervalSince1970))"

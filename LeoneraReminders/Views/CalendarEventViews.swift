@@ -108,7 +108,7 @@ struct CalendarEventDetailView: View {
                 Section {
                     ForEach(synced.alarms) { alarm in
                         LabeledContent {
-                            Text(alarm.isRepeat ? "Sin confirmar" : "\(alarm.leadMinutes) min antes")
+                            Text(alarmDescription(alarm))
                         } label: {
                             Label(DateText.time(alarm.fireDate), systemImage: "alarm")
                         }
@@ -120,14 +120,21 @@ struct CalendarEventDetailView: View {
                 }
 
                 Section {
-                    Button("Enterado") {
-                        Task {
-                            await alarms.acknowledgeCalendarEvent(synced)
-                            dismiss()
+                    TimelineView(.everyMinute) { context in
+                        Button("Enterado") {
+                            Task {
+                                await alarms.acknowledgeCalendarEvent(synced)
+                                dismiss()
+                            }
                         }
+                        .disabled(synced.isLocked(now: context.date))
                     }
                 } footer: {
-                    Text("Mientras no lo confirmes, la alarma vuelve a sonar un minuto después de cada vez que la detengas.")
+                    TimelineView(.everyMinute) { context in
+                        Text(synced.isLocked(now: context.date)
+                            ? "Ya lo confirmaste. Podrás volver a confirmarlo cuando empiece el evento."
+                            : "Mientras no lo confirmes, la alarma vuelve a sonar un minuto después de cada vez que la detengas.")
+                    }
                 }
 
                 Section {
@@ -146,6 +153,12 @@ struct CalendarEventDetailView: View {
                 }
             }
         }
+    }
+
+    /// How an alarm of the event is described in the details.
+    private func alarmDescription(_ alarm: CalendarEventAlarm) -> String {
+        if alarm.isRepeat { return "Sin confirmar" }
+        return alarm.ringsAtStart ? "Al empezar" : "\(alarm.leadMinutes) min antes"
     }
 
     /// The end time, with the day when it ends on another day.

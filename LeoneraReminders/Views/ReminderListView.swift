@@ -322,6 +322,8 @@ struct ReminderListView: View {
             .contentShape(Rectangle())
         }
         .swipeActions(edge: .trailing) {
+            // Acknowledged before the event starts: the action stays, greyed out, until the event starts.
+            let locked = synced.isLocked(now: now)
             // When acknowledging leaves the event without alarms, it drops off the list, so the row slides out
             // as when deleting instead of springing back into place and then vanishing.
             Button(role: leavesListWhenAcknowledged(synced, now: now) ? .destructive : nil) {
@@ -329,7 +331,8 @@ struct ReminderListView: View {
             } label: {
                 Label("Enterado", systemImage: "checkmark.circle")
             }
-            .tint(Color.calendarEvent)
+            .tint(locked ? .gray : Color.calendarEvent)
+            .disabled(locked)
         }
     }
 

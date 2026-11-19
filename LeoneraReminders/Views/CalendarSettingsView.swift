@@ -102,7 +102,7 @@ struct CalendarSettingsView: View {
         Section {
             Toggle("Sonar a la hora aunque ya esté confirmado", isOn: ringsAcknowledgedAtStart)
         } footer: {
-            Text("Un evento que ya confirmaste con «Enterado» vuelve a sonar una vez cuando empieza. Apagado, los eventos confirmados ya no suenan.")
+            Text("Un evento que ya confirmaste con «Enterado» suena cuando empieza y repite cada minuto hasta que lo vuelvas a confirmar. Antes de su hora no se puede confirmar otra vez. Apagado, los eventos confirmados ya no suenan.")
         }
     }
 

@@ -11,8 +11,6 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
 
     nonisolated private static let categoryID = "reminder"
     nonisolated private static let calendarEventCategoryID = "calendarEvent"
-    /// The notification at the start of an acknowledged event: it has no buttons.
-    nonisolated private static let calendarEventAtStartCategoryID = "calendarEventAtStart"
     nonisolated private static let snoozeActionID = "snooze"
     nonisolated private static let optionsActionID = "options"
     nonisolated private static let reminderKey = "reminderID"
@@ -67,7 +65,7 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
                 content.body = alarm.isRepeat
                     ? "Sin confirmar"
                     : alarm.ringsAtStart ? "Empieza ahora" : "Empieza en \(alarm.leadMinutes) min"
-                content.categoryIdentifier = alarm.ringsAtStart ? Self.calendarEventAtStartCategoryID : Self.calendarEventCategoryID
+                content.categoryIdentifier = Self.calendarEventCategoryID
                 content.userInfo = [Self.calendarEventKey: true, Self.alarmKey: alarm.id.uuidString]
             }
             content.sound = Self.sound(for: settings.sound)
@@ -129,10 +127,7 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
             intentIdentifiers: [],
             options: [.customDismissAction]
         )
-        let calendarEventAtStartCategory = UNNotificationCategory(
-            identifier: Self.calendarEventAtStartCategoryID, actions: [], intentIdentifiers: [], options: [.customDismissAction]
-        )
-        center.setNotificationCategories([category, calendarEventCategory, calendarEventAtStartCategory])
+        center.setNotificationCategories([category, calendarEventCategory])
     }
 
     private static func sound(for sound: AlarmSound) -> UNNotificationSound? {
@@ -157,8 +152,8 @@ final class NotificationDelivery: NSObject, UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse
     ) async {
         let info = response.notification.request.content.userInfo
-        // A calendar event notification: clearing it stops the alarm; «Abrir app» or a tap also opens the event in
-        // the app (the one at the start of the event is already acknowledged, so a tap only opens the app).
+        // A calendar event notification: clearing it stops the alarm, which plans its repeat; «Abrir app» or a tap
+        // also opens the event in the app, where it can be acknowledged.
         if info[Self.calendarEventKey] != nil {
             guard let alarmID = info[Self.alarmKey] as? String else { return }
             switch response.actionIdentifier {
