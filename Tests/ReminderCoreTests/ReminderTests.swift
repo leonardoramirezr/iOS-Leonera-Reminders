@@ -292,14 +292,40 @@ struct AppSettingsTests {
         #expect(decoded.swipeCompleteDirection == .leftToRight)
     }
 
-    @Test func celebratesCompletionDefaultsToOnAndRoundTrips() throws {
-        #expect(AppSettings.default.celebratesCompletion)
+    @Test func completionAnimationDefaultsToFireworksAndRoundTrips() throws {
+        #expect(AppSettings.default.completionAnimation == .fireworks)
         let legacy = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"stopAction":"snooze"}"#.utf8))
-        #expect(legacy.celebratesCompletion)
-        var settings = AppSettings.default
-        settings.celebratesCompletion = false
-        let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
-        #expect(!decoded.celebratesCompletion)
+        #expect(legacy.completionAnimation == .fireworks)
+        for animation in CompletionAnimation.allCases {
+            var settings = AppSettings.default
+            settings.completionAnimation = animation
+            let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
+            #expect(decoded.completionAnimation == animation)
+        }
+        let unknown = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"completionAnimation":"lasers"}"#.utf8))
+        #expect(unknown.completionAnimation == .fireworks)
+    }
+
+    @Test func fireworksSwitchOfEarlierVersionsBecomesTheAnimation() throws {
+        let off = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"celebratesCompletion":false}"#.utf8))
+        #expect(off.completionAnimation == .off)
+        let on = try JSONDecoder().decode(AppSettings.self, from: Data(#"{"celebratesCompletion":true}"#.utf8))
+        #expect(on.completionAnimation == .fireworks)
+        // Once an animation is chosen, the old switch no longer matters, and it is not saved again.
+        let chosen = try JSONDecoder().decode(
+            AppSettings.self,
+            from: Data(#"{"celebratesCompletion":false,"completionAnimation":"coins"}"#.utf8)
+        )
+        #expect(chosen.completionAnimation == .coins)
+        let saved = String(decoding: try JSONEncoder().encode(chosen), as: UTF8.self)
+        #expect(!saved.contains("celebratesCompletion"))
+    }
+
+    @Test func onlyTheFireworksCanHoldTheApp() {
+        #expect(CompletionAnimation.allCases.filter { !$0.alwaysAllowsInteraction } == [.fireworks])
+        // Eight animations besides the fireworks, plus turning it off.
+        #expect(CompletionAnimation.allCases.filter { $0 != .fireworks && $0 != .off }.count == 8)
+        #expect(Set(CompletionAnimation.allCases.map(\.label)).count == CompletionAnimation.allCases.count)
     }
 
     @Test func fireworksInteractionDefaultsToBlockingAndRoundTrips() throws {
