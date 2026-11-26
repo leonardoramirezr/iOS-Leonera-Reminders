@@ -553,7 +553,7 @@ struct ReminderListView: View {
     private func complete(_ reminder: Reminder) {
         withAnimation(.smooth) { store.complete(id: reminder.id) }
         completedTrigger += 1
-        FireworksPresenter.shared.celebrate()
+        CelebrationPresenter.shared.celebrateCompletion()
     }
 
     /// Completes the reminder confirmed in the action sheet only after the sheet has finished closing, so

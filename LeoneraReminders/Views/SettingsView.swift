@@ -29,6 +29,7 @@ struct SettingsView: View {
                 snoozeSection
                 gridSection
                 listSection
+                completionAnimationSection
                 checklistSection
                 permissionSection
                 aboutSection
@@ -239,8 +240,25 @@ struct SettingsView: View {
                 Text("De derecha a izquierda").tag(SwipeCompleteDirection.rightToLeft)
                 Text("De izquierda a derecha").tag(SwipeCompleteDirection.leftToRight)
             }
-            Toggle("Fuegos artificiales al completar", isOn: settings.celebratesCompletion)
-            if settingsStore.settings.celebratesCompletion {
+        } header: {
+            Text("Lista")
+        } footer: {
+            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y, si es de izquierda a derecha, «Posponer». Mantener pulsado un recordatorio pendiente también abre «Posponer».")
+        }
+    }
+
+    private var completionAnimationSection: some View {
+        Section {
+            NavigationLink {
+                CompletionAnimationPickerView(selection: settings.completionAnimation)
+            } label: {
+                LabeledContent {
+                    Text(settingsStore.settings.completionAnimation.label)
+                } label: {
+                    Label("Animación", systemImage: settingsStore.settings.completionAnimation.systemImage)
+                }
+            }
+            if settingsStore.settings.completionAnimation == .fireworks {
                 Picker("Mientras se ven", selection: settings.fireworksInteraction) {
                     ForEach(FireworksInteraction.allCases) { interaction in
                         Text(interaction.label).tag(interaction)
@@ -248,9 +266,20 @@ struct SettingsView: View {
                 }
             }
         } header: {
-            Text("Lista")
+            Text("Al completar un recordatorio")
         } footer: {
-            Text("Deslizar una fila en el sentido contrario muestra «Eliminar» y, si es de izquierda a derecha, «Posponer». Mantener pulsado un recordatorio pendiente también abre «Posponer». Al completar un recordatorio hay fuegos artificiales, nunca iguales. «Bloquear la app» impide usarla mientras se ven; «Tocar para terminar» lo impide hasta que un toque los acaba; «Permitir usar la app» no impide nada.")
+            Text(completionAnimationFooter)
+        }
+    }
+
+    private var completionAnimationFooter: String {
+        switch settingsStore.settings.completionAnimation {
+        case .off:
+            "Completar un recordatorio sólo vibra."
+        case .fireworks:
+            "Fuegos artificiales, nunca iguales. «Bloquear la app» impide usarla mientras se ven; «Tocar para terminar» lo impide hasta que un toque los acaba; «Permitir usar la app» no impide nada."
+        default:
+            "La animación se ve encima de la app sin detenerla: puedes seguir usándola mientras dura."
         }
     }
 

@@ -96,7 +96,7 @@ struct ReminderActionSheet: View {
                         // Deja ver la palomita un instante antes de cerrar.
                         try? await Task.sleep(for: .milliseconds(350))
                         dismiss()
-                        FireworksPresenter.shared.celebrate()
+                        CelebrationPresenter.shared.celebrateCompletion()
                     }
                 }
 

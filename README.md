@@ -61,6 +61,14 @@ App de recordatorios para iOS hecha con SwiftUI que usa **AlarmKit** para que ca
     elige otro tiempo de "Recordar en…" (1, 5, 10, 15, 30 y 60 min, 2 h y 3 h por defecto; se pueden quitar y agregar).
   - En la lista, deslizar la fila de derecha a izquierda completa directamente (se puede invertir en Configuración → Lista).
   - Desde iOS 26.1 el control Detener lo dibuja el sistema (no se puede cambiar su texto); la app sólo decide qué hace.
+- **Completion animations** (*Configuración → Al completar un recordatorio → Animación*): completing a reminder (by
+  swiping its row or with «Desliza para completar») plays the chosen animation over the app: fireworks, confetti,
+  coins, balloons, stars, a check mark, hearts, a glow around the edges of the screen or party emojis, or none.
+  Tapping one in that list chooses it and plays it. Every animation but the fireworks lets the app be used while it
+  plays: it runs in a window above the app that lets every touch through, and nothing dims the screen. The fireworks
+  keep their *Mientras se ven* setting (block the app, end with a tap, or let the app be used). Acknowledging an
+  Apple Calendar event plays no animation. They are drawn in code with SpriteKit (`Views/Celebration`), with fewer
+  pieces and less movement under Reduce Motion, fewer pieces in Low Power Mode, and a light haptic touch.
 - **Si ignoras la alarma, vuelve a sonar**: cada recordatorio deja programadas alarmas extra cada minuto (hasta 10 veces,
   configurable en *Configuración → Si ignoras la alarma*). Como están programadas de antemano, suenan aunque la app
   no esté abierta; al completar o posponer se cancelan todas.
@@ -129,7 +137,8 @@ LeoneraReminders/
   Alarms/     AlarmKit: sincronización, metadatos e intents de los botones
   Assistant/  Groq (peticiones), clave en el llavero, grabación del dictado y fotos
   Stores/     Persistencia (JSON en Application Support y UserDefaults)
-  Views/      SwiftUI (Views/Assistant: barra para crear, voz, fotos, revisión y configuración del asistente)
+  Views/      SwiftUI (Views/Assistant: barra para crear, voz, fotos, revisión y configuración del asistente;
+              Views/Celebration: the SpriteKit animations played when a reminder is completed)
 LeoneraWidgets/  Lock screen widgets (WidgetKit extension) that open the app on voice capture or on its home screen
 Config/Info.plist
 Tests/ReminderCoreTests/

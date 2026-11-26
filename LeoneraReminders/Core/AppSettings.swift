@@ -117,6 +117,54 @@ enum SwipeCompleteDirection: String, Codable, CaseIterable, Sendable, Identifiab
     var id: String { rawValue }
 }
 
+/// The animation that plays over the app when a reminder is completed. Acknowledging an Apple Calendar event
+/// plays none.
+enum CompletionAnimation: String, Codable, CaseIterable, Sendable, Identifiable {
+    /// A fireworks show, never the same twice.
+    case fireworks
+    /// Two cannons at the bottom corners shoot confetti that flutters down.
+    case confetti
+    /// A fountain of spinning gold coins.
+    case coins
+    /// Balloons float up from the bottom of the screen.
+    case balloons
+    /// Golden stars burst from the middle of the screen.
+    case stars
+    /// A big check mark draws itself in a circle.
+    case checkmark
+    /// Hearts float up, swaying.
+    case hearts
+    /// A colored light runs around the edges of the screen.
+    case glow
+    /// Party emojis rain down.
+    case emoji
+    /// No animation: completing only vibrates.
+    case off
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .fireworks: "Fuegos artificiales"
+        case .confetti: "Confeti"
+        case .coins: "Monedas"
+        case .balloons: "Globos"
+        case .stars: "Estrellas"
+        case .checkmark: "Palomita"
+        case .hearts: "Corazones"
+        case .glow: "Resplandor"
+        case .emoji: "Emojis"
+        case .off: "Ninguna"
+        }
+    }
+
+    /// Whether the app keeps responding to touches while the animation plays. Only the fireworks can hold
+    /// them, as `FireworksInteraction` decides; every other animation plays over the app without stopping it.
+    var alwaysAllowsInteraction: Bool {
+        self != .fireworks
+    }
+}
+
 /// Whether the app responds while the fireworks of a completed reminder are playing.
 enum FireworksInteraction: String, Codable, CaseIterable, Sendable, Identifiable {
     /// The app does not respond until the show is over.
@@ -207,8 +255,8 @@ struct AppSettings: Codable, Hashable, Sendable {
     var ignoresSilentMode = true
     /// Hacia dónde se desliza una fila para completarla.
     var swipeCompleteDirection: SwipeCompleteDirection = .rightToLeft
-    /// Plays a fireworks show when a reminder is completed.
-    var celebratesCompletion = true
+    /// The animation that plays when a reminder is completed.
+    var completionAnimation: CompletionAnimation = .fireworks
     /// Whether the app responds while the fireworks play.
     var fireworksInteraction: FireworksInteraction = .blocksApp
     /// Modelos de Groq para crear recordatorios con voz, texto o fotos.
@@ -233,7 +281,7 @@ struct AppSettings: Codable, Hashable, Sendable {
         sound: .bell,
         ignoresSilentMode: true,
         swipeCompleteDirection: .rightToLeft,
-        celebratesCompletion: true,
+        completionAnimation: .fireworks,
         fireworksInteraction: .blocksApp,
         assistant: .default,
         calendarAlarms: .default,
@@ -255,12 +303,22 @@ struct AppSettings: Codable, Hashable, Sendable {
 extension AppSettings {
     private enum CodingKeys: String, CodingKey {
         case snoozeOptions, defaultSnooze, stopAction, secondaryAction, quickAdjustGrid, overdueAdditionBase, followUp, sound, ignoresSilentMode
-        case swipeCompleteDirection, celebratesCompletion, fireworksInteraction, assistant, calendarAlarms, autoSavesChecklist
+        case swipeCompleteDirection, completionAnimation, fireworksInteraction, assistant, calendarAlarms, autoSavesChecklist
+    }
+
+    /// Keys that only settings saved by earlier versions have.
+    private enum LegacyCodingKeys: String, CodingKey {
+        /// The switch that turned the fireworks on and off, before an animation could be chosen.
+        case celebratesCompletion
     }
 
     init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
+        let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
         let fallback = AppSettings.default
+        // Fireworks that were turned off stay off; turned on, they stay the animation.
+        let legacyAnimation: CompletionAnimation? = (try? legacy.decodeIfPresent(Bool.self, forKey: .celebratesCompletion))
+            .map { celebrates in celebrates ? CompletionAnimation.fireworks : CompletionAnimation.off }
         self.init(
             snoozeOptions: (try? c.decodeIfPresent([TimeAmount].self, forKey: .snoozeOptions)) ?? fallback.snoozeOptions,
             defaultSnooze: (try? c.decodeIfPresent(TimeAmount.self, forKey: .defaultSnooze)) ?? fallback.defaultSnooze,
@@ -273,7 +331,8 @@ extension AppSettings {
             ignoresSilentMode: (try? c.decodeIfPresent(Bool.self, forKey: .ignoresSilentMode)) ?? fallback.ignoresSilentMode,
             swipeCompleteDirection: (try? c.decodeIfPresent(SwipeCompleteDirection.self, forKey: .swipeCompleteDirection))
                 ?? fallback.swipeCompleteDirection,
-            celebratesCompletion: (try? c.decodeIfPresent(Bool.self, forKey: .celebratesCompletion)) ?? fallback.celebratesCompletion,
+            completionAnimation: (try? c.decodeIfPresent(CompletionAnimation.self, forKey: .completionAnimation))
+                ?? legacyAnimation ?? fallback.completionAnimation,
             fireworksInteraction: (try? c.decodeIfPresent(FireworksInteraction.self, forKey: .fireworksInteraction))
                 ?? fallback.fireworksInteraction,
             assistant: (try? c.decodeIfPresent(AssistantSettings.self, forKey: .assistant)) ?? fallback.assistant,
