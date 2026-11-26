@@ -91,6 +91,24 @@ struct CalendarEventDetailView: View {
                     }
                 }
 
+                Section {
+                    TimelineView(.everyMinute) { context in
+                        Button("Enterado") {
+                            Task {
+                                await alarms.acknowledgeCalendarEvent(synced)
+                                dismiss()
+                            }
+                        }
+                        .disabled(synced.isLocked(now: context.date))
+                    }
+                } footer: {
+                    TimelineView(.everyMinute) { context in
+                        Text(synced.isLocked(now: context.date)
+                            ? "Ya lo confirmaste. Podrás volver a confirmarlo cuando empiece el evento."
+                            : "Mientras no lo confirmes, la alarma vuelve a sonar un minuto después de cada vez que la detengas.")
+                    }
+                }
+
                 if let location = event.location {
                     Section("Ubicación") {
                         Text(location)
@@ -117,24 +135,6 @@ struct CalendarEventDetailView: View {
                     Text("Alarmas")
                 } footer: {
                     Text("El evento viene de Calendario de Apple; para cambiarlo, edítalo ahí.")
-                }
-
-                Section {
-                    TimelineView(.everyMinute) { context in
-                        Button("Enterado") {
-                            Task {
-                                await alarms.acknowledgeCalendarEvent(synced)
-                                dismiss()
-                            }
-                        }
-                        .disabled(synced.isLocked(now: context.date))
-                    }
-                } footer: {
-                    TimelineView(.everyMinute) { context in
-                        Text(synced.isLocked(now: context.date)
-                            ? "Ya lo confirmaste. Podrás volver a confirmarlo cuando empiece el evento."
-                            : "Mientras no lo confirmes, la alarma vuelve a sonar un minuto después de cada vez que la detengas.")
-                    }
                 }
 
                 Section {
