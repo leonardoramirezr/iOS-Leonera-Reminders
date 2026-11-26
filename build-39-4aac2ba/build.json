@@ -1,0 +1,18 @@
+{
+  "tag": "build-39-4aac2ba",
+  "channel": "branch",
+  "branch": "claude/keen-mccarthy-jl6q30",
+  "commit": "4aac2ba484bad328645f7355ec6c59ee9e3470a0",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.12.0",
+  "build": "39",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-39-4aac2ba.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39317143535",
+  "created_at": "2026-10-19T20:13:19Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-39-4aac2ba/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-39-4aac2ba/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-39-4aac2ba%2Fmanifest.plist",
+  "commit_title": "Añade CLAUDE.md con el formato del nombre de build en los resúmenes"
+}

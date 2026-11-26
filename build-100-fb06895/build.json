@@ -1,0 +1,18 @@
+{
+  "tag": "build-100-fb06895",
+  "channel": "branch",
+  "branch": "claude/upbeat-planck-a5j9y0",
+  "commit": "fb0689558024fb36289b7024522da99b6f9a64fb",
+  "commit_title": "Open the reminder menu on tap and keep the snooze sheet on long press",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.36.0",
+  "build": "100",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-100-fb06895.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42156338859",
+  "created_at": "2026-11-06T03:27:02Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-100-fb06895/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-100-fb06895/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-100-fb06895%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "0.35.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "6330cd4d380d5458eaced423e38b025b927ce4a6",
+  "commit_title": "Add a setting to save checkbox changes automatically while editing (#39)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.35.0",
+  "build": "96",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.35.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42050337996",
+  "created_at": "2026-11-05T15:03:02Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.35.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.35.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.35.0%2Fmanifest.plist"
+}

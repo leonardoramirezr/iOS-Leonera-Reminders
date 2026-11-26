@@ -1,0 +1,18 @@
+{
+  "tag": "build-107-9d6dea2",
+  "channel": "branch",
+  "branch": "claude/reminder-note-feature-ojl3yf",
+  "commit": "9d6dea2858b32de9934c319b019aac3222c429e9",
+  "commit_title": "Add a note to reminders, edited on its own screen with voice dictation",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.39.0",
+  "build": "107",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-107-9d6dea2.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42961184197",
+  "created_at": "2026-11-11T04:47:26Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-107-9d6dea2/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-107-9d6dea2/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-107-9d6dea2%2Fmanifest.plist"
+}

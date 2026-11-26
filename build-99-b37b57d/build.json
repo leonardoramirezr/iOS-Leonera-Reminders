@@ -1,0 +1,18 @@
+{
+  "tag": "build-99-b37b57d",
+  "channel": "branch",
+  "branch": "claude/upbeat-planck-a5j9y0",
+  "commit": "b37b57d470ff51788753fed2ba683d3f79824c13",
+  "commit_title": "Change default snooze options to 15 and 30 minutes",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.36.0",
+  "build": "99",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-99-b37b57d.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/42154445469",
+  "created_at": "2026-11-06T03:07:57Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-99-b37b57d/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-99-b37b57d/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-99-b37b57d%2Fmanifest.plist"
+}

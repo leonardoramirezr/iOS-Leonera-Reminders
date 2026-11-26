@@ -1,0 +1,18 @@
+{
+  "tag": "0.42.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "b59ca6aefd8d7beb1bebf934df96979315968043",
+  "commit_title": "Move the acknowledge button below the date section in the event details (#46)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.42.0",
+  "build": "115",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.42.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/45881425024",
+  "created_at": "2026-11-26T19:10:36Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.42.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.42.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.42.0%2Fmanifest.plist"
+}

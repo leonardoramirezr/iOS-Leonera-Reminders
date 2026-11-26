@@ -1,0 +1,18 @@
+{
+  "tag": "build-110-a2e069f",
+  "channel": "branch",
+  "branch": "claude/busy-ramanujan-r008bq",
+  "commit": "a2e069fa2c9ac674fdf67c9e214018b35a40c9cd",
+  "commit_title": "Repeat acknowledged event alarms until acknowledged again",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.40.0",
+  "build": "110",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-110-a2e069f.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/44163194818",
+  "created_at": "2026-11-17T20:00:31Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-110-a2e069f/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-110-a2e069f/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-110-a2e069f%2Fmanifest.plist"
+}

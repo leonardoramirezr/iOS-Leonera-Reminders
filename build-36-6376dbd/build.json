@@ -1,0 +1,18 @@
+{
+  "tag": "build-36-6376dbd",
+  "channel": "branch",
+  "branch": "vibrar-editor-hora-fija",
+  "commit": "6376dbd70595a8f6cc04c2ad7a32b86ac8880e9c",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.11.0",
+  "build": "36",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-36-6376dbd.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/39162692730",
+  "created_at": "2026-10-18T20:22:24Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-36-6376dbd/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-36-6376dbd/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-36-6376dbd%2Fmanifest.plist",
+  "commit_title": "Vibrar en el editor y hora fija al día siguiente si ya pasó"
+}

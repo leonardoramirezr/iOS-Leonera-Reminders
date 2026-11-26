@@ -1,0 +1,18 @@
+{
+  "tag": "0.28.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "b5eb59907d802e6b8c02074bcb623ea6545ccd5b",
+  "commit_title": "Make links in Apple Calendar event notes tappable (#32)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.28.0",
+  "build": "81",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.28.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40605586782",
+  "created_at": "2026-10-28T00:00:18Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.28.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.28.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.28.0%2Fmanifest.plist"
+}

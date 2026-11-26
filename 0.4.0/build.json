@@ -1,0 +1,18 @@
+{
+  "tag": "0.4.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "7a0694388aa57e5dae41ad264b16325a60dcf53d",
+  "title": "Leonera",
+  "bundle_id": "com.leonardoramirezr.leonerareminders",
+  "version": "0.4.0",
+  "build": "16",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.4.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/LeoneraReminders/actions/runs/38436398131",
+  "created_at": "2026-10-13T17:11:52Z",
+  "page_url": "https://leonardoramirezr.github.io/LeoneraReminders/0.4.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/LeoneraReminders/0.4.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FLeoneraReminders%2F0.4.0%2Fmanifest.plist",
+  "commit_title": "Merge pull request #5 from leonardoramirezr/claude/youthful-turing-tx6rf5"
+}

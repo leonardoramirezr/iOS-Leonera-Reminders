@@ -1,0 +1,18 @@
+{
+  "tag": "0.24.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "c431909bf165e7d348cee73e1e049ea839fb39b6",
+  "commit_title": "Let checkboxes of a reminder be reordered in the editor (#27)",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.24.0",
+  "build": "71",
+  "devices": 2,
+  "ipa": "LeoneraReminders-0.24.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40453417439",
+  "created_at": "2026-10-27T05:08:45Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.24.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.24.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.24.0%2Fmanifest.plist"
+}

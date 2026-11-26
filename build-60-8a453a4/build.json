@@ -1,0 +1,18 @@
+{
+  "tag": "build-60-8a453a4",
+  "channel": "branch",
+  "branch": "claude/kind-gates-q1w1qo",
+  "commit": "8a453a4a945bd18e58378b88cc8b851a1be6c4bf",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.19.0",
+  "build": "60",
+  "devices": 1,
+  "ipa": "LeoneraReminders-build-60-8a453a4.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40071051940",
+  "created_at": "2026-10-24T06:42:56Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-60-8a453a4/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-60-8a453a4/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-60-8a453a4%2Fmanifest.plist",
+  "commit_title": "Fix checklist row bindings in the editor"
+}

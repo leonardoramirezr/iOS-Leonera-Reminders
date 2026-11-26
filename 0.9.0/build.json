@@ -1,0 +1,18 @@
+{
+  "tag": "0.9.0",
+  "channel": "stable",
+  "branch": "main",
+  "commit": "78033b97e32e58fd8d93932a579737a87dd17637",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.9.0",
+  "build": "30",
+  "devices": 1,
+  "ipa": "LeoneraReminders-0.9.0.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/38623386343",
+  "created_at": "2026-10-14T19:26:13Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.9.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/0.9.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2F0.9.0%2Fmanifest.plist",
+  "commit_title": "Barra para crear recordatorios al estilo de Instagram (#9)"
+}

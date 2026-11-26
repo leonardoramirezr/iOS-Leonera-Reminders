@@ -1,0 +1,18 @@
+{
+  "tag": "build-116-c7ea5a3",
+  "channel": "branch",
+  "branch": "claude/beautiful-curie-b92h2y",
+  "commit": "c7ea5a3cc5bdabfc4fad94aaf1740e38389d686e",
+  "commit_title": "Add eight completion animations, chosen in Settings, that never block the app",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.42.0",
+  "build": "116",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-116-c7ea5a3.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/45886642261",
+  "created_at": "2026-11-26T19:53:55Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-116-c7ea5a3/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-116-c7ea5a3/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-116-c7ea5a3%2Fmanifest.plist"
+}

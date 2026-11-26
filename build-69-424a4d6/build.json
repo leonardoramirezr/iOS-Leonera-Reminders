@@ -1,0 +1,18 @@
+{
+  "tag": "build-69-424a4d6",
+  "channel": "branch",
+  "branch": "claude/reorder-subreminders-hhd8x4",
+  "commit": "424a4d66216d2d9c7b00b113bd8e1f7e652405fa",
+  "commit_title": "Show the commit title on each build's GitHub Pages page",
+  "title": "Leonera Reminders",
+  "bundle_id": "com.leonardoramirezr.ios-leonera-reminders",
+  "version": "0.23.0",
+  "build": "69",
+  "devices": 2,
+  "ipa": "LeoneraReminders-build-69-424a4d6.ipa",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Reminders/actions/runs/40453122043",
+  "created_at": "2026-10-27T05:05:26Z",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-69-424a4d6/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Reminders/build-69-424a4d6/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Reminders%2Fbuild-69-424a4d6%2Fmanifest.plist"
+}
